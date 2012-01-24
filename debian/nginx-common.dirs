@@ -1,0 +1,9 @@
+etc/nginx
+etc/nginx/sites-available
+etc/nginx/sites-enabled
+etc/nginx/conf.d
+etc/ufw/applications.d
+etc/logrotate.d
+usr/share/nginx
+var/log/nginx
+var/lib/nginx

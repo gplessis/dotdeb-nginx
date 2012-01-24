@@ -1,0 +1,74 @@
+##
+#  File:
+#    wordpress
+#  Description:
+#    This file is meant to offer a basic guide to get a Wordpress site up and
+#    running on Nginx. This file should be almost drop-in if the user is able
+#    to understand the three lines that need to be changed.
+##
+
+server {
+
+	# This is the URI of your website.
+	server_name domain.com;
+
+	# This is the root of the Wordpress directory.
+	root /var/www/wordpress;
+ 
+	# In some cases a favicon does not exist but this is not something you
+	# normally need to worry about. It's also a microscopic image and will
+	# just clutter the logs.
+	location = /favicon.ico {
+		log_not_found off;
+		access_log off;
+	}
+ 
+	# This is for the robots.txt file used by search engines.
+	location = /robots.txt {
+		# If you have one, you want to allow them access to it.
+		allow all;
+		# If you don't have one, you don't want to fill your logs with
+		# not found errors.
+		log_not_found off;
+		access_log off;
+	}
+ 
+	# This location block protects against a known attack. It happens if
+	# the attacker uploads a non-php file and attempts to run it as a
+	# php file on the server.
+	location ~ \..*/.*\.php$ {
+		return 403;
+	}
+ 
+	# This is our primary location block. The try_files directive will
+	# attempt to serve the data in the order listed. First try the exact
+	# request (such as an image or text file). If it doesn't exist, see if
+	# the directory exists. If not, then we move to the last options which
+	# passes the request to /index.php with the requested query.
+	location / {
+		try_files $uri $uri/ /index.php?q=$uri&$args;
+	}
+ 
+	# If a PHP file is served, this block will handle the request. This block
+	# works on the assumption you are using php-cgi listening on /tmp/phpcgi.socket.
+	# Please see the php example (usr/share/doc/nginx/exmaples/php) for more
+	# information about setting up PHP.
+	# NOTE: You should have "cgi.fix_pathinfo = 0;" in php.ini
+	location ~ \.php$ {
+		fastcgi_split_path_info ^(.+\.php)(/.+)$;
+		include fastcgi_params;
+		# Intercepting errors will cause PHP errors to appear in Nginx logs
+		fastcgi_intercept_errors on;
+		fastcgi_pass unix:/tmp/phpcgi.socket;
+	}
+ 
+	# As mentioned above, Nignx is king of static. If we're serving a static
+	# file that ends with one of the following extensions, it is best to set
+	# a very high expires time. This will generate fewer requests for the
+	# file. These requests will be logged if found, but not if they don't
+	# exist.
+	location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+		expires max;
+		log_not_found off;
+	}
+}

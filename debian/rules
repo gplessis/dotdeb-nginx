@@ -1,0 +1,236 @@
+#!/usr/bin/make -f
+
+CFLAGS = -Wall -g
+
+FLAVOURS:=full light extras
+
+BUILDDIR_full = $(CURDIR)/debian/build-full
+BUILDDIR_light = $(CURDIR)/debian/build-light
+BUILDDIR_extras = $(CURDIR)/debian/build-extras
+MODULESDIR = $(CURDIR)/debian/modules
+BASEDIR = $(CURDIR)
+
+DEB_BUILD_ARCH ?=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
+ifeq ($(DEB_BUILD_ARCH),sparc)
+	CONFIGURE_OPTS = --with-cc-opt="-m32 -mcpu=ultrasparc"
+endif
+
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+	CFLAGS += -O0
+else
+	CFLAGS += -O2
+endif
+
+config.sub:
+	dh_testdir
+ifneq "$(wildcard /usr/share/misc/config.sub)" ""
+		cp -f /usr/share/misc/config.sub config.sub
+endif
+
+config.guess:
+	dh_testdir
+ifneq "$(wildcard /usr/share/misc/config.guess)" ""
+		cp -f /usr/share/misc/config.guess config.guess
+endif
+
+config.env.%:
+	dh_testdir
+	mkdir -p $(BUILDDIR_$*)
+	cp -Pa $(CURDIR)/auto $(BUILDDIR_$*)/
+	cp -Pa $(CURDIR)/conf $(BUILDDIR_$*)/
+	cp -Pa $(CURDIR)/configure $(BUILDDIR_$*)/
+	cp -Pa $(CURDIR)/contrib $(BUILDDIR_$*)/
+	cp -Pa $(CURDIR)/src $(BUILDDIR_$*)/
+	cp -Pa $(CURDIR)/man $(BUILDDIR_$*)/
+
+config.status.full: config.env.full config.sub config.guess
+	cd $(BUILDDIR_full) && ./configure \
+	    --prefix=/etc/nginx \
+	    --conf-path=/etc/nginx/nginx.conf \
+	    --error-log-path=/var/log/nginx/error.log \
+	    --http-client-body-temp-path=/var/lib/nginx/body \
+	    --http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
+	    --http-log-path=/var/log/nginx/access.log \
+	    --http-proxy-temp-path=/var/lib/nginx/proxy \
+	    --http-scgi-temp-path=/var/lib/nginx/scgi \
+	    --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
+	    --lock-path=/var/lock/nginx.lock \
+	    --pid-path=/var/run/nginx.pid \
+	    --with-debug \
+	    --with-http_addition_module \
+	    --with-http_dav_module \
+	    --with-http_geoip_module \
+	    --with-http_gzip_static_module \
+	    --with-http_image_filter_module \
+	    --with-http_realip_module \
+	    --with-http_stub_status_module \
+	    --with-http_ssl_module \
+	    --with-http_sub_module \
+	    --with-http_xslt_module \
+	    --with-ipv6 \
+	    --with-sha1=/usr/include/openssl \
+	    --with-md5=/usr/include/openssl \
+	    --with-mail \
+	    --with-mail_ssl_module \
+	    --add-module=$(MODULESDIR)/nginx-echo \
+	    --add-module=$(MODULESDIR)/nginx-upstream-fair \
+	    --add-module=$(MODULESDIR)/nginx-syslog \
+            $(CONFIGURE_OPTS) >$@
+	touch $@
+
+config.status.light: config.env.light config.sub config.guess
+	cd $(BUILDDIR_light) && ./configure \
+	    --prefix=/etc/nginx \
+	    --conf-path=/etc/nginx/nginx.conf \
+	    --error-log-path=/var/log/nginx/error.log \
+	    --http-client-body-temp-path=/var/lib/nginx/body \
+	    --http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
+	    --http-log-path=/var/log/nginx/access.log \
+	    --http-proxy-temp-path=/var/lib/nginx/proxy \
+	    --lock-path=/var/lock/nginx.lock \
+	    --pid-path=/var/run/nginx.pid \
+	    --with-http_gzip_static_module \
+	    --with-http_ssl_module \
+	    --with-ipv6 \
+	    --without-http_browser_module \
+	    --without-http_geo_module \
+	    --without-http_limit_req_module \
+	    --without-http_limit_zone_module \
+	    --without-http_memcached_module \
+	    --without-http_referer_module \
+	    --without-http_scgi_module \
+	    --without-http_split_clients_module \
+	    --with-http_stub_status_module \
+	    --without-http_ssi_module \
+	    --without-http_userid_module \
+	    --without-http_uwsgi_module \
+	    --add-module=$(MODULESDIR)/nginx-echo \
+            $(CONFIGURE_OPTS) >$@
+	touch $@
+
+config.status.extras: config.env.extras config.sub config.guess
+	cd $(BUILDDIR_extras) && ./configure \
+	    --prefix=/etc/nginx \
+	    --conf-path=/etc/nginx/nginx.conf \
+	    --error-log-path=/var/log/nginx/error.log \
+	    --http-client-body-temp-path=/var/lib/nginx/body \
+	    --http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
+	    --http-log-path=/var/log/nginx/access.log \
+	    --http-proxy-temp-path=/var/lib/nginx/proxy \
+	    --http-scgi-temp-path=/var/lib/nginx/scgi \
+	    --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
+	    --lock-path=/var/lock/nginx.lock \
+	    --pid-path=/var/run/nginx.pid \
+	    --with-debug \
+	    --with-file-aio \
+	    --with-http_addition_module \
+	    --with-http_dav_module \
+	    --with-http_flv_module \
+	    --with-http_geoip_module \
+	    --with-http_gzip_static_module \
+	    --with-http_image_filter_module \
+	    --with-http_mp4_module \
+	    --with-http_perl_module \
+	    --with-http_random_index_module \
+	    --with-http_realip_module \
+	    --with-http_secure_link_module \
+	    --with-http_stub_status_module \
+	    --with-http_ssl_module \
+	    --with-http_sub_module \
+	    --with-http_xslt_module \
+	    --with-ipv6 \
+	    --with-sha1=/usr/include/openssl \
+	    --with-md5=/usr/include/openssl \
+	    --with-mail \
+	    --with-mail_ssl_module \
+	    --add-module=$(MODULESDIR)/nginx-development-kit \
+	    --add-module=$(MODULESDIR)/nginx-upstream-fair \
+	    --add-module=$(MODULESDIR)/nginx-echo \
+	    --add-module=$(MODULESDIR)/nginx-lua \
+	    --add-module=$(MODULESDIR)/nginx-push-stream-module \
+	    --add-module=$(MODULESDIR)/nginx-upload-progress \
+	    --add-module=$(MODULESDIR)/chunkin-nginx-module \
+	    --add-module=$(MODULESDIR)/headers-more-nginx-module \
+	    --add-module=$(MODULESDIR)/nginx-syslog \
+	    --add-module=/usr/lib/phusion-passenger/ext/nginx \
+            $(CONFIGURE_OPTS) >$@
+	touch $@
+
+config.status.%:
+	echo "configuration for flavour $* not yet defined."
+
+build-arch.%: config.status.%
+	dh_testdir
+	dh_prep
+	$(MAKE) -C $(BUILDDIR_$*) build
+
+build-arch: $(foreach flavour,$(FLAVOURS),build-arch.$(flavour))
+	dh_testdir
+	touch $@
+
+build-dbg.%:
+	dh_testdir
+	dh_strip --package=nginx-$(*) --dbg-package=nginx-$(*)-dbg
+
+build-dbg: $(foreach flavour,$(FLAVOURS),build-dbg.$(flavour))
+	dh_testdir
+	touch $@
+
+build-indep:
+
+build: build-indep build-arch
+	dh_testdir
+	touch $@
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp
+	rm -f config.sub config.guess
+	dh_clean
+	rm -rf $(CURDIR)/debian/build-*
+mime-types:
+	
+
+install: mime-types
+	dh_testdir
+	dh_testroot
+	dh_prep
+	dh_installdirs
+	dh_install
+
+binary-indep: install
+	dh_testdir -i
+	dh_testroot -i
+	dh_installman -i
+	dh_installchangelogs -i -k CHANGES
+	dh_installdocs -i
+	dh_installexamples -i
+	dh_installinit -r --no-start -i --init-script=nginx
+	cp debian/logrotate debian/nginx-common/etc/logrotate.d/nginx
+	dh_link -i
+	dh_compress -i
+	dh_fixperms -i
+	dh_installdeb -i
+	dh_gencontrol -i
+	dh_md5sums -i
+	dh_builddeb -i
+
+binary-arch: install build-dbg
+	dh_testdir -a
+	dh_testroot -a
+	dh_installchangelogs -a -k CHANGES
+	dh_installdocs -a
+	dh_link -aA
+	dh_compress -a
+	dh_perl -a
+	dh_fixperms -a
+	dh_installdeb -a
+	dh_shlibdeps -a
+	dh_gencontrol -a
+	dh_md5sums -a
+	dh_builddeb -a
+
+binary: binary-indep binary-arch
+
+.PHONY: build clean binary-indep binary-arch binary install

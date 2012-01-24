@@ -1,0 +1,30 @@
+##
+#  File:
+#    mail
+#  Description:
+#    Provides a basic example of a mail proxy.
+##
+
+# All mail proxy configuration should be inside of the mail block.
+# Most settings here are pretty self explanatory.
+# See http://wiki.nginx.org/MailCoreModule
+mail {
+	# See sample authentication script at:
+	# http://wiki.nginx.org/ImapAuthenticateWithApachePhpScript
+ 
+	# auth_http localhost/auth.php;
+	# pop3_capabilities "TOP" "USER";
+	# imap_capabilities "IMAP4rev1" "UIDPLUS";
+ 
+	server {
+		listen     localhost:110;
+		protocol   pop3;
+		proxy      on;
+	}
+ 
+	server {
+		listen     localhost:143;
+		protocol   imap;
+		proxy      on;
+	}
+}

@@ -1,0 +1,67 @@
+Format: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?op=file&rev=174
+Upstream-Name: nginx
+Source: http://nginx.net/
+Upstream-Contact: Igor Sysoev <igor@sysoev.ru>
+
+Files: *
+Copyright: © 2002-2011, Igor Sysoev <igor@sysoev.ru>
+License:
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
+ .
+ 1. Redistributions of source code must retain the above copyright notice, this
+    list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+ .
+ THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND ANY
+ EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
+ DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+
+Files: contrib/geo2nginx.pl
+Copyright: © 2005, Andrei Nigmatulin
+License:
+ Same as upstream license.
+
+Files: modules/nginx-upstream-fair/ngx_http_upstream_fair_module.c
+Copyright: © 2007, Igor Sysoev, Grzegorz Nosek
+License:
+ Same as upstream license.
+
+Files: modules/nginx-development-kit/*
+Copyright: © Marcus Clyne
+License:
+ Same as upstream license.
+
+Files: modules/nginx-http-push/*
+Copyright: © 2009, Leo Ponomarev
+License:
+ Same as upstream license.
+
+Files: nginx-upload-progress/ngx_http_uploadprogress_module.c
+Copyright: © 2007, Brice Figureau
+Copyright: © 2002-2007, Igor Sysoev
+License:
+ Same as upstream license.
+
+Files: modules/agentzh-chunkin-nginx-module-*/*
+ modules/agentzh-headers-more-nginx-module-*/*
+Copyright: © 2009, Taobao Inc., Alibaba Group <http://www.taobao.com>.
+Copyright: © 2009, 2010, 2011, Zhang "agentzh" Yichun (章亦春) <agentzh@gmail.com>.
+License:
+ Same as upstream license.
+
+Files: debian/*
+Copyright: © 2006-2010, Jose Parrella <joseparrella@cantv.net>,
+                        Fabio Tranchitella <kobold@debian.org>,
+           © 2009-2011, Kartik Mistry <kartik@debian.org>,
+           © 2011, Michael Lustfield <michael@lustfield.net>.
+License:
+ Same as upstream license.

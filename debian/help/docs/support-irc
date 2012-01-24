@@ -1,0 +1,28 @@
+##
+#  File:
+#    support-irc
+#  Description:
+#    This file explains how to get support on IRC.
+##
+
+Nginx has a moderately active IRC channel on Freenode.
+
+You can get there by:
+  * Client
+    Using an IRC Client and pointing it to:
+    #nginx on irc.freenode.net
+  * Browser
+    Opening a web browser and pointing it to:
+    http://webchat.freenode.net?channels=nginx
+
+Common sense is expected to be followed:
+  * Code of Conduct
+    http://www.ubuntu.com/community/conduct
+  * IRC Etiquette
+    http://www.ircbeginner.com/ircinfo/etiquette.html
+  * Patience
+    If somebody doesn't answer you right away, then wait.
+    Even active IRC users have to run off sometimes.
+
+If you need more help with IRC The Linux Documentation Project has more information:
+  http://tldp.org/HOWTO/IRC/beginners.html

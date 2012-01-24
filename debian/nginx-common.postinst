@@ -1,0 +1,27 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+  configure)
+    logdir="/var/log/nginx"
+    # Ensure existance and right state of log files and directory
+    if [ ! -d "$logdir" -a ! -L "$logdir" ]; then
+      mkdir "$logdir"
+    fi
+    chown -R www-data:adm $logdir
+    chmod 0750 $logdir
+    find $logdir -type f -exec chmod 0640 {} +;
+    ;;
+
+  abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+  *)
+    echo "postinst called with unknown argument \`$1'" >&2
+    exit 1
+    ;;
+esac
+
+#DEBHELPER#
+
+exit 0

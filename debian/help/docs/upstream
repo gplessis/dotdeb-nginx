@@ -1,0 +1,51 @@
+##
+#  File:
+#    upstream
+#  Description:
+#    This file describes how to use upstream blocks.
+##
+
+An upstream block allows you to set a list of upstream locations for both
+proxy_pass and fastcgi_pass directives.
+
+Examples of upstream blocks:
+
+# PHP listening on the same server
+upstream php {
+	# ip_hash ensures the same backend is used for client reconnects.
+	ip_hash;
+	# This assumes we have multiple PHP listeners on different known ports.
+	server 127.0.0.1:9000;
+	server 127.0.0.1:9001;
+	server 127.0.0.1:9002;
+	server 127.0.0.1:9003;
+	# In addition to listening on ports, we can listen to unix sockets.
+	server unix:/tmp/php-cgi.socket;
+}
+
+# Multiple backend Apache instances on separate servers
+upstream apache {
+	# Adding a weight alters the chance the upstream server will be used.
+	server apache1.domain.com weight 5;
+	server apache2.domain.com;
+	server apache3.domain.com;
+	# Adding 'down' keeps the upstream from being used. Useful for downtime management.
+	server apache4.domain.com down;
+	server apache5.domain.com;
+}
+
+Using an upstream location:
+
+# Passing PHP to upstream
+location ~ \.php$ {
+	fastcgi_split_path_info ^(.+\.php)(/.+)$;
+	include fastcgi_params;
+	fastcgi_pass php;
+}
+
+# Passing all requests for /cgi-bin/* to Apache upstreams.
+location /cgi-bin {
+	proxy_pass apache;
+}
+
+For more information see http://wiki.nginx.org/HttpUpstreamModule

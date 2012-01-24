@@ -1,0 +1,4 @@
+debian/build-extras/objs/nginx usr/sbin
+debian/build-extras/objs/src/http/modules/perl/blib/arch/auto/nginx/nginx.so usr/lib/perl5/auto/nginx
+debian/build-extras/objs/src/http/modules/perl/blib/arch/auto/nginx/nginx.bs usr/lib/perl5/auto/nginx
+debian/build-extras/objs/src/http/modules/perl/blib/lib/nginx.pm usr/lib/perl5

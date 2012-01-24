@@ -1,0 +1,50 @@
+nginx (0.8.53-1) unstable; urgency=low
+
+  As stated by upstream, the 0.7.x branch is consedered legacy and 0.8.x will
+  be the new stable branch. For this reason, the nginx maintainers decided to
+  upload 0.8.53 to unstable.
+
+ -- Kartik Mistry <kartik@debian.org>  Fri, 26 Nov 2010 19:42:09 +0530
+
+nginx (0.7.59-1) unstable; urgency=low
+
+  As stated by upstream, the 0.6.x branch is consedered legacy and 0.7.x will
+  be the new stable branch. For this reason, the nginx maintainers decided to
+  upload 0.7.59 to unstable.
+
+  Should you get the following error while starting nginx:
+
+    could not build the server_names_hash, you should increase
+    server_names_hash_bucket_size: 32
+
+  Please add the following parameter to your nginx.conf:
+
+    server_names_hash_bucket_size 100;
+
+  Where 100 is the size of your server names hash bucket. For more information
+  about this option, please read the following resources:
+
+    http://wiki.nginx.org/NginxHttpCoreModule#server_names_hash_bucket_size
+    http://thread.gmane.org/gmane.comp.web.nginx.english/820/focus=821
+    http://thread.gmane.org/gmane.comp.web.nginx.english/985/focus=989
+
+ -- Fabio Tranchitella <kobold@debian.org>  Sun, 31 May 2009 18:30:10 +0200
+
+nginx (0.6.30-2) unstable; urgency=low
+
+  As of May 4th., nginx 0.5.x branch is considered legacy and 0.6.x will
+  be the new stable branch. The announcement was made by Igor Sysoev when
+  releasing the last 0.5.x version, nginx 0.5.36.
+
+  Debian, the universal operating system, has provided binary packages for
+  both 0.5 and 0.6 branches in unstable and experimental, and will now offer
+  only 0.6 packages in the unstable distribution, starting with the
+  0.6.30-1 package.
+
+  In the future, Debian will also provide experimental packages for the
+  next testing branch of nginx, at the moment upstream announces it.
+
+  Should you have any problem with nginx in Debian, please file a bug in
+  the Debian Bug Tracking System.
+
+ -- Fabio Tranchitella <kobold@debian.org>  Mon, 12 May 2008 14:24:53 +0200

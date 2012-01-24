@@ -1,0 +1,119 @@
+##
+#  File:
+#    php
+#  Description:
+#    This file is meant to help users get a basic understanding of a PHP stack
+#    with Nginx as the web server.
+##
+
+# Note: This is not a configuration sample and comment lines will be userd differently.
+
+
+== PHP Options ==
+
+There are a number of options that can be used to provide PHP. The two most
+common methods are php-cgi and php-fpm. The php-fpm option is relatively new
+and is not yet a standard option. This package is stable however and is moving
+toward being a standard option in distribution repositories.
+
+== PHP-FPM ==
+
+The php-fpm option is considerably harder to debug. However, the hardest issues
+to debug should be solved by including that fastcgi_params file provided by
+this package. It should at a minimum remove all silent errors.
+
+# sudo apt-get install php5-fpm
+
+If you do not have php5-fpm available, you will want to add the repository for
+the package.  https://launchpad.net/~nginx/+archive/php5
+
+In php5-fpm, you will want to edit the php pool.
+Edit /etc/php5/fpm/pool.d/www.conf
+
+The listen directive is the most important piece in this file. It is suggested
+to listen to a local unix socket. This listen directive will be used in your
+nginx configuration.
+Example: listen = /tmp/phpfpm.socket
+
+The rest of this file can be tweaked to your liking.
+
+== PHP-CGI ==
+
+The simplest and easiest method to run PHP is to use php-cgi. It does not offer
+the ability to monitor and restart processes that hang or die however.
+
+# sudo apt-get install php5-cgi
+
+To make php5-cgio work, you will need to create an init script.
+
+===== FILE: /etc/init.d/phpcgi =====
+#!/bin/bash
+#
+### BEGIN INIT INFO
+# Provides:          php-fcgi
+# Required-Start:    $local_fs $remote_fs $network $syslog
+# Required-Stop:     $local_fs $remote_fs $network $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: starts php-cgi processes
+# Description:       starts php-cgi using start-stop-daemon for each user
+### END INIT INFO
+
+# Number of PHP processes to be able to handle connections.
+CHILD=10
+# Maximum number of requests each child should handle before being regenerated
+MAX_REQS=750
+
+start() {
+        start-stop-daemon --quiet --start --background --chuid "www-data" \
+          --exec /usr/bin/env \
+          -- - USER="www-data" \
+          PATH=/usr/bin PHP_FCGI_CHILDREN=$CHILD PHP_FCGI_MAX_REQUESTS=$MAX_REQS \
+          php-cgi -b /tmp/phpcgi.socket &
+}
+
+stop() {
+        killall -w php-cgi
+        rm /tmp/phpcgi.socket
+        sync
+        sleep 1
+}
+
+case "$1" in
+        start) start;;
+        stop) stop;;
+        restart) stop; start;;
+        *) echo "Usage: php-fastcgi {start|stop|restart} [user]"; exit 1;;
+esac
+===== END FILE =====
+
+# Make file executable
+chmod +x /etc/init.d/phpcgi
+
+# Add file to startup
+update-rc.d phpcgi defaults
+
+== Using PHP in Nginx ==
+
+In order to use the sockets you created (/tmp/phpfpm.socket or /tmp/phpcgi.socket)
+you will need to add a php block to your Nignx configuration.
+
+# This block adds a little security.
+# See /usr/share/doc/nginx/examples/drupal for context
+location ~ \..*/.*\.php$ {
+	return 403;
+}
+
+# This is basic PHP block that can be used to handle all PHP requests.
+# See /usr/share/doc/nginx/examples/drupal for context
+location ~ \.php$ {
+	fastcgi_split_path_info ^(.+\.php)(/.+)$;
+	include fastcgi_params;
+	# Intercepting errors will cause PHP errors to appear in Nginx logs
+	fastcgi_intercept_errors on;
+	fastcgi_pass unix:/tmp/phpcgi.socket;
+}
+
+# The above example will use php5-cgi which is bound to /tmp/phpcgi.socket.
+# If you choose to use php5-fpm the example above will bind to /tmp/phpcgi.socket
+# instead and this should be used for fastcgi_pass instead.

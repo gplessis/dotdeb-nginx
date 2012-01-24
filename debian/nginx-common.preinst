@@ -1,0 +1,33 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+  install)
+    # If we are doing a fresh install, then these files are no longer needed.
+    # They were around for a very short time and are best simply removed.
+    rm -f /etc/logrotate.d/nginx-full
+    rm -f /etc/logrotate.d/nginx-light
+    rm -f /etc/logrotate.d/nginx-extras
+    rm -f /etc/logrotate.d/nginx-common
+    ;;
+
+  upgrade)
+    # If this is an upgrade, then they might have the UFW profile in the wrong spot.
+    if [ -d /etc/ufw/applications.d/nginx ]; then
+      rm -f /etc/ufw/applications.d/nginx/ufw.profile
+      rmdir /etc/ufw/applications.d/nginx
+    fi
+    ;;
+
+  abort-upgrade)
+    ;;
+
+  *)
+    echo "preinst called with unknown argument \`$1'" >&2
+    exit 1
+    ;;
+esac
+
+#DEBHELPER#
+
+exit 0

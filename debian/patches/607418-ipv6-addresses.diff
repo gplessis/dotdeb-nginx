@@ -1,0 +1,64 @@
+Description: $host variable mis-parses IPv6 literal addresses from HTTP
+Author: Steven Chamberlain <steven@pyro.eu.org>
+Debian-Bug: http://bugs.debian.org/607418
+Last-Update: 2010-12-30
+
+Index: trunk/src/http/ngx_http_request.c
+===================================================================
+--- trunk.orig/src/http/ngx_http_request.c	2010-12-30 01:46:10.308926973 -0600
++++ trunk/src/http/ngx_http_request.c	2010-12-30 01:48:21.638927393 -0600
+@@ -1650,11 +1650,12 @@
+ {
+     u_char      *h, ch;
+     size_t       i, last;
+-    ngx_uint_t   dot;
++    ngx_uint_t   dot, in_brackets;
+ 
+     last = len;
+     h = *host;
+     dot = 0;
++    in_brackets = 0;
+ 
+     for (i = 0; i < len; i++) {
+         ch = h[i];
+@@ -1670,11 +1671,27 @@
+ 
+         dot = 0;
+ 
+-        if (ch == ':') {
++        if (ch == '[' && i == 0) {
++            /* start of literal IPv6 address */
++            in_brackets = 1;
++            continue;
++        }
++
++        /*
++         * Inside square brackets, the colon is a delimeter for an IPv6 address.
++         * Otherwise it comes before the port number, so remove it.
++         */
++        if (ch == ':' && !in_brackets) {
+             last = i;
+             continue;
+         }
+ 
++        if (ch == ']') {
++            /* end of literal IPv6 address */
++            in_brackets = 0;
++            continue;
++        }
++
+         if (ngx_path_separator(ch) || ch == '\0') {
+             return 0;
+         }
+@@ -1684,6 +1701,11 @@
+         }
+     }
+ 
++    if (in_brackets) {
++        /* missing the closing square bracket for IPv6 address */
++        return 0;
++    }
++
+     if (dot) {
+         last--;
+     }

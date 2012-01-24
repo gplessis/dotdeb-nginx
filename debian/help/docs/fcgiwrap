@@ -1,0 +1,14 @@
+##
+#  File:
+#    fcgiwrap
+#  Description:
+#    The fcgiwrap tool allows a user to quickly and painlessly setup a socket
+#    to handle CGI requests. This is useful for Python, Perl, etc.
+##
+
+The easy way:
+apt-get install fcgiwrap
+
+The less-easy way:
+If your distribution does not provide it, the Nginx wiki describes the steps.
+http://wiki.nginx.org/Fcgiwrap

@@ -1,0 +1,832 @@
+nginx (1.0.11-1~dotdeb.1) stable; urgency=low
+
+  * New upstream release
+  * Built against Passenger 3.0.11
+  * Add the Push Stream module
+  # Removes the buggy HTTP Push module
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Fri, 16 Dec 2011 17:37:42 +0100
+
+nginx (1.0.10-1~dotdeb.1) stable; urgency=low
+
+  * New upstream release
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Tue, 15 Nov 2011 15:21:42 +0100
+
+nginx (1.0.9-1~dotdeb.1) stable; urgency=low
+
+  * New upstream release
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Tue,  1 Nov 2011 16:36:42 +0100
+
+nginx (1.0.8-1~dotdeb.1) stable; urgency=low
+
+  * New upstream release
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Thu, 20 Oct 2011 16:55:42 +0200
+
+nginx (1.0.6-1~dotdeb.2) stable; urgency=low
+
+  * Add the syslog patch : https://github.com/yaoweibin/nginx_syslog_patch
+  * Build against Passenger 3.0.9
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Wed, 14 Sep 2011 14:17:42 +0200
+
+nginx (1.0.6-1~dotdeb.1) stable; urgency=low
+
+  * New upstream release
+  * Remove the deprecated Secure Download module
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Tue, 30 Aug 2011 17:33:42 +0200
+
+nginx (1.0.5-1~dotdeb.1) stable; urgency=low
+
+  * Rebuilt for Dotdeb with File AIO and Passenger support
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Thu, 21 Jul 2011 22:23:42 +0200
+
+nginx (1.0.5-1) unstable; urgency=low
+
+  * New upstream release
+  * debian/control:
+    + nginx Depends on either nginx-full or nginx-light, Thanks to
+      Hans van Kranenburg <hans.van.kranenburg@mendix.com> (Closes: #633879)
+  * debian/copyright:
+    + Updated to latest DEP-5 specification
+    + Added some missing copyrights for modules
+    + Updated copyright years
+
+ -- Kartik Mistry <kartik@debian.org>  Wed, 20 Jul 2011 10:16:45 +0530
+
+nginx (1.0.4-1) unstable; urgency=low
+
+  * New upstream release
+  * debian/*.lintian-overrides, debian/rules:
+    + Removed unused lintian for missing manpages
+
+ -- Kartik Mistry <kartik@debian.org>  Wed, 01 Jun 2011 19:12:25 +0530
+
+nginx (1.0.1-1) unstable; urgency=low
+
+  * New upstream release
+  * debian/rules:
+    + Removed if surrounding copy of man/ as it is required for builds.
+    + Added nginx-upload-progress to nginx-extras. (Closes: #618306)
+    + Added nginx-secure-downloads to nginx-extras. (Closes: #622268)
+    + Added --prefix to configure command. (Closes: #619482)
+  * debian/modules:
+    + Added nginx-upload-progress/*.
+    + Added nginx-secure-download/*.
+    + Updated nginx-lua/*.
+    + Updated versions.
+  * debian/control:
+    + Added libmhash-dev build dependency.
+    + Updated Standards-Version to 3.9.1.
+
+ -- Michael Lustfield <mtecknology@ubuntu.com>  Mon, 09 May 2011 00:36:54 +0530
+
+nginx (1.0.0-2) unstable; urgency=low
+
+  * debian/rules:
+    + Removed --with-file-aio support. Fixed FTBFS on kFreeBSD-* arch
+      (Closes: #621882)
+
+ -- Kartik Mistry <kartik@debian.org>  Sat, 16 Apr 2011 13:47:58 +0530
+
+nginx (1.0.0-1) unstable; urgency=low
+
+  [Kartik Mistry]
+  * New upstream release:
+    + Removed debian/patches/609343-log-time-iso8601.diff, merged upstream.
+  * debian/rules:
+    + Fixed: FTBFS on sparc64, detects sparc64 as sparc. Thanks to
+      Aurelien Jarno <aurel32@debian.org> (Closes: #617924)
+  * debian/watch:
+    + Updated for 1.x.x release
+
+  [Michael Lustfield]
+  * debian/rules:
+    + Added Echo module back to nginx-full. (LP: #735622)
+    + Moved nginx-push-0.96 to nginx-http-push.
+  * debian/modules:
+    + Updated nginx-development-kit.
+    + Updated nginx-echo.
+    + Updated nginx-http-push.
+    + Updated nginx-lua.
+    + Updated nginx-upstream-fair.
+    + Added versions to track module versions.
+  * debian/conf/fastcgi_params:
+    + Changed $document_root$fastcgi_script_name to $request_filename.
+
+ -- Kartik Mistry <kartik@debian.org>  Thu, 14 Apr 2011 10:41:08 +0530
+
+nginx (0.8.54-4) unstable; urgency=low
+
+  [Micheal Lustfield]
+  * debian/nginx-{full,light,extras}.default:
+    + Added comment about alternative to ULIMIT.
+  * debian/nginx-{full,light,extras}.init.d:
+    + Added quotes around a test variable. (Closes: #610946, LP: #699736)
+  * debian/patches/609343-log-time-iso8601.diff:
+    + Added patch to add $time_iso8601 variable to logs. (Closes: #609343)
+  * Clean up old logrotate files. (Closes: #608983, Closes: #610289)
+    + Added Files:
+      - debian/nginx-common.preinst
+    + Modified Files:
+      - debian/rules
+    + Moved debian/nginx-common.logrotate to debian/logrotate.
+  * Added common files to nginx-common package. (Closes: #610290)
+    + Removed Files:
+      - debian/nginx-full.dirs
+      - debian/nginx-light.dirs
+      - debian/nginx-full.install
+      - debian/nginx-light.install
+      - debian/nginx-extras.install
+      - debian/nginx.*
+    + Added Files:
+      - debian/nginx-common.default
+      - debian/nginx-common.dirs
+      - debian/nginx-common.init.d
+      - debian/nginx-common.install
+      - debian/nginx-common.manpages
+      - debian/logrotate
+    + Modified Files:
+      - debian/nginx-extras.dirs
+      - debian/control
+      - debian/rules
+  * debian/nginx-*.install: (Closes: #609797)
+    + Removed NEWS.Debian from nginx-{full,light,extras}.install.
+    + Added NEWS.Debian to nginx-common.install.
+  * nginx-common.postinst:
+    + Enforce /var/log/nginx mode and user:group. (Closes: #610983)
+    + Enforce /var/log/nginx/*.log mode and user:group. (Closes: #612832)
+  * debian/rules:
+    + Added --with-file-aio to nginx-extras. (Closes: #613175)
+    + Removed split clients and user id modules from nginx-light.
+  * debian/conf/sites-available/default:
+    + Fixed a minor typo ( s/Quickstart/QuickStart/ ). (Closes: #613355)
+  * debian/conf/mime.types:
+    + Changed xml type to application/xhtml+xml. (Closes: #613851)
+  * debian/help/docs/fcgiwrap:
+    + Removed Ubuntu specific line in docs. (Closes: #614987)
+  * debian/conf/sites-available/default:
+    + Fixed a pointer to a file. (Closes: #614980)
+
+  [Kartik Mistry]
+  * debian/*.lintian-overrides:
+    + Add Lintian overrides for nginx man page. We've manpage in nginx-common
+      binary
+
+ -- Michael Lustfield <mtecknology@ubuntu.com>  Thu, 03 Mar 2011 23:39:07 +0530
+
+nginx (0.8.54-3) unstable; urgency=low
+
+  * debian/control:
+    + Added Breaks: and Replaces: to nginx packages. (Closes: #609254)
+  * debian/rules:
+    + Adding SSL support to nginx-light. (Closes: #609134)
+    + Adding HTTP Addition module to nginx-full and nginx-extras. (Closes: #609411)
+    + Added HTTP Push module to nginx-extras. (LP: #694456)
+
+ -- Michael Lustfield <mtecknology@ubuntu.com>  Tue, 11 Jan 2011 05:27:39 -0600
+
+nginx (0.8.54-2) unstable; urgency=low
+
+  * Do not install nginx.8 man page in debug packages (Closes: #608633)
+
+ -- Kartik Mistry <kartik@debian.org>  Sun, 02 Jan 2011 18:46:03 +0530
+
+nginx (0.8.54-1) unstable; urgency=low
+
+  [ Michael Lustfield ]
+  * Added ipv6 patch. (Closes: #607418)
+    + Edited files:
+      - src/http/ngx_http_request.c
+  * Added ulmit patches. (Closes: #606094)
+    + Added files:
+      - debian/nginx-full.default
+      - debian/nginx-light.default
+      - debian/nginx-extras.default
+    + Edited files:
+      - debian/nginx-full.init.d
+      - debian/nginx-light.init.d
+      - debian/nginx-extras.init.d
+  * Added perl module to nginx-extras. (Closes: #598461)
+    + debian/rules:
+      - Added --with-http_perl_module to nginx-extras.
+    + debian/control:
+      - Added libperl-dev build dependency.
+    + debian/nginx-extras.install:
+      - Added perl install files
+    + debian/nginx-extras.dirs:
+      - Added directory to install perl files.
+  * debian/rules:
+    + Added ifeq to handle nginx.8 (man page) if it exists in the source.
+  * debian/control:
+    + Added descriptions to make clear the differences between nginx packages.
+  * Removed patches:
+    + debian/patches/nginx-echo.diff
+      - Put source into debian/patches/.
+    + debian/patches/nginx-upstream-fair.diff
+      - Put source into debian/patches/.
+    + debian/patches/dlopen.diff
+      - Patch no longer relevant.
+  * Added modules:
+    + debian/modules/nginx-development-kit
+    + debian/modules/nginx-upstream-fair
+    + debian/modules/nginx-echo
+    + debian/modules/nginx-lua
+  * Split Nginx into multiple variations of the package.
+    + Added files for nginx-full:
+      - debian/nginx-full.install
+      - debian/nginx-full.dirs
+      - debian/nginx-full.logrotate
+      - debian/nginx-full.init.d
+      - debian/nginx-full.postinst
+      - debian/nginx-full.prerm
+      - debian/nginx-full.postrm
+    + Added files for nginx-light:
+      - debian/nginx-light.install
+      - debian/nginx-light.dirs
+      - debian/nginx-light.logrotate
+      - debian/nginx-light.init.d
+      - debian/nginx-light.postinst
+      - debian/nginx-light.prerm
+      - debian/nginx-light.postrm
+    + Added files for nginx-extras:
+      - debian/nginx-extras.install
+      - debian/nginx-extras.dirs
+      - debian/nginx-extras.logrotate
+      - debian/nginx-extras.init.d
+      - debian/nginx-extras.postinst
+      - debian/nginx-extras.prerm
+      - debian/nginx-extras.postrm
+    + Removed files for nginx:
+      - debian/nginx.install
+      - debian/nginx.dirs
+      - debian/nginx.logrotate
+      - debian/init.d
+      - debian/postinst
+      - debian/prerm
+      - debian/postrm
+    + Updated debian/rules:
+      - Modified rules to create extra packages.
+    + Updated debian/control:
+      - Added packages for nginx-{full,light,extras}.
+      - Added packages for nginx-{full,light,extras}-dbg.
+      - Changed nginx to a dummy package selecting nginx-full.
+
+  [Kartik Mistry]
+  * debian/control:
+    + Added doc section for nginx-doc
+    + Wrapped some long descriptions, updated short descriptions
+    + Added perl:Depends for nginx-extras
+  * debian/rules:
+    + Fixed dh_installchangelogs, dh_compress
+
+ -- Michael Lustfield <mtecknology@ubuntu.com>  Thu, 30 Dec 2010 14:15:26 +0530
+
+nginx (0.8.53-2) unstable; urgency=low
+
+  [Kartik Mistry]
+  * debian/conf/mime.types:
+    + Added html5 codecs support (Closes: #605212)
+  * debian/conf/fastcgi_params:
+    + Fixed typo (Closes: #605582)
+
+  [Michael Lustfield]
+  * debian/conf/nginx.conf:
+    + Reduced worker_connections to 768 (Closes: #605529)
+  * Add an nginx site management script to nginx-doc. (Closes: #593580)
+    + debian/help/examples/nginx_modsite: Added.
+  * debian/nginx.logrotate:
+    + Added prerotate chunk for awstats. (Closes: #590098)
+  * debian/copyright:
+    + Added Michael Lustfield
+  * Created nginx-doc:
+    + Added 'Package: nginx-doc' section to debian/control
+    + Moved debian/nginx.examples -> debian/nginx-doc.examples
+    + Moved debian/nginx.docs -> debian/nginx-doc.docs
+
+ -- Kartik Mistry <kartik@debian.org>  Mon, 06 Dec 2010 11:26:22 +0530
+
+nginx (0.8.53-1) unstable; urgency=low
+
+  [Kartik Mistry]
+  * debian/control:
+    + Added Michael Lustfield as co-maintainer
+  * nginx.conf:
+    + No need to use regex in gzip_disable for msie6, Thanks to António P. P.
+      Almeida <appa@perusio.net> (Closes: #592147)
+  * conf/sites-available/default:
+    + Fixed typo for "include fastcgi", Thanks to Mostafa Ghadamyari
+      <nginx@gigfa.com> (Closes: #593142, #593143)
+  * debian/patches/fix_reloading_ipv6.diff:
+    + Removed, merged upstream
+  * debian/init.d:
+    + Added fix to control nginx by user in a simple way by setting DAEMON
+      variable to an invalid name in /etc/default/nginx. Patch by Toni Mueller
+      <support@oeko.net> (Closes: #594598)
+  * debian/NEWS.Debian:
+    + Updated news for 0.8.x as stable branch
+
+  [Michael Lustfield]
+  * New upstream release (Closes: #602970)
+    + 0.8.x branch is declared stable by upstream now
+  * Add a UFW profile set:
+    + debian/nginx.ufw.profile: Added.
+    + debian/control: nginx: Suggests ufw.
+    + debian/dirs: Add 'etc/ufw/applications.d'
+    + debian/rules: Add install rule for the nginx UFW profile.
+  * Moved debian/dirs to debian/nginx.dirs
+  * Added types_hash_max_size to nginx.conf
+  * Install simple default index.html file (Closes: #581416)
+    + debian/dirs: Add 'usr/share/nginx/www'.
+    + debian/nginx.install: Add 'html/* usr/share/nginx/www'.
+  * debian/patches/nginx-echo.diff:
+    + Added Echo module
+  * Added files for nginx.docs
+    - /usr/share/doc/nginx/
+      + debian/help/docs/fcgiwrap
+      + debian/help/docs/php
+      + debian/help/docs/support-irc
+      + debian/help/docs/upstream
+  * Added files for nginx.examples
+    - /usr/share/doc/nginx/examples/
+      + debian/help/docs/drupal
+      + debian/help/docs/http
+      + debian/help/docs/mail
+      + debian/help/docs/mailman
+      + debian/help/docs/nginx.conf
+      + debian/help/docs/virtual_hosts
+      + debian/help/docs/wordpress
+  * debian/conf/:
+    + Removed excess spaces
+    + Added tabs where appropriate
+    + Added SCRIPT_FILENAME to fastcgi_params
+
+ -- Kartik Mistry <kartik@debian.org>  Sat, 27 Nov 2010 21:04:02 +0530
+
+nginx (0.7.67-3) unstable; urgency=low
+
+  * debian/rules:
+    + Readded the configure option --with-mail_ssl_module, Thanks to Roland
+      Rosenfeld <roland@spinnaker.de> (Closes: #590815)
+  * debian/control:
+    + Updated Standards-Version to 3.9.1 (no changes needed)
+
+ -- Kartik Mistry <kartik@debian.org>  Thu, 29 Jul 2010 21:41:52 +0530
+
+nginx (0.7.67-2) unstable; urgency=low
+
+  * debian/conf/sites-available/default:
+    + Removed reference to SSLv2 protocol (Closes: #589139)
+  * debian/control:
+    + Updated Standards-Version to 3.9.0
+  * debian/copyright:
+    + Don't point to BSD license file, included exact upstream version of
+      license text
+    + Added missing copyright owner for contrib/ scripts
+    + debian/* license is same as upstream now as discussed with co-maintainers
+
+ -- Kartik Mistry <kartik@debian.org>  Mon, 19 Jul 2010 10:36:32 +0530
+
+nginx (0.7.67-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Kartik Mistry <kartik@debian.org>  Wed, 16 Jun 2010 01:26:51 +0530
+
+nginx (0.7.65-7) unstable; urgency=low
+
+  [Kartik Mistry]
+  * debian/rules:
+    + Enabled HTTPSubModule module in configure (Closes: #584828)
+    + Arranged configure options in better manner
+
+ -- Kartik Mistry <kartik@debian.org>  Mon, 07 Jun 2010 14:33:24 +0530
+
+nginx (0.7.65-6) unstable; urgency=low
+
+  [Kartik Mistry]
+  * debian/README.Debian:
+    + Fixed typo and somewhat better wordings
+  * debian/conf/mime.types:
+    + Added entry to support 7zip files (Closes: #580423)
+  * debian/init.d:
+    + Do not print config testing info until an error found, Thanks to Ubuntu
+      bug 568293
+  * debian/copyright:
+    + Updated as per DEP-5 specification
+
+ -- Kartik Mistry <kartik@debian.org>  Sat, 22 May 2010 01:41:33 +0530
+
+nginx (0.7.65-5) unstable; urgency=low
+
+  [Kartik Mistry]
+  * debian/patches/fix_reloading_ipv6.diff:
+    + Added patch to fix reloading with IPv6 addresses, Thanks to
+      Matthias-Christian Ott <ott@mirix.org> for patch (Closes: #577456)
+
+ -- Kartik Mistry <kartik@debian.org>  Wed, 14 Apr 2010 11:36:48 +0530
+
+nginx (0.7.65-4) unstable; urgency=low
+
+  [Kartik Mistry]
+  * debian/conf/sites-available/default:
+    + Really listen for both IPv4 and IPv6 addresses. Thanks to Nikolaus
+      Schulz <microschulz@web.de> for notice (Closes: #574983)
+  * debian/control, debian/rules:
+    + Added GeoIP support, Thanks to Caetano Carezzato
+      <caetano@vision.ime.usp.br> (Closes: #575280)
+  * debian/conf/mime.types:
+    + Added svg entry to mime.types, Jeremy Lal <kapouer@melix.org>
+      (Closes: #575155)
+
+ -- Kartik Mistry <kartik@debian.org>  Thu, 25 Mar 2010 00:21:50 +0530
+
+nginx (0.7.65-3) unstable; urgency=medium
+
+  [Kartik Mistry]
+  * Urgency set to medium due to Release Goal
+  * debian/conf/sites-available/default:
+    + Listen for both IPv4 and IPv6 addresses by default (Closes: #574983)
+
+ -- Kartik Mistry <kartik@debian.org>  Tue, 23 Mar 2010 10:30:18 +0530
+
+nginx (0.7.65-2) unstable; urgency=low
+
+  * debian/README.Debian:
+    + Added explanation about not installing files in /var/www/
+      (Closes: #572513)
+  * debian/rules:
+    + Readded realip module support (Closes: #507419)
+
+ -- Kartik Mistry <kartik@debian.org>  Sat, 06 Mar 2010 13:14:48 +0530
+
+nginx (0.7.65-1) unstable; urgency=low
+
+  [Kartik Mistry]
+  * New upstream release
+  * debian/init.d:
+    + $local_fs $remote_fs $network $syslog is what we need in Required-Start
+    and Required-Stop (Closes: #568238)
+  * debian/copyright:
+    + Updated package copyright year
+    + Updated license text to make same as upstream license
+
+ -- Kartik Mistry <kartik@debian.org>  Fri, 05 Feb 2010 11:20:28 +0530
+
+nginx (0.7.64-3) unstable; urgency=low
+
+  [Kartik Mistry]
+  * debian/conf/sites-available/default:
+    + Added patch to fix default virtual host, Thanks to Thomas Venieris
+     <mot@freemail.gr> (Closes: #564726)
+  * debian/init.d:
+    + Added dependency on $remote_fs in Required-Start and Required-Stop
+      (Closes: #566862)
+  * Converted package to use 3.0 (quilt) source format
+  * Updated to Standards-Version 3.8.4
+
+ -- Kartik Mistry <kartik@debian.org>  Mon, 01 Feb 2010 23:44:21 +0530
+
+nginx (0.7.64-2) unstable; urgency=low
+
+  [Kartik Mistry]
+  * debian/rules:
+    + Used dh_prep instead of dh_clean -k
+  * debian/control:
+    + Added ${misc:Depends} in Depends
+  * Added patch for adding debug package, Thanks to Matthew Palmer
+    <mpalmer@debian.org> (Closes: #563339)
+  * debian/copyright:
+    + Added missing copyright owners for Debian package and fixed year and
+    licence doesn't point to versionless symlink
+
+  [Fabio Tranchitella]
+  * debian/init.d:
+    + Added patch from Wouter de Bie to add $DAEMON_OPTS in
+    test_nginx_config()
+
+ -- Kartik Mistry <kartik@debian.org>  Sat, 09 Jan 2010 11:15:59 +0530
+
+nginx (0.7.64-1) unstable; urgency=medium
+
+  [Kartik Mistry]
+  * Urgency set to medium due to security issue
+  * New upstream release (Closes: #557602)
+    + fixes SSL renegotiation vuln CVE-2009-3555 (Closes: #557873)
+  * debian/nginx.1:
+    + Corrected homepage entry (Closes: #556617)
+    + Minor whitespace and empty line cleanups, added SEE ALSO section. Used
+      .TP instead of .br, Added missing options, and this should
+      (Closes: #556616)
+  * debian/copyright:
+    + Used © instead of deprecated (C) symbol
+    + Formatted some texts
+  * debian/control:
+    + Added myself as uploader
+    + Wrapped and rearranged Build-Depends for better readability
+  * debian/patches/dlopen.dpatch:
+    + Fixed patch name in comment
+    + Added missing DP comment from changelog
+  * debian/rules:
+    + Minor fixes related to formatting of file and whitespaces
+  * debian/watch:
+    + Removed comments out of it
+
+ -- Kartik Mistry <kartik@debian.org>  Fri, 27 Nov 2009 11:10:18 +0530
+
+nginx (0.7.63-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Fabio Tranchitella <kobold@debian.org>  Sun, 08 Nov 2009 09:53:46 +0100
+
+nginx (0.7.62-4) unstable; urgency=low
+
+  * debian/conf/nginx.conf: commented out the mail proxy example.
+    (Closes: #551682)
+  * debian/init.d: do not redirect the output of nginx -t.
+    (Closes: #551683)
+
+ -- Fabio Tranchitella <kobold@debian.org>  Thu, 22 Oct 2009 19:50:05 +0200
+
+nginx (0.7.62-3) unstable; urgency=low
+
+  * debian/rules: fix the FTBFS on sparc.
+
+ -- Fabio Tranchitella <kobold@debian.org>  Fri, 16 Oct 2009 06:39:22 +0000
+
+nginx (0.7.62-2) unstable; urgency=low
+
+  * debian/rules: added --with-mail and --with-mail_ssl_module.
+  * debian/patches/nginx-upstream-fair.dpatch: added support for the
+    nginx-upstream-fair module. (Closes: #521447)
+  * debian/patches/dlopen.dpatch: applied patch to remove the unnecesssary link
+    to libdl. (Closes: #540599)
+
+ -- Fabio Tranchitella <kobold@debian.org>  Thu, 15 Oct 2009 18:32:00 +0000
+
+nginx (0.7.62-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/rules: added --with-ipv6. (Closes: #547249)
+
+ -- Fabio Tranchitella <kobold@debian.org>  Sun, 27 Sep 2009 22:25:16 +0200
+
+nginx (0.7.61-2) unstable; urgency=low
+
+  * debian/control: bumped Standards-Version to 3.8.3, no changes needed.
+  * debian/init.d: added status action. (Closes: #541228)
+  * debian/rules:
+    - added -with-http_gzip_static_module. (Closes: #541229)
+    - use the switch --with-cc-opt="-m32 -mcpu=ultrasparc" on sparc.
+      (Closes: #543571)
+
+ -- Fabio Tranchitella <kobold@debian.org>  Sat, 29 Aug 2009 17:03:44 +0200
+
+nginx (0.7.61-1) unstable; urgency=low
+
+  * New upstream version:
+    *) Bugfix: nginx could not be built --without-http-cache; the bug had 
+       appeared in 0.7.60.
+    *) Bugfix: a segmentation fault occurred in worker process, if a 
+       backend 401 error was intercepted and the backend did not set the 
+       "WWW-Authenticate" response header line.
+       Thanks to Eugene Mychlo.
+    *) Feature: the "keepalive_requests" directive.
+    *) Bugfix: in open_file_cache and proxy/fastcgi cache interaction on 
+       start up.
+    *) Bugfix: open_file_cache might cache open file descriptors too long.
+    *) Bugfix: XLST filter did not work in subrequests.
+  * Fix "gzip_disable in default conf for old IE", adding ignore rules for
+    certain MSIE versions in the default configuration (Closes: #540025)
+  * Fix "init.d: Config test before allowing a restart" adding a function
+    and calling it before reloading, restarting and starting (Closes: #539778)
+  * Drops path for pidof call in postinst script.
+
+ -- Jose Parrella <bureado@debian.org>  Wed, 05 Aug 2009 14:00:11 -0500
+
+nginx (0.7.59-1) unstable; urgency=low
+
+  * New upstream release, first in Debian for the 0.7 branch. Among other
+    issues, it also fixes the problem with wildcard dns names used with SSL.
+    (Closes: #515904)
+  * debian/watch: updated.
+  * debian/postinst: fixed a bashism. (Closes: #507913)
+  * debian/conf/nginx.conf: removed default_type. (Closes: #509390)
+  * debian/control: updated Standards-Version to 3.8.1, no changes needed.
+  * debian/NEWS.Debian: documented the issues with
+    server_names_hash_bucket_size. (Closes: #524785)
+
+ -- Fabio Tranchitella <kobold@debian.org>  Sun, 31 May 2009 18:38:56 +0200
+
+nginx (0.7.14-1) experimental; urgency=low
+
+  * New upstream release.
+  * Adding configtest to the init.d script (Closes: #496279)
+  * postinst now calls the builtin kill, so tweaks on the specific signal
+    calls were needed.
+  * Default HTML files are no longer installed.
+  * The default configuration file no longer requires a 50x file under
+    /var/www.
+
+ -- Jose Parrella <bureado@debian.org>  Tue, 02 Sep 2008 20:48:58 -0430
+
+nginx (0.6.34-2) unstable; urgency=low
+
+  * Added support for realip module. (Closes: #507419)
+
+ -- Fabio Tranchitella <kobold@debian.org>  Sat, 06 Dec 2008 10:34:01 +0100
+
+nginx (0.6.34-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/rules: removed the --with-debug configure switch. (Closes: #500891)
+
+ -- Fabio Tranchitella <kobold@debian.org>  Sun, 30 Nov 2008 11:37:13 +0100
+
+nginx (0.6.32-3) unstable; urgency=low
+
+  * debian/control: build again on all the architectures, but use the switch
+    --with-cc-opt="-m32 -mcpu=ultrasparc" on sparch. (Closes: #479185)
+
+ -- Fabio Tranchitella <kobold@debian.org>  Thu, 25 Sep 2008 17:14:27 +0200
+
+nginx (0.6.32-2) unstable; urgency=low
+
+  * debian/control: disabled support for sparc. (Closes: #479185)
+
+ -- Fabio Tranchitella <kobold@debian.org>  Sat, 20 Sep 2008 11:48:48 +0200
+
+nginx (0.6.32-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Fabio Tranchitella <kobold@debian.org>  Fri, 18 Jul 2008 09:15:58 +0200
+
+nginx (0.6.31-2) unstable; urgency=low
+
+  * debian/control: removed httpd-cgi, nginx doesn't support executing
+    external programs. (Closes: #482332)
+
+ -- Fabio Tranchitella <kobold@debian.org>  Thu, 22 May 2008 08:18:52 +0200
+
+nginx (0.6.31-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Fabio Tranchitella <kobold@debian.org>  Mon, 12 May 2008 22:34:55 +0200
+
+nginx (0.6.30-2) unstable; urgency=low
+
+  * Upload into unstable.
+
+ -- Fabio Tranchitella <kobold@debian.org>  Mon, 12 May 2008 14:24:53 +0200
+
+nginx (0.6.30-1) experimental; urgency=low
+
+  * New upstream release.
+  * Sync with the unstable packages.
+  * debian/conf/nginx.conf: add support for a conf.d directory.
+    (Closes: #476952)
+
+ -- Fabio Tranchitella <kobold@debian.org>  Fri, 02 May 2008 09:32:46 +0200
+
+nginx (0.5.35-3) unstable; urgency=low
+
+  * debian/conf/sites-available/default: adding support for /doc and /images
+    namespaces (Closes: #474519)
+
+ -- Jose Parrella <bureado@debian.org>  Mon, 07 Apr 2008 13:22:32 -0430
+
+nginx (0.5.35-2) unstable; urgency=low
+
+  * debian/init.d: do not break if start-stop-daemon exits with an error.
+    (Closes: #464453)
+
+ -- Fabio Tranchitella <kobold@debian.org>  Sun, 10 Feb 2008 17:57:57 +0100
+
+nginx (0.5.35-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Fabio Tranchitella <kobold@debian.org>  Wed, 09 Jan 2008 07:58:56 +0100
+
+nginx (0.5.34-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/control: added Homepage, Vcs-Svn, Vcs-Browser fields; updated
+    Standard-Versions to 3.7.3.
+
+ -- Fabio Tranchitella <kobold@debian.org>  Mon, 24 Dec 2007 12:26:27 +0100
+
+nginx (0.5.33-1) unstable; urgency=low
+
+  * New stable upstream release (Closes: #451173)
+  * nginx now provides httpd, httpd-cgi virtual packages
+    (Closes: #439468, #452025)
+  * sites-enabled/default link is now provided only on fresh 
+    installations (Closes: #432961)
+  * Updated code for online upgrading of nginx (Closes: #445246)
+  * Reviewed maintainer scripts for correct behaviour on updates
+    (Closes: #452787, #435965)
+  * Removed debian/nginx.links and debian/preinst.
+  * Changing Maintainer address to bureado@debian.org.
+  * Welcoming Fabio Tranchitella <kobold@debian.org> as an nginx 
+    uploader for Debian. Thanks for your patches.
+
+ -- Jose Parrella <bureado@debian.org>  Sat, 08 Dec 2007 11:27:54 -0400
+
+nginx (0.5.30-1) unstable; urgency=low
+
+  * New stable upstream release.
+  * Adding mime.types (and other upstream conffiles) to the package 
+    since it was lost on 0.5.26 (Closes: #435964)
+
+ -- Jose Parrella <joseparrella@cantv.net>  Sat, 04 Aug 2007 10:39:40 -0400
+
+nginx (0.5.26-1) unstable; urgency=low
+
+  * New stable upstream release.
+  * Updating init.d usage message.
+  * Installing logrotate script (Closes: #397978)
+
+ -- Jose Parrella <joseparrella@cantv.net>  Sun, 17 Jun 2007 20:43:35 +0100
+
+nginx (0.5.18-1) unstable; urgency=low
+
+  * New upstream version (Closes: #420063)
+  * Adding DAV support (Closes: #415678)
+  * Adding support for sites-[available|enabled]/ (Closes: #419912)
+
+ -- Jose Parrella <joseparrella@cantv.net>  Thu, 19 Apr 2007 21:50:37 -0400
+
+nginx (0.5.13-1) unstable; urgency=low
+
+  * Adding FLV support. (Closes: #411105)
+  * Adding SSL support.
+
+ -- Jose Parrella <joseparrella@cantv.net>  Mon, 19 Feb 2007 10:30:07 -0400
+
+nginx (0.5.12-2) unstable; urgency=low
+
+  * Patching src/core/ngx_shmtx.h in order to solve FTBFS problems in 
+    non-x86 archs (Thanks to Igor Sysoev) (Closes: #410884)
+
+ -- Jose Parrella <joseparrella@cantv.net>  Wed, 14 Feb 2007 13:32:01 -0400
+
+nginx (0.5.12-1) unstable; urgency=low
+
+  * New upstream version fixes FTBFS problems in non-x86 archs
+    (Closes: #409878)
+
+ -- Jose Parrella <joseparrella@cantv.net>  Mon, 12 Feb 2007 19:37:07 -0400
+
+nginx (0.5.11-1) unstable; urgency=low
+
+  * New upstream version. (Closes: #405983)
+
+ -- Jose Parrella <joseparrella@cantv.net>  Sun, 5 Feb 2007 19:35:56 -0400
+
+nginx (0.4.13-2) unstable; urgency=low
+
+  * Fixed default installation paths for www/ files, avoiding the
+    default installation of index.html in /var/www (Closes: #400103)
+  * Alexey Besciokov <proforg@maloletka.ru> provided new postinst and prerm
+    scripts with the ability to reload the master binary (Closes: #398009)
+
+ -- Jose Parrella <joseparrella@cantv.net>  Fri, 24 Nov 2006 07:12:46 -0400
+
+nginx (0.4.13-1) unstable; urgency=low
+
+  * New upstream version
+  * Fixed default configuration file which made nginx to fail at
+    installation and purge.
+
+ -- Jose Parrella <joseparrella@cantv.net>  Thu, 16 Nov 2006 22:44:33 -0400
+
+nginx (0.4.12-1) unstable; urgency=low
+
+  * New upstream version (Closes: #397969)
+  * nginx will now compile with debugging and status support
+    (Closes: #397967)
+  * Added configuration reload support in the init.d script
+    (Closes: #397980)
+  * Added logrotate script (Closes: #397978)
+  * Added debian/upstream.pl as a brief helper for new
+    upstream version packaging.
+  * Thanks to Alexey Besciokov <proforg@maloletka.ru> for
+    suggestions, bug reports and patches.
+
+ -- Jose Parrella <joseparrella@cantv.net>  Sun, 12 Nov 2006 18:31:24 -0400
+
+nginx (0.4.2-1) unstable; urgency=low
+
+  * Initial release (Closes: #386151)
+  * Tweaked the configuration file and the path handling for Debian.
+
+ -- Jose Parrella <joseparrella@cantv.net>  Thu, 14 Sep 2006 11:40:20 -0400
+

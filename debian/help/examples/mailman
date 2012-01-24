@@ -1,0 +1,59 @@
+##
+#  File:
+#    mailman
+#  Description:
+#    This file explains how to install MailMan and offers a nearly drop-in
+#    model if MailMan was installed from Debian/Ubuntu repositories.
+##
+
+server {
+
+	# This is the URI of your website. You can specify multiple sites to be
+	# served by the same Drupal installation.
+	server_name lists.DOMAIN.TLD;
+
+	# This is the default MailMan root directory.
+	root /usr/lib/cgi-bin;
+
+	# If the request is exactly the server_name, then we need to redirect
+	# the browser to the listinfo page. Notice the = for an exact match.
+	location = / {
+		rewrite ^ /mailman/listinfo permanent;
+	}
+
+	# Any requests need to be rewritten to /mailman/.
+	# This happens only if no other location block matches.
+	location / {
+		rewrite ^ /mailman$uri;
+	}
+
+	# If /mailmain/ was part of the request, then we need to let python
+	# handle the request.
+	location /mailman/ {
+		fastcgi_split_path_info (^/mailman/[^/]*)(.*)$;
+		include fastcgi_params;
+		fastcgi_param GATEWAY_INTERFACE CGI/1.1;
+		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+		fastcgi_param PATH_INFO $fastcgi_path_info;
+		fastcgi_param PATH_TRANSLATED $document_root$fastcgi_path_info;
+		# fcgiwrap was used to create this socket.
+		# See /usr/share/doc/nginx-doc/fcgiwrap
+		fastcgi_pass unix:/tmp/cgi.socket;
+	}
+
+	# If a request was made for an image, we need to change the directory
+	# that is beeing looked at. Nothing else is needed because the images
+	# are static content.
+	location /images/mailman {
+		alias /var/lib/mailman/icons;
+	}
+
+	# If a request for /pipermail was made, we are still only dealing with
+	# static content. The archives are at a different location and we need
+	# to point at it. Because these are public, there's no issue in letting
+	# them be browsed; autoindex is turned on to allow browsing.
+	location /pipermail {
+		alias /var/lib/mailman/archives/public;
+		autoindex on;
+	}
+}

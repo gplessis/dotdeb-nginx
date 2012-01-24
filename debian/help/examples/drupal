@@ -1,0 +1,114 @@
+##
+#  File:
+#    drupal
+#  Description:
+#    This file is meant to offer a very detailed set of instructions and best
+#    practices for deploying a Drupal website with Nginx. This file should be
+#    almost drop-in if the user is able to understand the three lines that
+#    need to be changed.
+##
+
+server {
+
+	# This is the URI of your website. You can specify multiple sites to be
+	# served by the same Drupal installation.
+	server_name domain.com www.domain.com .example.net;
+
+	# This is the root of the Drupal directory.
+	# Note that Drupal 6, Drupal 7, and Pressflow are interchangeable
+	root /var/www/drupal6;
+ 
+	# In some cases a favicon does not exist but this is not something you
+	# normally need to worry about. It's also a microscopic image and will
+	# just clutter the logs.
+	location = /favicon.ico {
+		log_not_found off;
+		access_log off;
+	}
+ 
+	# This is for the robots.txt file used by search engines.
+	location = /robots.txt {
+		# If you have one, you want to allow them access to it.
+		allow all;
+		# If you don't have one, you don't want to fill your logs with
+		# not found errors.
+		log_not_found off;
+		access_log off;
+	}
+ 
+	# This matters if you use drush because drush copies backups of modules
+	# to this directory. In the event personal information wound up in the
+	# module, you want to know outside users can't access it.
+	location = /backup {
+		deny all;
+	}
+
+	# Very rarely should these ever be accessed outside of your lan
+	# The above location for robots.txt is an exact match and will override
+	# this location block.
+	location ~* \.(txt|log)$ {
+		allow 192.168.0.0/16;
+		deny all;
+	}
+
+	# This location block protects against a known attack. It happens if
+	# the attacker uploads a non-php file and attempts to run it as a
+	# php file on the server.
+	location ~ \..*/.*\.php$ {
+		return 403;
+	}
+ 
+	# This is our primary location block. The try_files directive will
+	# attempt to serve the data in the order listed. First try the exact
+	# request (such as an image or text file). If it doesn't exist, see if
+	# the directory exists. If not, then we move to the rewrite which is
+	# used for the front-end controller pattern.
+	location / {
+		try_files $uri $uri/ @rewrite;
+	}
+ 
+	# This will rewrite our request from domain.com/node/1/ to domain.com/index.php?q=node/1
+	# This could be done in try_files without a rewrite however, the GlobalRedirect
+	# module enforces no slash (/) at the end of URL's. This rewrite removes that
+	# so no infinite redirect loop is reached.
+	location @rewrite {
+		rewrite ^/(.*)$ /index.php?q=$1;
+	}
+ 
+	# If a PHP file is served, this block will handle the request. This block
+	# works on the assumption you are using php-cgi listening on /tmp/phpcgi.socket.
+	# Please see the php example (usr/share/doc/nginx/exmaples/php) for more
+	# information about setting up PHP.
+	# NOTE: You should have "cgi.fix_pathinfo = 0;" in php.ini
+	location ~ \.php$ {
+		fastcgi_split_path_info ^(.+\.php)(/.+)$;
+		include fastcgi_params;
+		# Intercepting errors will cause PHP errors to appear in Nginx logs
+		fastcgi_intercept_errors on;
+		fastcgi_pass unix:/tmp/phpcgi.socket;
+	}
+ 
+	# The ImageCache module builds an image 'on the fly' which means that
+	# if it doesn't exist, it needs to be created. Nginx is king of static
+	# so there's no point in letting PHP decide if it needs to be servered
+	# from an existing file.
+	# If the image can't be served directly, it's assumed that it doesn't
+	# exist and is passed off to PHP via our previous rewrite to let PHP
+	# create and serve the image.
+	# Notice that try_files does not have $uri/ in it. This is because an
+	# image should never be a directory. So there's no point in wasting a
+	# stat to serve it that way.
+	location ~ ^/sites/.*/files/imagecache/ {
+		try_files $uri @rewrite;
+	}
+
+	# As mentioned above, Nignx is king of static. If we're serving a static
+	# file that ends with one of the following extensions, it is best to set
+	# a very high expires time. This will generate fewer requests for the
+	# file. These requests will be logged if found, but not if they don't
+	# exist.
+	location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+		expires max;
+		log_not_found off;
+	}
+}
