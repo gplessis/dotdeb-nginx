@@ -1,3 +1,11 @@
+nginx (1.0.12-1~dotdeb.0) stable; urgency=low
+
+  * New upstream release
+  * Add the Cache purge module
+  * Use default_server instead of default in sites-available/default
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Tue,  7 Feb 2011 16:55:42 +0100
+
 nginx (1.0.11-1~dotdeb.1) stable; urgency=low
 
   * New upstream release

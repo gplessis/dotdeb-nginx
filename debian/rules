@@ -75,6 +75,7 @@ config.status.full: config.env.full config.sub config.guess
 	    --add-module=$(MODULESDIR)/nginx-echo \
 	    --add-module=$(MODULESDIR)/nginx-upstream-fair \
 	    --add-module=$(MODULESDIR)/nginx-syslog \
+	    --add-module=$(MODULESDIR)/ngx_cache_purge \
             $(CONFIGURE_OPTS) >$@
 	touch $@
 
@@ -152,6 +153,7 @@ config.status.extras: config.env.extras config.sub config.guess
 	    --add-module=$(MODULESDIR)/chunkin-nginx-module \
 	    --add-module=$(MODULESDIR)/headers-more-nginx-module \
 	    --add-module=$(MODULESDIR)/nginx-syslog \
+	    --add-module=$(MODULESDIR)/ngx_cache_purge \
 	    --add-module=/usr/lib/phusion-passenger/ext/nginx \
             $(CONFIGURE_OPTS) >$@
 	touch $@

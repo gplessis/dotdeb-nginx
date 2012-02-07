@@ -84,7 +84,7 @@ Description: nginx web server with full set of core modules
  Mail Modules:
    Mail Core, IMAP, POP3, SMTP, SSL
  Third Party Modules:
-   Echo, Syslog, Upstream Fair Queue
+   Cache purge, Echo, Syslog, Upstream Fair Queue
 
 Package: nginx-full-dbg
 Architecture: any
@@ -173,8 +173,8 @@ Description: nginx web server with full set of core modules and extras
  Mail Modules:
    Mail Core, POP3, IMAP, SMTP, SSL
  Third Party Modules:
-   Echo, Embedded Lua, Push Stream, Nginx Development Kit, Upload Progress,
-   Passenger, Syslog,
+   Cache purge, Echo, Embedded Lua, Push Stream, Nginx Development Kit,
+   Upload Progress, Passenger, Syslog,
    HttpHeadersMore, HttpChunkin,
    Upstream Fair Queue
 

@@ -43,3 +43,8 @@ README for Modules versions
   https://github.com/masterzen/nginx-upload-progress-module/archives/436ec80547bdc92bd7d9253b1815d4b964009883
   rm -r debian/nginx-upload-progress/test
   Version: v0.8.3-1-g436ec80
+
+ ngx_cache_purge
+  https://github.com/FRiCKLE/ngx_cache_purge.git
+  http://labs.frickle.com/files/ngx_cache_purge-1.5.tar.gz
+  Version: 1.5
