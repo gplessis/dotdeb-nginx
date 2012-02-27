@@ -154,6 +154,7 @@ config.status.extras: config.env.extras config.sub config.guess
 	    --add-module=$(MODULESDIR)/headers-more-nginx-module \
 	    --add-module=$(MODULESDIR)/nginx-syslog \
 	    --add-module=$(MODULESDIR)/ngx_cache_purge \
+	    --add-module=$(MODULESDIR)/ngx_http_auth_pam_module \
 	    --add-module=/usr/lib/phusion-passenger/ext/nginx \
             $(CONFIGURE_OPTS) >$@
 	touch $@

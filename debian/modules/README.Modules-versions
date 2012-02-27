@@ -48,3 +48,7 @@ README for Modules versions
   https://github.com/FRiCKLE/ngx_cache_purge.git
   http://labs.frickle.com/files/ngx_cache_purge-1.5.tar.gz
   Version: 1.5
+
+ ngx_http_auth_pam_module
+  http://web.iti.upv.es/~sto/nginx/
+  Version: 1.2
