@@ -1,0 +1,15 @@
+2010-11-15  sto@iti.upv.es
+
+	* Version 1.2.
+	* Fixed possible memory leak when authentication fails, pam_end has to
+	  be called to free memory (thanks to Neil Chintomby).
+
+2009-01-26  sto@iti.upv.es
+
+	* Version 1.1.
+	* Fixed ngx_log_debugX calls, no we use the correct X value on each
+	  call.
+
+2008-09-17  sto@iti.upv.es
+
+	* Initial version (1.0).
