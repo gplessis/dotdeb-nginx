@@ -57,6 +57,7 @@ config.status.full: config.env.full config.sub config.guess
 	    --lock-path=/var/lock/nginx.lock \
 	    --pid-path=/var/run/nginx.pid \
 	    --with-debug \
+	    --with-file-aio \
 	    --with-http_addition_module \
 	    --with-http_dav_module \
 	    --with-http_geoip_module \
@@ -91,6 +92,7 @@ config.status.light: config.env.light config.sub config.guess
 	    --http-proxy-temp-path=/var/lib/nginx/proxy \
 	    --lock-path=/var/lock/nginx.lock \
 	    --pid-path=/var/run/nginx.pid \
+	    --with-file-aio \
 	    --with-http_gzip_static_module \
 	    --with-http_ssl_module \
 	    --with-ipv6 \
