@@ -1,6 +1,9 @@
 #!/usr/bin/make -f
 
-CFLAGS = -Wall -g
+CFLAGS = `dpkg-buildflags --get CFLAGS`
+CFLAGS += -Wall
+CFLAGS += `dpkg-buildflags --get CPPFLAGS`
+LDFLAGS = `dpkg-buildflags --get LDFLAGS`
 
 FLAVOURS:=full light extras
 
@@ -15,10 +18,12 @@ ifeq ($(DEB_BUILD_ARCH),sparc)
 	CONFIGURE_OPTS = --with-cc-opt="-m32 -mcpu=ultrasparc"
 endif
 
-ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
-	CFLAGS += -O0
-else
-	CFLAGS += -O2
+
+ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+	NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+	ifeq (${NUMJOBS}, 0)
+		NUMJOBS = 1
+	endif
 endif
 
 config.sub:
@@ -44,7 +49,7 @@ config.env.%:
 	cp -Pa $(CURDIR)/man $(BUILDDIR_$*)/
 
 config.status.full: config.env.full config.sub config.guess
-	cd $(BUILDDIR_full) && ./configure \
+	cd $(BUILDDIR_full) && CFLAGS="$(CFLAGS)" CORE_LINK="$(LDFLAGS)" ./configure  \
 	    --prefix=/etc/nginx \
 	    --conf-path=/etc/nginx/nginx.conf \
 	    --error-log-path=/var/log/nginx/error.log \
@@ -74,6 +79,7 @@ config.status.full: config.env.full config.sub config.guess
 	    --with-md5=/usr/include/openssl \
 	    --with-mail \
 	    --with-mail_ssl_module \
+	    --add-module=$(MODULESDIR)/nginx-auth-pam \
 	    --add-module=$(MODULESDIR)/nginx-echo \
 	    --add-module=$(MODULESDIR)/nginx-upstream-fair \
 	    --add-module=$(MODULESDIR)/nginx-syslog \
@@ -82,7 +88,7 @@ config.status.full: config.env.full config.sub config.guess
 	touch $@
 
 config.status.light: config.env.light config.sub config.guess
-	cd $(BUILDDIR_light) && ./configure \
+	cd $(BUILDDIR_light) && CFLAGS="$(CFLAGS)" CORE_LINK="$(LDFLAGS)" ./configure  \
 	    --prefix=/etc/nginx \
 	    --conf-path=/etc/nginx/nginx.conf \
 	    --error-log-path=/var/log/nginx/error.log \
@@ -113,7 +119,7 @@ config.status.light: config.env.light config.sub config.guess
 	touch $@
 
 config.status.extras: config.env.extras config.sub config.guess
-	cd $(BUILDDIR_extras) && ./configure \
+	cd $(BUILDDIR_extras) && CFLAGS="$(CFLAGS)" CORE_LINK="$(LDFLAGS)" ./configure  \
 	    --prefix=/etc/nginx \
 	    --conf-path=/etc/nginx/nginx.conf \
 	    --error-log-path=/var/log/nginx/error.log \
@@ -147,17 +153,18 @@ config.status.extras: config.env.extras config.sub config.guess
 	    --with-md5=/usr/include/openssl \
 	    --with-mail \
 	    --with-mail_ssl_module \
-	    --add-module=$(MODULESDIR)/nginx-development-kit \
-	    --add-module=$(MODULESDIR)/nginx-upstream-fair \
-	    --add-module=$(MODULESDIR)/nginx-echo \
-	    --add-module=$(MODULESDIR)/nginx-lua \
-	    --add-module=$(MODULESDIR)/nginx-push-stream-module \
-	    --add-module=$(MODULESDIR)/nginx-upload-progress \
 	    --add-module=$(MODULESDIR)/chunkin-nginx-module \
 	    --add-module=$(MODULESDIR)/headers-more-nginx-module \
+	    --add-module=$(MODULESDIR)/nginx-auth-pam \
+	    --add-module=$(MODULESDIR)/nginx-development-kit \
+	    --add-module=$(MODULESDIR)/nginx-echo \
+	    --add-module=$(MODULESDIR)/nginx-push-stream-module \
+	    --add-module=$(MODULESDIR)/nginx-lua \
+	    --add-module=$(MODULESDIR)/nginx-upload-module \
+	    --add-module=$(MODULESDIR)/nginx-upload-progress \
+	    --add-module=$(MODULESDIR)/nginx-upstream-fair \
 	    --add-module=$(MODULESDIR)/nginx-syslog \
 	    --add-module=$(MODULESDIR)/ngx_cache_purge \
-	    --add-module=$(MODULESDIR)/ngx_http_auth_pam_module \
 	    --add-module=/usr/lib/phusion-passenger/ext/nginx \
             $(CONFIGURE_OPTS) >$@
 	touch $@
@@ -168,13 +175,13 @@ config.status.%:
 build-arch.%: config.status.%
 	dh_testdir
 	dh_prep
-	$(MAKE) -C $(BUILDDIR_$*) build
+	$(MAKE) -j$(NUMJOBS) -C $(BUILDDIR_$*) build
 
 build-arch: $(foreach flavour,$(FLAVOURS),build-arch.$(flavour))
 	dh_testdir
 	touch $@
 
-build-dbg.%:
+build-dbg.%: install
 	dh_testdir
 	dh_strip --package=nginx-$(*) --dbg-package=nginx-$(*)-dbg
 
@@ -206,8 +213,8 @@ install: mime-types
 	dh_install
 
 binary-indep: install
-	dh_testdir -i
-	dh_testroot -i
+	dh_testdir
+	dh_testroot
 	dh_installman -i
 	dh_installchangelogs -i -k CHANGES
 	dh_installdocs -i
@@ -223,8 +230,8 @@ binary-indep: install
 	dh_builddeb -i
 
 binary-arch: install build-dbg
-	dh_testdir -a
-	dh_testroot -a
+	dh_testdir
+	dh_testroot
 	dh_installchangelogs -a -k CHANGES
 	dh_installdocs -a
 	dh_link -aA

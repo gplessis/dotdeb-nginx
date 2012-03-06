@@ -39,7 +39,7 @@ ngx_http_push_stream_websocket_handler(ngx_http_request_t *r)
     ngx_http_push_stream_loc_conf_t                *cf = ngx_http_get_module_loc_conf(r, ngx_http_push_stream_module);
     ngx_http_push_stream_subscriber_t              *worker_subscriber;
     ngx_http_push_stream_requested_channel_t       *channels_ids, *cur;
-    ngx_pool_t                                     *temp_pool;
+    ngx_http_push_stream_subscriber_ctx_t          *ctx;
     ngx_int_t                                       rc;
     ngx_int_t                                       status_code;
     ngx_str_t                                      *explain_error_message;
@@ -69,35 +69,30 @@ ngx_http_push_stream_websocket_handler(ngx_http_request_t *r)
         return ngx_http_push_stream_send_only_header_response(r, NGX_HTTP_BAD_REQUEST, &NGX_HTTP_PUSH_STREAM_WRONG_WEBSOCKET_VERSION_MESSAGE);
     }
 
-    //create a temporary pool to allocate temporary elements
-    if ((temp_pool = ngx_create_pool(NGX_CYCLE_POOL_SIZE, r->connection->log)) == NULL) {
-        ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "push stream module: unable to allocate memory for temporary pool");
+    if ((ctx = ngx_http_push_stream_add_request_context(r)) == NULL) {
+        ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "push stream module: unable to create request context");
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
     //get channels ids and backtracks from path
-    channels_ids = ngx_http_push_stream_parse_channels_ids_from_path(r, temp_pool);
+    channels_ids = ngx_http_push_stream_parse_channels_ids_from_path(r, ctx->temp_pool);
     if ((channels_ids == NULL) || ngx_queue_empty(&channels_ids->queue)) {
         ngx_log_error(NGX_LOG_WARN, r->connection->log, 0, "push stream module: the $push_stream_channels_path variable is required but is not set");
-        ngx_destroy_pool(temp_pool);
         return ngx_http_push_stream_send_only_header_response(r, NGX_HTTP_BAD_REQUEST, &NGX_HTTP_PUSH_STREAM_NO_CHANNEL_ID_MESSAGE);
     }
 
     //validate channels: name, length and quantity. check if channel exists when authorized_channels_only is on. check if channel is full of subscribers
     if (ngx_http_push_stream_validate_channels(r, channels_ids, &status_code, &explain_error_message) == NGX_ERROR) {
-        ngx_destroy_pool(temp_pool);
         return ngx_http_push_stream_send_only_header_response(r, status_code, explain_error_message);
     }
 
     // stream access
     if ((worker_subscriber = ngx_http_push_stream_subscriber_prepare_request_to_keep_connected(r)) == NULL) {
-        ngx_destroy_pool(temp_pool);
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
-    if ((sec_accept_header = ngx_http_push_stream_generate_websocket_accept_value(r, sec_key_header, temp_pool)) == NULL) {
+    if ((sec_accept_header = ngx_http_push_stream_generate_websocket_accept_value(r, sec_key_header, ctx->temp_pool)) == NULL) {
         ngx_log_error(NGX_LOG_WARN, r->connection->log, 0, "push stream module: could not generate security accept heade value");
-        ngx_destroy_pool(temp_pool);
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
@@ -112,7 +107,6 @@ ngx_http_push_stream_websocket_handler(ngx_http_request_t *r)
     // sending response content header
     if (ngx_http_push_stream_send_response_content_header(r, cf) == NGX_ERROR) {
         ngx_log_error(NGX_LOG_ERR, (r)->connection->log, 0, "push stream module: could not send content header to subscriber");
-        ngx_destroy_pool(temp_pool);
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
@@ -121,20 +115,21 @@ ngx_http_push_stream_websocket_handler(ngx_http_request_t *r)
     ngx_shmtx_unlock(&shpool->mutex);
 
     if (rc == NGX_ERROR) {
-        ngx_destroy_pool(temp_pool);
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
     // adding subscriber to channel(s) and send backtrack messages
     cur = channels_ids;
     while ((cur = (ngx_http_push_stream_requested_channel_t *) ngx_queue_next(&cur->queue)) != channels_ids) {
-        if (ngx_http_push_stream_subscriber_assign_channel(shpool, cf, r, cur, -1, NULL, worker_subscriber, temp_pool) != NGX_OK) {
-            ngx_destroy_pool(temp_pool);
+        if (ngx_http_push_stream_subscriber_assign_channel(shpool, cf, r, cur, -1, NULL, worker_subscriber, ctx->temp_pool) != NGX_OK) {
             return NGX_HTTP_INTERNAL_SERVER_ERROR;
         }
     }
 
-    ngx_destroy_pool(temp_pool);
+    if (ctx->temp_pool != NULL) {
+        ngx_destroy_pool(ctx->temp_pool);
+        ctx->temp_pool = NULL;
+    }
     return NGX_DONE;
 }
 
@@ -262,7 +257,8 @@ ngx_http_push_stream_websocket_reading(ngx_http_request_t *r)
         //create a temporary pool to allocate temporary elements
         if ((temp_pool = ngx_create_pool(NGX_CYCLE_POOL_SIZE, r->connection->log)) == NULL) {
             ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "push stream module: unable to allocate memory for temporary pool");
-            ngx_http_finalize_request(r, 0);
+            ngx_http_finalize_request(r, NGX_OK);
+            ngx_destroy_pool(temp_pool);
             return;
         }
 
@@ -281,8 +277,8 @@ ngx_http_push_stream_websocket_reading(ngx_http_request_t *r)
 
             ngx_http_push_stream_subscriber_ctx_t *ctx = ngx_http_get_module_ctx(r, ngx_http_push_stream_module);
             ngx_http_push_stream_subscription_t *subscription = (ngx_http_push_stream_subscription_t *)ngx_queue_head(&ctx->subscriber->subscriptions_sentinel.queue);
-            if (ngx_http_push_stream_add_msg_to_channel(r, &subscription->channel->id, frame.payload, frame.payload_len, NULL, temp_pool) == NULL) {
-                ngx_http_finalize_request(r, 0);
+            if (ngx_http_push_stream_add_msg_to_channel(r, &subscription->channel->id, frame.payload, frame.payload_len, NULL, NULL, temp_pool) == NULL) {
+                ngx_http_finalize_request(r, NGX_OK);
                 ngx_destroy_pool(temp_pool);
                 return;
             }
@@ -300,7 +296,7 @@ ngx_http_push_stream_websocket_reading(ngx_http_request_t *r)
     if ((ngx_event_flags & NGX_USE_LEVEL_EVENT) && rev->active) {
 
         if (ngx_del_event(rev, NGX_READ_EVENT, 0) != NGX_OK) {
-            ngx_http_finalize_request(r, 0);
+            ngx_http_finalize_request(r, NGX_OK);
         }
     }
     return;
@@ -316,5 +312,5 @@ closed:
 
     ngx_log_error(NGX_LOG_INFO, c->log, err, "client closed prematurely connection");
 
-    ngx_http_finalize_request(r, 0);
+    ngx_http_finalize_request(r, NGX_OK);
 }

@@ -172,14 +172,14 @@ ngx_http_push_stream_clean_worker_data()
     ngx_shmtx_lock(&shpool->mutex);
     if (data->ipc[ngx_process_slot].messages_queue != NULL) {
         while ((cur_msg = (ngx_http_push_stream_worker_msg_t *) ngx_queue_next(&data->ipc[ngx_process_slot].messages_queue->queue)) != data->ipc[ngx_process_slot].messages_queue) {
-            ngx_queue_remove(&cur_msg->queue);
-            ngx_slab_free_locked(shpool, cur_msg);
+            ngx_http_push_stream_free_worker_message_memory_locked(shpool, cur_msg);
         }
     }
 
     if (data->ipc[ngx_process_slot].subscribers_sentinel != NULL) {
         ngx_queue_init(&data->ipc[ngx_process_slot].subscribers_sentinel->queue);
     }
+
     ngx_shmtx_unlock(&shpool->mutex);
 
     data->ipc[ngx_process_slot].pid = -1;
@@ -316,12 +316,7 @@ ngx_http_push_stream_process_worker_message(void)
 
         // free worker_msg already sent
         ngx_shmtx_lock(&shpool->mutex);
-        worker_msg->msg->workers_ref_count--;
-        if ((worker_msg->msg->workers_ref_count <= 0) && worker_msg->msg->deleted) {
-            worker_msg->msg->expires = ngx_time() + ngx_http_push_stream_module_main_conf->shm_cleanup_objects_ttl;
-        }
-        ngx_queue_remove(&worker_msg->queue);
-        ngx_slab_free_locked(shpool, worker_msg);
+        ngx_http_push_stream_free_worker_message_memory_locked(shpool, worker_msg);
         ngx_shmtx_unlock(&shpool->mutex);
     }
 }
@@ -345,9 +340,7 @@ ngx_http_push_stream_send_worker_message_locked(ngx_http_push_stream_channel_t *
     newmessage->pid = pid;
     newmessage->subscribers_sentinel = subscribers_sentinel;
     newmessage->channel = channel;
-    if (ngx_queue_empty(&thisworker_data->messages_queue->queue)) {
-        *queue_was_empty = 1;
-    }
+    *queue_was_empty = ngx_queue_empty(&thisworker_data->messages_queue->queue);
     ngx_queue_insert_tail(&thisworker_data->messages_queue->queue, &newmessage->queue);
 
     return NGX_OK;
@@ -362,21 +355,19 @@ ngx_http_push_stream_broadcast(ngx_http_push_stream_channel_t *channel, ngx_http
     ngx_http_push_stream_pid_queue_t        *sentinel = &channel->workers_with_subscribers;
     ngx_http_push_stream_pid_queue_t        *cur = sentinel;
     ngx_slab_pool_t                         *shpool = (ngx_slab_pool_t *) ngx_http_push_stream_shm_zone->shm.addr;
-    ngx_flag_t                               queue_was_empty = 0;
+    ngx_flag_t                               queue_was_empty[NGX_MAX_PROCESSES];
 
     ngx_shmtx_lock(&shpool->mutex);
     while ((cur = (ngx_http_push_stream_pid_queue_t *) ngx_queue_next(&cur->queue)) != sentinel) {
-        ngx_http_push_stream_send_worker_message_locked(channel, &cur->subscribers_sentinel, cur->pid, cur->slot, msg, &queue_was_empty, log);
+        ngx_http_push_stream_send_worker_message_locked(channel, &cur->subscribers_sentinel, cur->pid, cur->slot, msg, &queue_was_empty[cur->slot], log);
     }
     ngx_shmtx_unlock(&shpool->mutex);
 
-    if (queue_was_empty) {
-        cur = sentinel;
-        while ((cur = (ngx_http_push_stream_pid_queue_t *) ngx_queue_next(&cur->queue)) != sentinel) {
-            // interprocess communication breakdown
-            if (ngx_http_push_stream_alert_worker_check_messages(cur->pid, cur->slot, log) != NGX_OK) {
-                ngx_log_error(NGX_LOG_ERR, log, 0, "push stream module: error communicating with worker process, pid: %P, slot: %d", cur->pid, cur->slot);
-            }
+    cur = sentinel;
+    while ((cur = (ngx_http_push_stream_pid_queue_t *) ngx_queue_next(&cur->queue)) != sentinel) {
+        // interprocess communication breakdown
+        if (queue_was_empty[cur->slot] && (ngx_http_push_stream_alert_worker_check_messages(cur->pid, cur->slot, log) != NGX_OK)) {
+            ngx_log_error(NGX_LOG_ERR, log, 0, "push stream module: error communicating with worker process, pid: %P, slot: %d", cur->pid, cur->slot);
         }
     }
 
@@ -413,10 +404,14 @@ ngx_http_push_stream_respond_to_subscribers(ngx_http_push_stream_channel_t *chan
 
                 cur = prev;
             } else {
-                if (ngx_http_push_stream_send_response_message(subscriber->request, channel, msg) == NGX_ERROR) {
+                if (ngx_http_push_stream_send_response_message(subscriber->request, channel, msg) != NGX_OK) {
                     ngx_http_push_stream_queue_elem_t *prev = (ngx_http_push_stream_queue_elem_t *) ngx_queue_prev(&cur->queue);
                     ngx_http_push_stream_send_response_finalize(subscriber->request);
                     cur = prev;
+                } else {
+                    ngx_http_push_stream_subscriber_ctx_t *ctx = ngx_http_get_module_ctx(subscriber->request, ngx_http_push_stream_module);
+                    ngx_http_push_stream_loc_conf_t       *pslcf = ngx_http_get_module_loc_conf(subscriber->request, ngx_http_push_stream_module);
+                    ngx_http_push_stream_timer_reset(pslcf->ping_message_interval, ctx->ping_timer);
                 }
             }
         }

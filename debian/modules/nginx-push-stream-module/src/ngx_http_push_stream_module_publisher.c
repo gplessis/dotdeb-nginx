@@ -24,6 +24,7 @@
  */
 
 #include <ngx_http_push_stream_module_publisher.h>
+#include <ngx_http_push_stream_module_version.h>
 
 static ngx_int_t    ngx_http_push_stream_publisher_handle_post(ngx_http_push_stream_loc_conf_t *cf, ngx_http_request_t *r, ngx_str_t *id);
 
@@ -127,7 +128,7 @@ static void
 ngx_http_push_stream_publisher_body_handler(ngx_http_request_t *r)
 {
     ngx_str_t                              *id;
-    ngx_str_t                              *event_id;
+    ngx_str_t                              *event_id, *event_type;
     ngx_http_push_stream_loc_conf_t        *cf = ngx_http_get_module_loc_conf(r, ngx_http_push_stream_module);
     ngx_buf_t                              *buf = NULL;
     ngx_chain_t                            *chain;
@@ -185,8 +186,9 @@ ngx_http_push_stream_publisher_body_handler(ngx_http_request_t *r)
     }
 
     event_id = ngx_http_push_stream_get_header(r, &NGX_HTTP_PUSH_STREAM_HEADER_EVENT_ID);
+    event_type = ngx_http_push_stream_get_header(r, &NGX_HTTP_PUSH_STREAM_HEADER_EVENT_TYPE);
 
-    channel = ngx_http_push_stream_add_msg_to_channel(r, id, buf->pos, ngx_buf_size(buf), event_id, r->pool);
+    channel = ngx_http_push_stream_add_msg_to_channel(r, id, buf->pos, ngx_buf_size(buf), event_id, event_type, r->pool);
     if (channel == NULL) {
         ngx_http_finalize_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
         return;
@@ -212,6 +214,9 @@ ngx_http_push_stream_channels_statistics_handler(ngx_http_request_t *r)
         ngx_http_push_stream_add_response_header(r, &NGX_HTTP_PUSH_STREAM_HEADER_ALLOW, &NGX_HTTP_PUSH_STREAM_ALLOW_GET);
         return ngx_http_push_stream_send_only_header_response(r, NGX_HTTP_NOT_ALLOWED, NULL);
     }
+
+    ngx_http_push_stream_add_response_header(r, &NGX_HTTP_PUSH_STREAM_HEADER_TAG, &NGX_HTTP_PUSH_STREAM_TAG);
+    ngx_http_push_stream_add_response_header(r, &NGX_HTTP_PUSH_STREAM_HEADER_COMMIT, &NGX_HTTP_PUSH_STREAM_COMMIT);
 
     // get and check channel id value
     id = ngx_http_push_stream_get_channel_id(r, cf);

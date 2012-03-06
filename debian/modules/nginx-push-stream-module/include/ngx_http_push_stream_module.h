@@ -36,6 +36,20 @@ typedef struct {
     void                           *value;
 } ngx_http_push_stream_queue_elem_t;
 
+typedef struct {
+    ngx_queue_t                     queue;
+    time_t                          expires;
+    ngx_pool_t                     *pool;
+} ngx_http_push_stream_queue_pool_t;
+
+
+typedef struct {
+    ngx_queue_t                     queue;
+    ngx_regex_t                    *agent;
+    ngx_uint_t                      header_min_len;
+    ngx_uint_t                      message_min_len;
+} ngx_http_push_stream_padding_t;
+
 // template queue
 typedef struct {
     ngx_queue_t                     queue; // this MUST be first
@@ -82,6 +96,11 @@ typedef struct {
     ngx_msec_t                      subscriber_connection_ttl;
     ngx_msec_t                      longpolling_connection_ttl;
     ngx_flag_t                      websocket_allow_publish;
+    ngx_http_complex_value_t       *last_received_message_time;
+    ngx_http_complex_value_t       *last_received_message_tag;
+    ngx_http_complex_value_t       *user_agent;
+    ngx_str_t                       padding_by_user_agent;
+    ngx_http_push_stream_padding_t *paddings;
 } ngx_http_push_stream_loc_conf_t;
 
 // shared memory segment name
@@ -97,12 +116,13 @@ typedef struct {
     ngx_str_t                      *raw;
     ngx_int_t                       tag;
     ngx_str_t                      *event_id;
+    ngx_str_t                      *event_type;
     ngx_str_t                      *event_id_message;
+    ngx_str_t                      *event_type_message;
     ngx_str_t                      *formatted_messages;
     ngx_int_t                       workers_ref_count;
 } ngx_http_push_stream_msg_t;
 
-typedef struct ngx_http_push_stream_subscriber_cleanup_s ngx_http_push_stream_subscriber_cleanup_t;
 typedef struct ngx_http_push_stream_subscriber_s ngx_http_push_stream_subscriber_t;
 
 typedef struct {
@@ -148,7 +168,6 @@ typedef struct {
 struct ngx_http_push_stream_subscriber_s {
     ngx_http_request_t                         *request;
     ngx_http_push_stream_subscription_t         subscriptions_sentinel;
-    ngx_http_push_stream_subscriber_cleanup_t  *clndata;
     ngx_pid_t                                   worker_subscribed_pid;
     ngx_flag_t                                  longpolling;
     ngx_http_push_stream_queue_elem_t          *worker_subscriber_element_ref;
@@ -159,12 +178,12 @@ typedef struct {
     ngx_event_t                        *ping_timer;
     ngx_http_push_stream_subscriber_t  *subscriber;
     ngx_flag_t                          longpolling;
+    ngx_pool_t                         *temp_pool;
+    ngx_chain_t                        *free;
+    ngx_chain_t                        *busy;
+    ngx_http_push_stream_padding_t     *padding;
+    ngx_str_t                          *callback;
 } ngx_http_push_stream_subscriber_ctx_t;
-
-// cleaning supplies
-struct ngx_http_push_stream_subscriber_cleanup_s {
-    ngx_http_push_stream_subscriber_t    *worker_subscriber;
-};
 
 // messages to worker processes
 typedef struct {
@@ -203,6 +222,8 @@ ngx_shm_zone_t     *ngx_http_push_stream_shm_zone = NULL;
 
 ngx_http_push_stream_main_conf_t *ngx_http_push_stream_module_main_conf = NULL;
 
+ngx_str_t         **ngx_http_push_stream_module_paddings_chunks = NULL;
+
 // channel
 static ngx_str_t *      ngx_http_push_stream_get_channel_id(ngx_http_request_t *r, ngx_http_push_stream_loc_conf_t *cf);
 static ngx_int_t        ngx_http_push_stream_send_response_channel_info(ngx_http_request_t *r, ngx_http_push_stream_channel_t *channel);
@@ -232,15 +253,19 @@ static const ngx_str_t NGX_HTTP_PUSH_STREAM_CHANNEL_DELETED = ngx_string("Channe
 static ngx_str_t        NGX_HTTP_PUSH_STREAM_EMPTY = ngx_string("");
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_BACKTRACK_SEP = ngx_string(".b");
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_SLASH = ngx_string("/");
+static const ngx_str_t  NGX_HTTP_PUSH_STREAM_CALLBACK = ngx_string("callback");
 
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_DATE_FORMAT_ISO_8601 = ngx_string("%4d-%02d-%02dT%02d:%02d:%02d");
 
 // headers
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_HEADER_EVENT_ID = ngx_string("Event-Id");
+static const ngx_str_t  NGX_HTTP_PUSH_STREAM_HEADER_EVENT_TYPE = ngx_string("Event-Type");
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_HEADER_LAST_EVENT_ID = ngx_string("Last-Event-Id");
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_HEADER_ALLOW = ngx_string("Allow");
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_HEADER_EXPLAIN = ngx_string("X-Nginx-PushStream-Explain");
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_HEADER_MODE = ngx_string("X-Nginx-PushStream-Mode");
+static const ngx_str_t  NGX_HTTP_PUSH_STREAM_HEADER_TAG = ngx_string("X-Nginx-PushStream-Tag");
+static const ngx_str_t  NGX_HTTP_PUSH_STREAM_HEADER_COMMIT = ngx_string("X-Nginx-PushStream-Commit");
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_HEADER_TRANSFER_ENCODING = ngx_string("Transfer-Encoding");
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_HEADER_CHUNCKED = ngx_string("chunked");
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_HEADER_ETAG = ngx_string("Etag");
@@ -318,5 +343,7 @@ static const ngx_str_t  NGX_HTTP_PUSH_STREAM_ALLOW_GET = ngx_string("GET");
 
 #define NGX_HTTP_PUSH_STREAM_DECREMENT_COUNTER(counter) \
     (counter = (counter > 1) ? counter - 1 : 0)
+
+#define NGX_HTTP_PUSH_STREAM_TIME_FMT_LEN   30 //sizeof("Mon, 28 Sep 1970 06:00:00 GMT")
 
 #endif /* NGX_HTTP_PUSH_STREAM_MODULE_H_ */

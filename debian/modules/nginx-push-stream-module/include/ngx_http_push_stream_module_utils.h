@@ -194,17 +194,25 @@ static const ngx_int_t  NGX_HTTP_PUSH_STREAM_CHANNEL_DELETED_MESSAGE_ID = -2;
 
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_TOKEN_MESSAGE_ID = ngx_string("~id~");
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_TOKEN_MESSAGE_EVENT_ID = ngx_string("~event-id~");
+static const ngx_str_t  NGX_HTTP_PUSH_STREAM_TOKEN_MESSAGE_EVENT_TYPE = ngx_string("~event-type~");
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_TOKEN_MESSAGE_CHANNEL = ngx_string("~channel~");
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_TOKEN_MESSAGE_TEXT = ngx_string("~text~");
+static const ngx_str_t  NGX_HTTP_PUSH_STREAM_TOKEN_MESSAGE_TAG = ngx_string("~tag~");
+static const ngx_str_t  NGX_HTTP_PUSH_STREAM_TOKEN_MESSAGE_TIME = ngx_string("~time~");
 
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_EVENTSOURCE_DEFAULT_HEADER_TEMPLATE = ngx_string(":");
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_EVENTSOURCE_COMMENT_TEMPLATE = ngx_string(": ~text~\r\n");
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_EVENTSOURCE_MESSAGE_PREFIX = ngx_string("data: ");
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_EVENTSOURCE_ID_TEMPLATE = ngx_string("id: ~event-id~");
+static const ngx_str_t  NGX_HTTP_PUSH_STREAM_EVENTSOURCE_EVENT_TEMPLATE = ngx_string("event: ~event-type~");
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_EVENTSOURCE_CONTENT_TYPE = ngx_string("text/event-stream; charset=utf-8");
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_EVENTSOURCE_PING_MESSAGE_CHUNK = ngx_string("6" CRLF ": -1" CRLF CRLF);
 
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_LAST_CHUNK = ngx_string("0" CRLF CRLF);
+static const ngx_str_t  NGX_HTTP_PUSH_STREAM_CALLBACK_INIT_CHUNK = ngx_string("3" CRLF "(" CRLF CRLF);
+static const ngx_str_t  NGX_HTTP_PUSH_STREAM_CALLBACK_END_CHUNK = ngx_string("4" CRLF ");" CRLF CRLF);
+
+static const ngx_str_t  NGX_HTTP_PUSH_STREAM_PADDING_BY_USER_AGENT_PATTERN = ngx_string("([^:]+),(\\d+),(\\d+)");
 
 ngx_event_t         ngx_http_push_stream_memory_cleanup_event;
 ngx_event_t         ngx_http_push_stream_buffer_cleanup_event;
@@ -212,7 +220,7 @@ ngx_event_t         ngx_http_push_stream_buffer_cleanup_event;
 ngx_http_push_stream_msg_t *ngx_http_push_stream_ping_msg = NULL;
 
 // general request handling
-ngx_http_push_stream_msg_t *ngx_http_push_stream_convert_char_to_msg_on_shared_locked(u_char *data, size_t len, ngx_http_push_stream_channel_t *channel, ngx_int_t id, ngx_str_t *event_id, ngx_pool_t *temp_pool);
+ngx_http_push_stream_msg_t *ngx_http_push_stream_convert_char_to_msg_on_shared_locked(u_char *data, size_t len, ngx_http_push_stream_channel_t *channel, ngx_int_t id, ngx_str_t *event_id, ngx_str_t *event_type, ngx_pool_t *temp_pool);
 static ngx_int_t            ngx_http_push_stream_send_only_added_headers(ngx_http_request_t *r);
 static void                 ngx_http_push_stream_add_polling_headers(ngx_http_request_t *r, time_t last_modified_time, ngx_int_t tag, ngx_pool_t *temp_pool);
 static ngx_table_elt_t *    ngx_http_push_stream_add_response_header(ngx_http_request_t *r, const ngx_str_t *header_name, const ngx_str_t *header_value);
@@ -225,6 +233,7 @@ static ngx_str_t *          ngx_http_push_stream_get_formatted_message(ngx_http_
 static ngx_str_t *          ngx_http_push_stream_format_message(ngx_http_push_stream_channel_t *channel, ngx_http_push_stream_msg_t *message, ngx_str_t *text, ngx_str_t *message_template, ngx_pool_t *temp_pool);
 static ngx_str_t *          ngx_http_push_stream_apply_template_to_each_line(ngx_str_t *text, const ngx_str_t *message_template, ngx_pool_t *temp_pool);
 static ngx_int_t            ngx_http_push_stream_send_response_content_header(ngx_http_request_t *r, ngx_http_push_stream_loc_conf_t *pslcf);
+static ngx_int_t            ngx_http_push_stream_send_response(ngx_http_request_t *r, ngx_str_t *text, const ngx_str_t *content_type, ngx_int_t status_code);
 static ngx_int_t            ngx_http_push_stream_send_response_message(ngx_http_request_t *r, ngx_http_push_stream_channel_t *channel, ngx_http_push_stream_msg_t *msg);
 static ngx_int_t            ngx_http_push_stream_send_response_text(ngx_http_request_t *r, const u_char *text, uint len, ngx_flag_t last_buffer);
 static void                 ngx_http_push_stream_send_response_finalize(ngx_http_request_t *r);
@@ -232,7 +241,12 @@ static void                 ngx_http_push_stream_send_response_finalize_for_long
 static ngx_int_t            ngx_http_push_stream_memory_cleanup();
 static ngx_int_t            ngx_http_push_stream_buffer_cleanup();
 
-ngx_http_push_stream_channel_t *ngx_http_push_stream_add_msg_to_channel(ngx_http_request_t *r, ngx_str_t *id, u_char *text, size_t len, ngx_str_t *event_id, ngx_pool_t *temp_pool);
+ngx_chain_t *               ngx_http_push_stream_get_buf(ngx_http_request_t *r);
+static void                 ngx_http_push_stream_unescape_uri(ngx_str_t *value);
+static void                 ngx_http_push_stream_complex_value(ngx_http_request_t *r, ngx_http_complex_value_t *val, ngx_str_t *value);
+
+
+ngx_http_push_stream_channel_t *ngx_http_push_stream_add_msg_to_channel(ngx_http_request_t *r, ngx_str_t *id, u_char *text, size_t len, ngx_str_t *event_id, ngx_str_t *event_type, ngx_pool_t *temp_pool);
 
 static void                 ngx_http_push_stream_ping_timer_wake_handler(ngx_event_t *ev);
 static void                 ngx_http_push_stream_disconnect_timer_wake_handler(ngx_event_t *ev);
@@ -253,6 +267,7 @@ static void                 ngx_http_push_stream_delete_channel(ngx_str_t *id, n
 static void                 ngx_http_push_stream_collect_expired_messages(ngx_http_push_stream_shm_data_t *data, ngx_slab_pool_t *shpool, ngx_rbtree_node_t *node, ngx_flag_t force);
 static void                 ngx_http_push_stream_collect_expired_messages_and_empty_channels(ngx_http_push_stream_shm_data_t *data, ngx_slab_pool_t *shpool, ngx_rbtree_node_t *node, ngx_flag_t force);
 static void                 ngx_http_push_stream_free_message_memory_locked(ngx_slab_pool_t *shpool, ngx_http_push_stream_msg_t *msg);
+static void                 ngx_http_push_stream_free_worker_message_memory_locked(ngx_slab_pool_t *shpool, ngx_http_push_stream_worker_msg_t *worker_msg);
 static ngx_int_t            ngx_http_push_stream_free_memory_of_expired_messages_and_channels(ngx_flag_t force);
 static ngx_inline void      ngx_http_push_stream_ensure_qtd_of_messages_locked(ngx_http_push_stream_channel_t *channel, ngx_uint_t max_messages, ngx_flag_t expired);
 static ngx_inline void      ngx_http_push_stream_delete_worker_channel(void);
@@ -262,6 +277,9 @@ static ngx_http_push_stream_content_subtype_t *     ngx_http_push_stream_match_c
 static ngx_http_push_stream_line_t *                ngx_http_push_stream_split_by_crlf(ngx_str_t *msg, ngx_pool_t *temp_pool);
 static ngx_str_t *                                  ngx_http_push_stream_join_with_crlf(ngx_http_push_stream_line_t *lines, ngx_pool_t *temp_pool);
 
+static ngx_http_push_stream_subscriber_ctx_t *      ngx_http_push_stream_add_request_context(ngx_http_request_t *r);
+
+static ngx_http_push_stream_padding_t *             ngx_http_push_stream_parse_paddings(ngx_conf_t *cf, ngx_str_t *paddings_by_user_agent);
 
 static ngx_str_t *          ngx_http_push_stream_get_formatted_current_time(ngx_pool_t *pool);
 static ngx_str_t *          ngx_http_push_stream_get_formatted_hostname(ngx_pool_t *pool);

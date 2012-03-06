@@ -3,11 +3,12 @@
 #ifndef NGX_HTTP_LUA_COMMON_H
 #define NGX_HTTP_LUA_COMMON_H
 
-#ifndef DDEBUG
-#define DDEBUG 0
-#endif
-
 #include "ddebug.h"
+
+#include <nginx.h>
+#include <ngx_core.h>
+#include <ngx_http.h>
+#include <ngx_md5.h>
 
 #include <assert.h>
 #include <setjmp.h>
@@ -16,11 +17,6 @@
 #include <lualib.h>
 #include <lauxlib.h>
 
-#include <nginx.h>
-#include <ngx_core.h>
-#include <ngx_http.h>
-#include <ngx_md5.h>
-
 #if defined(NDK) && NDK
 #include <ndk.h>
 #endif
@@ -28,6 +24,11 @@
 #ifndef MD5_DIGEST_LENGTH
 #define MD5_DIGEST_LENGTH 16
 #endif
+
+#define NGX_HTTP_LUA_CHECK_ABORTED(L, ctx) \
+        if (ctx && ctx->aborted) { \
+            return luaL_error(L, "coroutine aborted"); \
+        }
 
 /* Nginx HTTP Lua Inline tag prefix */
 
@@ -58,13 +59,28 @@ typedef struct {
 #endif
 
 
+#ifndef NGX_HTTP_LUA_MAX_ARGS
+#define NGX_HTTP_LUA_MAX_ARGS 100
+#endif
+
+
+#ifndef NGX_HTTP_LUA_MAX_HEADERS
+#define NGX_HTTP_LUA_MAX_HEADERS 100
+#endif
+
+
 typedef struct {
     lua_State       *lua;
+
     ngx_str_t        lua_path;
     ngx_str_t        lua_cpath;
+
     ngx_pool_t      *pool;
+
     ngx_int_t        regex_cache_entries;
     ngx_int_t        regex_cache_max_entries;
+
+    ngx_array_t     *shm_zones;  /* of ngx_shm_zone_t* */
 
     unsigned    postponed_to_rewrite_phase_end:1;
     unsigned    postponed_to_access_phase_end:1;
@@ -73,6 +89,8 @@ typedef struct {
 
 
 typedef struct {
+    ngx_buf_tag_t           tag;
+
     ngx_flag_t              force_read_body; /* whether force request body to
                                                 be read */
 
@@ -109,8 +127,6 @@ typedef struct {
     u_char                 *header_filter_src_key;
                                     /* cached key for header_filter_src */
 
-
-
 } ngx_http_lua_loc_conf_t;
 
 
@@ -142,6 +158,8 @@ typedef struct {
     ngx_uint_t       index; /* index of the current subrequest in its
                                parent request */
 
+    unsigned         waiting;  /* number of subrequests being waited */
+
     ngx_str_t        exec_uri;
     ngx_str_t        exec_args;
 
@@ -152,10 +170,7 @@ typedef struct {
                                             0: header not sent yet */
 
     unsigned       eof:1;             /*  1: last_buf has been sent;
-                                            0: last_buf not sent yet */
-
-    unsigned       waiting;         /*  1: subrequest is still running;
-                                            0: subrequest is not running */
+                                          0: last_buf not sent yet */
 
     unsigned       done:1;            /*  1: subrequest is just done;
                                             0: subrequest is not done
@@ -171,6 +186,7 @@ typedef struct {
 
     unsigned         waiting_more_body:1;   /* 1: waiting for more data;
                                                0: no need to wait */
+    unsigned         req_read_body_done:1;  /* used by ngx.req.read_body */
 
     unsigned         headers_set:1;
     unsigned         entered_rewrite_phase:1;
@@ -181,6 +197,8 @@ typedef struct {
     unsigned         run_post_subrequest:1;
     unsigned         req_header_cached:1;
 
+    unsigned         waiting_flush:1;
+    unsigned         aborted:1;
 } ngx_http_lua_ctx_t;
 
 

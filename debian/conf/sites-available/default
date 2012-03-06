@@ -34,7 +34,7 @@ server {
 	}
 
 	location /doc/ {
-		alias /usr/share/doc;
+		alias /usr/share/doc/;
 		autoindex on;
 		allow 127.0.0.1;
 		deny all;

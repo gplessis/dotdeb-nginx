@@ -1,8 +1,9 @@
 /* vim:set ft=c ts=4 sw=4 et fdm=marker: */
 /* Copyright (C) agentzh */
 
+#ifndef DDEBUG
 #define DDEBUG 0
-
+#endif
 #include "ddebug.h"
 
 #include <nginx.h>
@@ -41,6 +42,12 @@ static ngx_int_t ngx_http_lua_rm_header(ngx_list_t *l, ngx_table_elt_t *h);
 
 
 static ngx_http_lua_set_header_t ngx_http_lua_set_handlers[] = {
+
+#if (NGX_HTTP_GZIP)
+    { ngx_string("Accept-Encoding"),
+                 offsetof(ngx_http_headers_in_t, accept_encoding),
+                 ngx_http_set_builtin_header },
+#endif
 
     { ngx_string("Host"),
                  offsetof(ngx_http_headers_in_t, host),
@@ -210,6 +217,7 @@ new_header:
     return NGX_OK;
 }
 
+
 static ngx_int_t
 ngx_http_set_builtin_header(ngx_http_request_t *r,
         ngx_http_lua_header_val_t *hv, ngx_str_t *value)
@@ -321,11 +329,12 @@ ngx_http_lua_set_input_header(ngx_http_request_t *r, ngx_str_t key,
 
     dd("set header value: %.*s", (int) value.len, value.data);
 
-    hv.hash = 1;
+    hv.hash = ngx_hash_key_lc(key.data, key.len);
     hv.key = key;
 
     hv.offset = 0;
     hv.no_override = ! override;
+    hv.handler = NULL;
 
     for (i = 0; handlers[i].name.len; i++) {
         if (hv.key.len != handlers[i].name.len
@@ -351,6 +360,12 @@ ngx_http_lua_set_input_header(ngx_http_request_t *r, ngx_str_t key,
         hv.handler = handlers[i].handler;
     }
 
+#if 1
+    if (hv.handler == NULL) {
+        return NGX_ERROR;
+    }
+#endif
+
     return hv.handler(r, &hv, &value);
 }
 
@@ -374,6 +389,8 @@ ngx_http_lua_rm_header(ngx_list_t *l, ngx_table_elt_t *h)
             }
 
             part = part->next;
+            data = part->elts;
+
             h = part->elts;
             i = 0;
         }

@@ -5,14 +5,14 @@ use Test::Nginx::Socket;
 #worker_connections(1014);
 #master_on();
 #workers(2);
-log_level('warn');
+#log_level('warn');
 
 repeat_each(2);
 
-plan tests => repeat_each() * (blocks() * 2);
+plan tests => repeat_each() * (blocks() * 2 + 4);
 
 #no_diff();
-#no_long_string();
+no_long_string();
 run_tests();
 
 __DATA__
@@ -69,8 +69,10 @@ __DATA__
     }
 --- request
     GET /re
---- response_body
-not matched!
+--- response_body_like: 500 Internal Server Error
+--- error_log eval
+[qr/invalid escape sequence near '"\('/]
+--- error_code: 500
 
 
 
@@ -88,8 +90,10 @@ not matched!
     }
 --- request
     GET /re
---- response_body
-not matched!
+--- response_body_like: 500 Internal Server Error
+--- error_log eval
+[qr/invalid escape sequence near '"\[\['/]
+--- error_code: 500
 
 
 
@@ -221,7 +225,12 @@ hello
 --- config
     location /re {
         content_by_lua '
-            m = ngx.re.match("hello章亦春", "HELLO.{2}", "iu")
+            rc, err = pcall(ngx.re.match, "hello章亦春", "HELLO.{2}", "iu")
+            if not rc then
+                ngx.say("FAIL: ", err)
+                return
+            end
+            local m = err
             if m then
                 ngx.say(m[0])
             else
@@ -231,8 +240,8 @@ hello
     }
 --- request
     GET /re
---- response_body
-hello章亦
+--- response_body_like chop
+^(?:FAIL: bad argument \#2 to '\?' \(failed to compile regex "HELLO\.\{2\}": pcre_compile\(\) failed: this version of PCRE is not compiled with PCRE_UTF8 support in "HELLO\.\{2\}" at "HELLO\.\{2\}"\)|hello章亦)$
 
 
 
@@ -546,4 +555,150 @@ not matched!
 --- response_body
 bar
 baz
+
+
+
+=== TEST 27: escaping sequences
+--- config
+    location /re {
+        content_by_lua_file html/a.lua;
+    }
+--- user_files
+>>> a.lua
+m = ngx.re.match("hello, 1234", "(\\\s+)")
+if m then
+    ngx.say("[", m[0], "]")
+else
+    ngx.say("not matched!")
+end
+--- request
+    GET /re
+--- response_body_like: 500 Internal Server Error
+--- error_log eval
+[qr/invalid escape sequence near '"\(\\'/]
+--- error_code: 500
+
+
+
+=== TEST 28: escaping sequences
+--- config
+    location /re {
+        access_by_lua_file html/a.lua;
+        content_by_lua return;
+    }
+--- user_files
+>>> a.lua
+local uri = "<impact>2</impact>"
+local regex = '(?:>[\\w\\s]*</?\\w{2,}>)';
+ngx.say("regex: ", regex)
+m = ngx.re.match(uri, regex, "oi")
+if m then
+    ngx.say("[", m[0], "]")
+else
+    ngx.say("not matched!")
+end
+--- request
+    GET /re
+--- response_body
+regex: (?:>[\w\s]*</?\w{2,}>)
+[>2</impact>]
+
+
+
+=== TEST 29: long brackets
+--- config
+    location /re {
+        content_by_lua '
+            m = ngx.re.match("hello, 1234", [[\\d+]])
+            if m then
+                ngx.say(m[0])
+            else
+                ngx.say("not matched!")
+            end
+        ';
+    }
+--- request
+    GET /re
+--- response_body
+1234
+
+
+
+=== TEST 30: bad pattern
+--- config
+    location /re {
+        content_by_lua '
+            m = ngx.re.match("hello, 1234", "([0-9]+")
+            if m then
+                ngx.say(m[0])
+            else
+                ngx.say("not matched!")
+            end
+        ';
+    }
+--- request
+    GET /re
+--- response_body_like: 500 Internal Server Error
+--- error_code: 500
+--- error_log chop
+lua handler aborted: runtime error: [string "content_by_lua"]:2: bad argument #2 to 'match' (failed to compile regex "([0-9]+": pcre_compile() failed: missing ) in "([0-9]+")
+
+
+
+=== TEST 31: long brackets containing [...]
+--- config
+    location /re {
+        content_by_lua '
+            m = ngx.re.match("hello, 1234", [[([0-9]+)]])
+            if m then
+                ngx.say(m[0])
+            else
+                ngx.say("not matched!")
+            end
+        ';
+    }
+--- request
+    GET /re
+--- response_body
+1234
+
+
+
+=== TEST 32: bug report (github issue #72)
+--- config
+    location /re {
+        content_by_lua '
+            ngx.re.match("hello", "hello", "j")
+            ngx.say("done")
+        ';
+        header_filter_by_lua '
+            ngx.re.match("hello", "world", "j")
+        ';
+    }
+--- request
+    GET /re
+--- response_body
+done
+
+
+
+=== TEST 33: bug report (github issue #72)
+--- config
+    location /re {
+        content_by_lua '
+            ngx.re.match("hello", "hello", "j")
+            ngx.exec("/foo")
+        ';
+    }
+
+    location /foo {
+        content_by_lua '
+            ngx.re.match("hello", "world", "j")
+            ngx.say("done")
+        ';
+    }
+--- request
+    GET /re
+--- response_body
+done
 

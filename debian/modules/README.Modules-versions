@@ -16,39 +16,44 @@ README for Modules versions
   https://github.com/agentzh/echo-nginx-module.git
   Version: 0.2.17rc2.tar.gz
 
+ nginx-auth-pam
+  https://github.com/rjenster/ngx_http_auth_pam_module.git
+  Version: 31 Mar 2011
+
  nginx-echo
   https://github.com/agentzh/echo-nginx-module.git
   Version: 0.37rc1
 
  nginx-lua
+  Homepage: https://github.com/chaoslawful/lua-nginx-module
   https://github.com/chaoslawful/lua-nginx-module.git
-  Version: v0.3.1rc8
+  Version: v0.4.1
 
  nginx-upstream-fair
-  https://github.com/gnosek/nginx-upstream-fair.git
+  Homepage: https://github.com/gnosek/nginx-upstream-fair
   Version: 2131c731d00b49c6ac01
 
+ nginx-upload
+  Homepage: https://github.com/vkholodkov/nginx-upload-module
+  Version: 2.2.0
+
+ nginx-upload-progress
+  Homepage: https://github.com/masterzen/nginx-upload-progress-module
+  https://nodeload.github.com/masterzen/nginx-upload-progress-module/tarball/master
+  rm -r debian/nginx-upload-progress/test
+  Version: v0.8.3-2-g03cbf1f
+
  nginx-push-stream-module
-  https://github.com/wandenberg/nginx-push-stream-module
+  Homepage: https://github.com/wandenberg/nginx-push-stream-module
   https://github.com/wandenberg/nginx-push-stream-module.git
-  Version: d530418f94
+  Version: a690c2e0d3
 
  nginx-syslog
-  https://github.com/yaoweibin/nginx_syslog_patch
+  Homepage: https://github.com/yaoweibin/nginx_syslog_patch
   https://raw.github.com/yaoweibin/nginx_syslog_patch/master/syslog_0.8.54.patch
   Version: afeea6d78d
 
- nginx-upload-progress
-  https://github.com/masterzen/nginx-upload-progress-module.git
-  https://github.com/masterzen/nginx-upload-progress-module/archives/436ec80547bdc92bd7d9253b1815d4b964009883
-  rm -r debian/nginx-upload-progress/test
-  Version: v0.8.3-1-g436ec80
-
  ngx_cache_purge
+  Homepage: https://github.com/FRiCKLE/ngx_cache_purge
   https://github.com/FRiCKLE/ngx_cache_purge.git
-  http://labs.frickle.com/files/ngx_cache_purge-1.5.tar.gz
   Version: 1.5
-
- ngx_http_auth_pam_module
-  http://web.iti.upv.es/~sto/nginx/
-  Version: 1.2

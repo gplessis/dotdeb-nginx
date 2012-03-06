@@ -19,6 +19,7 @@
 #include "ngx_http_lua_string.h"
 #include "ngx_http_lua_misc.h"
 #include "ngx_http_lua_consts.h"
+#include "ngx_http_lua_shdict.h"
 
 
 static ngx_http_output_header_filter_pt ngx_http_next_header_filter;
@@ -38,6 +39,10 @@ static ngx_http_output_header_filter_pt ngx_http_next_header_filter;
 static void
 ngx_http_lua_header_filter_by_lua_env(lua_State *L, ngx_http_request_t *r)
 {
+    ngx_http_lua_main_conf_t    *lmcf;
+
+    lmcf = ngx_http_get_module_main_conf(r, ngx_http_lua_module);
+
     /*  set nginx request pointer to current lua thread's globals table */
     lua_pushlightuserdata(L, r);
     lua_setglobal(L, GLOBALS_SYMBOL_REQUEST);
@@ -60,7 +65,9 @@ ngx_http_lua_header_filter_by_lua_env(lua_State *L, ngx_http_request_t *r)
 #endif /* defined(NDK) && NDK */
 
     /*  {{{ initialize ngx.* namespace */
-    lua_newtable(L);    /*  ngx.* */
+    lua_createtable(L, 0 /* narr */, 67 /* nrec */);    /*  ngx.* */
+
+    ngx_http_lua_inject_internal_utils(r->connection->log, L);
 
     ngx_http_lua_inject_http_consts(L);
     ngx_http_lua_inject_core_consts(L);
@@ -71,9 +78,10 @@ ngx_http_lua_header_filter_by_lua_env(lua_State *L, ngx_http_request_t *r)
 #if (NGX_PCRE)
     ngx_http_lua_inject_regex_api(L);
 #endif
-    ngx_http_lua_inject_req_api(L);
+    ngx_http_lua_inject_req_api_no_io(r->connection->log, L);
     ngx_http_lua_inject_resp_header_api(L);
     ngx_http_lua_inject_variable_api(L);
+    ngx_http_lua_inject_shdict_api(lmcf, L);
     ngx_http_lua_inject_misc_api(L);
 
     lua_setfield(L, -2, "ngx");
@@ -95,6 +103,9 @@ ngx_http_lua_header_filter_by_chunk(lua_State *L, ngx_http_request_t *r)
 {
     ngx_int_t        rc;
     u_char          *err_msg;
+#if (NGX_PCRE)
+    ngx_pool_t      *old_pool;
+#endif
 
     /*  set Lua VM panic handler */
     lua_atpanic(L, ngx_http_lua_atpanic);
@@ -104,7 +115,7 @@ ngx_http_lua_header_filter_by_chunk(lua_State *L, ngx_http_request_t *r)
 
 #if (NGX_PCRE)
     /* XXX: work-around to nginx regex subsystem */
-    ngx_http_lua_pcre_malloc_init(r->pool);
+    old_pool = ngx_http_lua_pcre_malloc_init(r->pool);
 #endif
 
     /*  protected call user code */
@@ -112,7 +123,7 @@ ngx_http_lua_header_filter_by_chunk(lua_State *L, ngx_http_request_t *r)
 
 #if (NGX_PCRE)
     /* XXX: work-around to nginx regex subsystem */
-    ngx_http_lua_pcre_malloc_done();
+    ngx_http_lua_pcre_malloc_done(old_pool);
 #endif
 
     if (rc != 0) {
@@ -244,15 +255,15 @@ ngx_http_lua_header_filter(ngx_http_request_t *r)
     ngx_http_lua_ctx_t          *ctx;
     ngx_int_t                    rc;
 
-    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-            "lua header filter, uri \"%V\"", &r->uri);
-
     llcf = ngx_http_get_module_loc_conf(r, ngx_http_lua_module);
 
     if (llcf->header_filter_handler == NULL) {
         dd("no header filter handler found");
         return ngx_http_next_header_filter(r);
     }
+
+    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+            "lua header filter for header_filter_by_lua , uri \"%V\"", &r->uri);
 
     ctx = ngx_http_get_module_ctx(r, ngx_http_lua_module);
 

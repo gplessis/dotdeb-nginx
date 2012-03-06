@@ -25,6 +25,7 @@ ngx_http_lua_create_main_conf(ngx_conf_t *cf)
      *      lmcf->lua_path = { 0, NULL };
      *      lmcf->lua_cpath = { 0, NULL };
      *      lmcf->regex_cache_entries = 0;
+     *      lmcf->shm_zones = NULL;
      */
 
     lmcf->pool = cf->pool;
@@ -86,6 +87,7 @@ ngx_http_lua_create_loc_conf(ngx_conf_t *cf)
 
     conf->force_read_body   = NGX_CONF_UNSET;
     conf->enable_code_cache = NGX_CONF_UNSET;
+    conf->tag = (ngx_buf_tag_t) &ngx_http_lua_module;
 
     return conf;
 }

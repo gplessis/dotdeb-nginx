@@ -5,10 +5,10 @@ use Test::Nginx::Socket;
 
 #worker_connections(1014);
 #master_on();
-#log_level('warn');
+log_level('debug');
 
 #repeat_each(120);
-#repeat_each(3);
+repeat_each(3);
 
 plan tests => repeat_each() * (blocks() * 2 + 2);
 
@@ -484,4 +484,80 @@ hello
 world
 nil
 nil
+
+
+
+=== TEST 23: set special variables
+--- config
+    location /main {
+        #set_unescape_uri $cookie_a "hello";
+        set $http_a "hello";
+        content_by_lua '
+            ngx.say(ngx.var.http_a)
+        ';
+    }
+--- request
+    GET /main
+--- response_body
+hello
+--- SKIP
+
+
+
+=== TEST 24: set special variables
+--- config
+    location /main {
+        content_by_lua '
+            dofile(ngx.var.realpath_root .. "/a.lua")
+        ';
+    }
+    location /echo {
+        echo hi;
+    }
+--- request
+    GET /main
+--- user_files
+>>> a.lua
+ngx.location.capture("/echo")
+--- response_body
+--- SKIP
+
+
+
+=== TEST 25: set 20+ headers
+--- config
+    location /test {
+        rewrite_by_lua '
+            ngx.req.clear_header("Authorization")
+        ';
+        echo $http_a1;
+        echo $http_authorization;
+        echo $http_a2;
+        echo $http_a3;
+        echo $http_a23;
+        echo $http_a24;
+        echo $http_a25;
+    }
+--- request
+    GET /test
+--- more_headers eval
+my $i = 1;
+my $s;
+while ($i <= 25) {
+    $s .= "A$i: $i\n";
+    if ($i == 22) {
+        $s .= "Authorization: blah\n";
+    }
+    $i++;
+}
+#warn $s;
+$s
+--- response_body
+1
+
+2
+3
+23
+24
+25
 

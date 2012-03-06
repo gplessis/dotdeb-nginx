@@ -9,7 +9,7 @@ log_level('warn');
 
 repeat_each(2);
 
-plan tests => repeat_each() * (blocks() * 2);
+plan tests => repeat_each() * (blocks() * 2 + 2);
 
 #no_diff();
 #no_long_string();
@@ -69,8 +69,10 @@ __DATA__
     }
 --- request
     GET /re
---- response_body
-not matched!
+--- response_body_like: 500 Internal Server Error
+--- error_code: 500
+--- error_log eval
+[qr/invalid escape sequence near '"\('/]
 
 
 
@@ -88,8 +90,10 @@ not matched!
     }
 --- request
     GET /re
---- response_body
-not matched!
+--- response_body_like: 500 Internal Server Error
+--- error_code: 500
+--- error_log eval
+[qr/invalid escape sequence near '"\[\['/]
 
 
 
@@ -198,7 +202,11 @@ hello
 --- config
     location /re {
         content_by_lua '
-            m = ngx.re.match("hello章亦春", "HELLO.{2}", "iou")
+            local rc, m = pcall(ngx.re.match, "hello章亦春", "HELLO.{2}", "iou")
+            if not rc then
+                ngx.say("error: ", m)
+                return
+            end
             if m then
                 ngx.say(m[0])
             else
@@ -208,8 +216,8 @@ hello
     }
 --- request
     GET /re
---- response_body
-hello章亦
+--- response_body_like chop
+this version of PCRE is not compiled with PCRE_UTF8 support|^hello章亦$
 
 
 
