@@ -5,6 +5,7 @@ Maintainer: Guillaume Plessis <gui@dotdeb.org>
 Build-Depends:
  autotools-dev,
  debhelper (>= 7),
+ hardening-wrapper,
  libgd2-noxpm-dev,
  libgeoip-dev,
  liblua5.1-dev,

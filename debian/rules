@@ -5,6 +5,12 @@ CFLAGS += -Wall
 CFLAGS += `dpkg-buildflags --get CPPFLAGS`
 LDFLAGS = `dpkg-buildflags --get LDFLAGS`
 
+# enable the hardening wrapper
+DEB_BUILD_HARDENING = 1
+# but disable PIE
+DEB_BUILD_HARDENING_PIE = 0
+export DEB_BUILD_HARDENING DEB_BUILD_HARDENING_PIE
+
 FLAVOURS:=full light extras
 
 BUILDDIR_full = $(CURDIR)/debian/build-full
