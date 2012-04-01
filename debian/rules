@@ -1,21 +1,34 @@
 #!/usr/bin/make -f
 
-CFLAGS = `dpkg-buildflags --get CFLAGS`
-CFLAGS += -Wall
-CFLAGS += `dpkg-buildflags --get CPPFLAGS`
-LDFLAGS = `dpkg-buildflags --get LDFLAGS`
-
 # enable the hardening wrapper
 DEB_BUILD_HARDENING = 1
 # but disable PIE
 DEB_BUILD_HARDENING_PIE = 0
 export DEB_BUILD_HARDENING DEB_BUILD_HARDENING_PIE
 
-FLAVOURS:=full light extras
+CFLAGS = `dpkg-buildflags --get CFLAGS`
+CFLAGS += -Wall
+CFLAGS += `dpkg-buildflags --get CPPFLAGS`
+LDFLAGS = `dpkg-buildflags --get LDFLAGS`
+# export necessary for (hardening) flags for perl
+# (src/http/modules/perl/Makefile.PL).
+export CFLAGS LDFLAGS
+
+# export to avoid building embedded libev for
+# passenger flavour
+export USE_VENDORED_LIBEV = false
+
+FLAVOURS:=full light extras naxsi
+
+ifneq ($(DEB_BUILD_ARCH_OS),hurd)
+  FLAVOURS+=passenger
+  BUILDDIR_passenger = $(CURDIR)/debian/build-passenger
+endif
 
 BUILDDIR_full = $(CURDIR)/debian/build-full
 BUILDDIR_light = $(CURDIR)/debian/build-light
 BUILDDIR_extras = $(CURDIR)/debian/build-extras
+BUILDDIR_naxsi = $(CURDIR)/debian/build-naxsi
 MODULESDIR = $(CURDIR)/debian/modules
 BASEDIR = $(CURDIR)
 
@@ -30,6 +43,8 @@ ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
 	ifeq (${NUMJOBS}, 0)
 		NUMJOBS = 1
 	endif
+else
+	NUMJOBS = 1
 endif
 
 config.sub:
@@ -89,7 +104,7 @@ config.status.full: config.env.full config.sub config.guess
 	    --add-module=$(MODULESDIR)/nginx-echo \
 	    --add-module=$(MODULESDIR)/nginx-upstream-fair \
 	    --add-module=$(MODULESDIR)/nginx-syslog \
-	    --add-module=$(MODULESDIR)/ngx_cache_purge \
+	    --add-module=$(MODULESDIR)/nginx-cache-purge \
             $(CONFIGURE_OPTS) >$@
 	touch $@
 
@@ -159,9 +174,9 @@ config.status.extras: config.env.extras config.sub config.guess
 	    --with-md5=/usr/include/openssl \
 	    --with-mail \
 	    --with-mail_ssl_module \
+	    --add-module=$(MODULESDIR)/nginx-auth-pam \
 	    --add-module=$(MODULESDIR)/chunkin-nginx-module \
 	    --add-module=$(MODULESDIR)/headers-more-nginx-module \
-	    --add-module=$(MODULESDIR)/nginx-auth-pam \
 	    --add-module=$(MODULESDIR)/nginx-development-kit \
 	    --add-module=$(MODULESDIR)/nginx-echo \
 	    --add-module=$(MODULESDIR)/nginx-push-stream-module \
@@ -170,9 +185,77 @@ config.status.extras: config.env.extras config.sub config.guess
 	    --add-module=$(MODULESDIR)/nginx-upload-progress \
 	    --add-module=$(MODULESDIR)/nginx-upstream-fair \
 	    --add-module=$(MODULESDIR)/nginx-syslog \
-	    --add-module=$(MODULESDIR)/ngx_cache_purge \
-	    --add-module=/usr/lib/phusion-passenger/ext/nginx \
+	    --add-module=$(MODULESDIR)/nginx-cache-purge \
             $(CONFIGURE_OPTS) >$@
+	touch $@
+
+config.status.naxsi: config.env.naxsi config.sub config.guess
+	cd $(BUILDDIR_naxsi) && CFLAGS="$(CFLAGS)" CORE_LINK="$(LDFLAGS)" ./configure  \
+	    --prefix=/etc/nginx \
+	    --conf-path=/etc/nginx/nginx.conf \
+	    --error-log-path=/var/log/nginx/error.log \
+	    --http-client-body-temp-path=/var/lib/nginx/body \
+	    --http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
+	    --http-log-path=/var/log/nginx/access.log \
+	    --http-proxy-temp-path=/var/lib/nginx/proxy \
+	    --http-scgi-temp-path=/var/lib/nginx/scgi \
+	    --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
+	    --lock-path=/var/lock/nginx.lock \
+	    --pid-path=/var/run/nginx.pid \
+	    --with-file-aio \
+	    --with-http_gzip_static_module \
+	    --with-http_ssl_module \
+	    --with-http_stub_status_module \
+	    --without-http_uwsgi_module \
+	    --without-http_scgi_module \
+	    --with-ipv6 \
+	    --add-module=$(MODULESDIR)/nginx-echo \
+	    --add-module=$(MODULESDIR)/nginx-upstream-fair \
+	    --add-module=$(MODULESDIR)/nginx-syslog \
+	    --add-module=$(MODULESDIR)/nginx-cache-purge \
+	    --add-module=$(MODULESDIR)/naxsi/naxsi_src \
+	    $(CONFIGURE_OPTS) >$@
+	touch $@
+
+config.status.passenger: config.env.passenger config.sub config.guess
+	cd $(BUILDDIR_passenger) && CFLAGS="$(CFLAGS)" CORE_LINK="$(LDFLAGS)" ./configure  \
+	    --prefix=/etc/nginx \
+	    --conf-path=/etc/nginx/nginx.conf \
+	    --error-log-path=/var/log/nginx/error.log \
+	    --http-client-body-temp-path=/var/lib/nginx/body \
+	    --http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
+	    --http-log-path=/var/log/nginx/access.log \
+	    --http-proxy-temp-path=/var/lib/nginx/proxy \
+	    --http-scgi-temp-path=/var/lib/nginx/scgi \
+	    --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
+	    --lock-path=/var/lock/nginx.lock \
+	    --pid-path=/var/run/nginx.pid \
+	    --with-debug \
+	    --with-file-aio \
+	    --with-http_addition_module \
+	    --with-http_dav_module \
+	    --with-http_geoip_module \
+	    --with-http_gzip_static_module \
+	    --with-http_image_filter_module \
+	    --with-http_realip_module \
+	    --with-http_secure_link_module \
+	    --with-http_stub_status_module \
+	    --with-http_ssl_module \
+	    --with-http_sub_module \
+	    --with-http_xslt_module \
+	    --with-ipv6 \
+	    --with-sha1=/usr/include/openssl \
+	    --with-md5=/usr/include/openssl \
+	    --with-mail \
+	    --with-mail_ssl_module \
+	    --add-module=$(MODULESDIR)/nginx-auth-pam \
+	    --add-module=$(MODULESDIR)/headers-more-nginx-module \
+	    --add-module=$(MODULESDIR)/nginx-echo \
+	    --add-module=$(MODULESDIR)/nginx-upstream-fair \
+	    --add-module=$(MODULESDIR)/nginx-syslog \
+	    --add-module=$(MODULESDIR)/nginx-cache-purge \
+	    --add-module=$(MODULESDIR)/ruby-passenger/ext/nginx \
+	    $(CONFIGURE_OPTS) >$@
 	touch $@
 
 config.status.%:
@@ -227,6 +310,8 @@ binary-indep: install
 	dh_installexamples -i
 	dh_installinit -r --no-start -i --init-script=nginx
 	cp debian/logrotate debian/nginx-common/etc/logrotate.d/nginx
+	mkdir -p debian/nginx-common/lib/systemd/system
+	cp debian/nginx-common.service debian/nginx-common/lib/systemd/system/nginx.service
 	dh_link -i
 	dh_compress -i
 	dh_fixperms -i

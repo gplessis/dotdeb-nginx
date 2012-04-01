@@ -1,0 +1,25 @@
+Description: Use build flags from environment for perl (dpkg-buildflags).
+ Necessary for hardening flags.
+Author: Simon Ruderich <simon@ruderich.org>
+--- a/src/http/modules/perl/Makefile.PL
++++ b/src/http/modules/perl/Makefile.PL
+@@ -3,6 +3,7 @@
+ # Copyright (C) Nginx, Inc.
+ 
+ use 5.006001;
++use Config;
+ use ExtUtils::MakeMaker;
+ 
+ WriteMakefile(
+@@ -13,7 +14,10 @@
+     ABSTRACT_FROM     => 'nginx.pm',     # retrieve abstract from module
+     AUTHOR            => 'Igor Sysoev',
+ 
+-    CCFLAGS           => "$ENV{NGX_PM_CFLAGS}",
++    # $Config{ccflags}/$Config{lddlflags} doesn't contain hardening flags
++    # (yet), add them manually.
++    CCFLAGS           => "$Config{ccflags} $ENV{CFLAGS} $ENV{CPPFLAGS} $ENV{NGX_PM_CFLAGS}",
++    LDDLFLAGS         => "$Config{lddlflags} $ENV{LDFLAGS}",
+     OPTIMIZE          => '-O',
+ 
+     INC               => "-I ../../../../../src/core " .

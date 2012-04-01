@@ -53,7 +53,21 @@ README for Modules versions
   https://raw.github.com/yaoweibin/nginx_syslog_patch/master/syslog_0.8.54.patch
   Version: afeea6d78d
 
- ngx_cache_purge
-  Homepage: https://github.com/FRiCKLE/ngx_cache_purge
-  https://github.com/FRiCKLE/ngx_cache_purge.git
+ naxsi
+  Homepage: http://code.google.com/p/naxsi/
+  Version: 0.42
+
+ nginx-cache-purge
+  Homepage: http://labs.frickle.com/nginx_ngx_cache_purge/
   Version: 1.5
+
+ ruby-passenger
+  Homepage: http://www.modrails.com/
+  Version: 3.0.11
+    dget http://cdn.debian.net/debian/pool/main/r/ruby-passenger/ruby-passenger_3.0.11debian-1.dsc
+    cd ruby-passenger-3.0.11debian
+    rm -rf debian/ rpm/ test/
+    cd ..
+    rsync -av ruby-passenger-3.0.11debian/ /path/to/nginx/debian/modules/ruby-passenger
+
+
