@@ -181,6 +181,7 @@ Package: nginx-extras
 Architecture: any
 Priority: extra
 Depends: nginx-common (= ${source:Version}),
+         ruby-passenger (>> 3.0.11debian),
          ${misc:Depends},
          ${perl:Depends},
          ${shlibs:Depends}
@@ -214,7 +215,7 @@ Description: nginx web server with full set of core modules and extras
    Echo, Embedded Lua, http push, Nginx Development Kit, Upload module,
    Upload Progress, HttpHeadersMore, Upstream Fair Queue, Chunkin, Auth PAM
  Modules added by Dotdeb:
-   File AIO, Syslog, Cache purge
+   File AIO, Syslog, Cache purge, Passenger
 
 Package: nginx-extras-dbg
 Architecture: any

@@ -2,7 +2,7 @@ nginx (1.0.14-1~dotdeb.1) stable; urgency=high
 
   * Sync with Debian
   * New nginx-naxsi and nginx-passenger flavors
-  * Passenger removed from nginx-extras
+  * Passenger will be removed from nginx-extras in the 1.2 branch
   * Built with hardening flags
   * http_perl_module uses the right build flags
 

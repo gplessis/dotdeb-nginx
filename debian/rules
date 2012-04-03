@@ -186,6 +186,7 @@ config.status.extras: config.env.extras config.sub config.guess
 	    --add-module=$(MODULESDIR)/nginx-upstream-fair \
 	    --add-module=$(MODULESDIR)/nginx-syslog \
 	    --add-module=$(MODULESDIR)/nginx-cache-purge \
+	    --add-module=$(MODULESDIR)/ruby-passenger/ext/nginx \
             $(CONFIGURE_OPTS) >$@
 	touch $@
 
