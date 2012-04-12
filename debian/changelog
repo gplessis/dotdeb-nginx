@@ -1,3 +1,9 @@
+nginx (1.0.15-1~dotdeb.0) stable; urgency=high
+
+  * New upstream release
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Thu, 12 Apr 2012 17:54:42 +0200
+
 nginx (1.0.14-1~dotdeb.1) stable; urgency=high
 
   * Sync with Debian
