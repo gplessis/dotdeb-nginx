@@ -103,6 +103,7 @@ config.status.full: config.env.full config.sub config.guess
 	    --add-module=$(MODULESDIR)/nginx-auth-pam \
 	    --add-module=$(MODULESDIR)/nginx-echo \
 	    --add-module=$(MODULESDIR)/nginx-upstream-fair \
+	    --add-module=$(MODULESDIR)/nginx-dav-ext-module \
 	    --add-module=$(MODULESDIR)/nginx-syslog \
 	    --add-module=$(MODULESDIR)/nginx-cache-purge \
             $(CONFIGURE_OPTS) >$@
@@ -184,6 +185,7 @@ config.status.extras: config.env.extras config.sub config.guess
 	    --add-module=$(MODULESDIR)/nginx-upload-module \
 	    --add-module=$(MODULESDIR)/nginx-upload-progress \
 	    --add-module=$(MODULESDIR)/nginx-upstream-fair \
+	    --add-module=$(MODULESDIR)/nginx-dav-ext-module \
 	    --add-module=$(MODULESDIR)/nginx-syslog \
 	    --add-module=$(MODULESDIR)/nginx-cache-purge \
 	    --add-module=$(MODULESDIR)/ruby-passenger/ext/nginx \
@@ -207,6 +209,9 @@ config.status.naxsi: config.env.naxsi config.sub config.guess
 	    --with-http_gzip_static_module \
 	    --with-http_ssl_module \
 	    --with-http_stub_status_module \
+	    --without-mail_pop3_module \
+	    --without-mail_smtp_module \
+	    --without-mail_imap_module \
 	    --without-http_uwsgi_module \
 	    --without-http_scgi_module \
 	    --with-ipv6 \

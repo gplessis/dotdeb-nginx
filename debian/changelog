@@ -1,3 +1,24 @@
+nginx (1.0.15-1~dotdeb.1) UNRELEASED; urgency=high
+
+  [Cyril Lavier]
+  * debian/copyright:
+    + Updated licenses.
+  * debian/nginx-extras.postinst, debian/nginx-full.postinst,
+    debian/nginx-light.postinst, debian/nginx-naxsi.postinst,
+    debian/nginx-passenger.postinst:
+    + Removing the debug markers. (Closes: #667894)
+  * debian/control, debian/rules, debian/copyright,
+    debian/modules/nginx-dav-ext-module:
+    + Added nginx-dav-ext-module in full and extras.
+  * debian/modules/naxsi:
+    + Updated naxsi to the SVN snapshot (r280) to fix the licence issue with
+      OpenSSL.
+
+  [Kartik Mistry]
+  * Misc cleanups in debian/control, debian/copyright.
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Thu, 12 Apr 2012 17:54:42 +0200
+
 nginx (1.0.15-1~dotdeb.0) stable; urgency=high
 
   * New upstream release

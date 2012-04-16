@@ -6,7 +6,20 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
+ * In addition, as a special exception, the copyright holders give
+ * permission to link the code of portions of this program with the
+ * OpenSSL library under certain conditions as described in each
+ * individual source file, and distribute linked combinations
+ * including the two.
+ * You must obey the GNU General Public License in all respects
+ * for all of the code used other than OpenSSL.  If you modify
+ * file(s) with this exception, you may extend this exception to your
+ * version of the file(s), but you are not obligated to do so.  If you
+ * do not wish to do so, delete this exception statement from your
+ * version.  If you delete this exception statement from all source
+ * files in the program, then also delete it here. 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -18,6 +31,8 @@
 
 #ifndef __FOO_H__
 #define __FOO_H__
+
+#define NAXSI_VERSION "0.45"
 
 #include <nginx.h>
 #include <ngx_config.h>
@@ -143,6 +158,10 @@ typedef struct
   enum DUMMY_MATCH_ZONE		zone;
   // if the "name" is only an url, specify it
   int				uri_only:1;
+  /* does the rule targets the name 
+     instead of the content ?*/
+  int				target_name;
+  
   ngx_str_t			*name;
   ngx_int_t			hash;
   ngx_array_t			*ids;
@@ -178,6 +197,9 @@ typedef struct
   /* set if defined "custom" match zone (GET_VAR/POST_VAR/...)  */
   ngx_flag_t		custom_location:1;
   ngx_int_t		custom_location_only;
+  /* does the rule targets variable name instead ? */
+  ngx_int_t		target_name;
+  
   /* custom location match zones list (GET_VAR/POST_VAR ...) */
   ngx_array_t		*custom_locations;
   /* ~~~~~~~ specific flags ~~~~~~~~~ */

@@ -55,11 +55,14 @@ README for Modules versions
 
  naxsi
   Homepage: http://code.google.com/p/naxsi/
-  Version: 0.42
+  Version: 0.44-r280
 
  nginx-cache-purge
   Homepage: http://labs.frickle.com/nginx_ngx_cache_purge/
   Version: 1.5
+
+ nginx-dav-ext-module
+  Homepage: https://github.com/arut/nginx-dav-ext-module
 
  ruby-passenger
   Homepage: http://www.modrails.com/
@@ -69,5 +72,3 @@ README for Modules versions
     rm -rf debian/ rpm/ test/
     cd ..
     rsync -av ruby-passenger-3.0.11debian/ /path/to/nginx/debian/modules/ruby-passenger
-
-

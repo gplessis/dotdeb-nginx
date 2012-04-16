@@ -6,7 +6,7 @@ Build-Depends: autotools-dev,
                debhelper (>= 7),
                hardening-wrapper,
                dpkg-dev (>= 1.15.7),
-               libcurl4-openssl-dev,
+               libexpat-dev,
                libev-dev,
                libgd2-noxpm-dev,
                libgeoip-dev,
@@ -28,8 +28,7 @@ Vcs-Browser: http://svn.debian.org/wsvn/collab-maint/deb-maint/nginx/trunk
 
 Package: nginx
 Architecture: all
-Depends: nginx-full | nginx-light,
-         ${misc:Depends}
+Depends: nginx-full | nginx-light, ${misc:Depends}
 Description: small, but very powerful and efficient web server and mail proxy
  Nginx (engine x) is a web server created by Igor Sysoev and kindly provided to
  the open-source community. This server can be used as standalone HTTP server
@@ -42,8 +41,7 @@ Description: small, but very powerful and efficient web server and mail proxy
 Package: nginx-doc
 Architecture: all
 Section: doc
-Depends: lsb-base (>= 3.2-14),
-         ${misc:Depends}
+Depends: lsb-base (>= 3.2-14), ${misc:Depends}
 Description: small, but very powerful and efficient web server (documentation)
  Nginx (engine x) is a web server created by Igor Sysoev and kindly provided to
  the open-source community. This server can be used as standalone HTTP server
@@ -54,8 +52,7 @@ Description: small, but very powerful and efficient web server (documentation)
 
 Package: nginx-common
 Architecture: all
-Depends: lsb-base (>= 3.2-14),
-         ${misc:Depends}
+Depends: lsb-base (>= 3.2-14), ${misc:Depends}
 Replaces: nginx (<< 0.8.54-4),
           nginx-extras (<< 0.8.54-4),
           nginx-full (<< 0.8.54-4),
@@ -75,14 +72,9 @@ Description: small, but very powerful and efficient web server (common files)
 
 Package: nginx-full
 Architecture: any
-Depends: nginx-common (= ${source:Version}),
-         ${misc:Depends},
-         ${shlibs:Depends}
-Provides: httpd,
-          nginx
-Conflicts: nginx-extras,
-           nginx-light,
-           nginx-naxsi
+Depends: nginx-common (= ${source:Version}), ${misc:Depends}, ${shlibs:Depends}
+Provides: httpd, nginx
+Conflicts: nginx-extras, nginx-light, nginx-naxsi
 Description: nginx web server with full set of core modules
  Nginx (engine x) is a web server created by Igor Sysoev and kindly provided to
  the open-source community. This server can be used as standalone HTTP server
@@ -103,7 +95,7 @@ Description: nginx web server with full set of core modules
  Mail Modules:
    Mail Core, IMAP, POP3, SMTP, SSL
  Third Party Modules:
-   Echo, Upstream Fair Queue
+   Echo, Upstream Fair Queue, DAV Ext
  Modules added by Dotdeb:
    File AIO, Secure link, Syslog, Cache purge
 
@@ -111,11 +103,8 @@ Package: nginx-full-dbg
 Architecture: any
 Section: debug
 Priority: extra
-Depends: nginx-full (= ${binary:Version}),
-         ${misc:Depends}
-Conflicts: nginx-extras-dbg,
-           nginx-light-dbg,
-           nginx-naxsi-dbg
+Depends: nginx-full (= ${binary:Version}), ${misc:Depends}
+Conflicts: nginx-extras-dbg, nginx-light-dbg, nginx-naxsi-dbg
 Description: Debugging symbols for nginx (full)
  Nginx (engine x) is a web server created by Igor Sysoev and kindly provided to
  the open-source community. This server can be used as standalone HTTP server
@@ -128,14 +117,9 @@ Description: Debugging symbols for nginx (full)
 Package: nginx-light
 Architecture: any
 Priority: extra
-Depends: nginx-common (= ${source:Version}),
-         ${misc:Depends},
-         ${shlibs:Depends}
-Provides: httpd,
-          nginx
-Conflicts: nginx-extras,
-           nginx-full,
-           nginx-naxsi
+Depends: nginx-common (= ${source:Version}), ${misc:Depends}, ${shlibs:Depends}
+Provides: httpd, nginx
+Conflicts: nginx-extras, nginx-full, nginx-naxsi
 Description: nginx web server with minimal set of core modules
  Nginx (engine x) is a web server created by Igor Sysoev and kindly provided to
  the open-source community. This server can be used as standalone HTTP server
@@ -150,7 +134,7 @@ Description: nginx web server with minimal set of core modules
    Core, Access, Auth Basic, Auto Index, Charset, Empty GIF, FastCGI, Gzip,
    Headers, Index, Log, Map, Proxy, Rewrite, Split Clients, Upstream, User ID
  Optional HTTP Modules:
-   Gzip Precompression, IPv6, Stub Status
+   Gzip Precompression, IPv6, Stub Status, SSL
  Mail Modules:
    None
  Third Party Modules:
@@ -162,11 +146,8 @@ Package: nginx-light-dbg
 Architecture: any
 Section: debug
 Priority: extra
-Depends: nginx-light (= ${binary:Version}),
-         ${misc:Depends}
-Conflicts: nginx-extras-dbg,
-           nginx-full-dbg,
-           nginx-naxsi-dbg
+Depends: nginx-light (= ${binary:Version}), ${misc:Depends}
+Conflicts: nginx-extras-dbg, nginx-full-dbg, nginx-naxsi-dbg
 Description: Debugging symbols for nginx (light)
  Nginx (engine x) is a web server created by Igor Sysoev and kindly provided to
  the open-source community. This server can be used as standalone HTTP server
@@ -185,11 +166,8 @@ Depends: nginx-common (= ${source:Version}),
          ${misc:Depends},
          ${perl:Depends},
          ${shlibs:Depends}
-Provides: httpd,
-          nginx
-Conflicts: nginx-full,
-           nginx-light,
-           nginx-naxsi
+Provides: httpd, nginx
+Conflicts: nginx-full, nginx-light, nginx-naxsi
 Description: nginx web server with full set of core modules and extras
  Nginx (engine x) is a web server created by Igor Sysoev and kindly provided to
  the open-source community. This server can be used as standalone HTTP server
@@ -213,7 +191,8 @@ Description: nginx web server with full set of core modules and extras
    Mail Core, POP3, IMAP, SMTP, SSL
  Third Party Modules:
    Echo, Embedded Lua, http push, Nginx Development Kit, Upload module,
-   Upload Progress, HttpHeadersMore, Upstream Fair Queue, Chunkin, Auth PAM
+   Upload Progress, HttpHeadersMore, Upstream Fair Queue, Chunkin, Auth PAM,
+   DAV Ext
  Modules added by Dotdeb:
    File AIO, Syslog, Cache purge, Passenger
 
@@ -221,11 +200,8 @@ Package: nginx-extras-dbg
 Architecture: any
 Section: debug
 Priority: extra
-Depends: nginx-extras (= ${binary:Version}),
-         ${misc:Depends}
-Conflicts: nginx-full-dbg,
-           nginx-light-dbg,
-           nginx-naxsi-dbg
+Depends: nginx-extras (= ${binary:Version}), ${misc:Depends}
+Conflicts: nginx-full-dbg, nginx-light-dbg, nginx-naxsi-dbg
 Description: Debugging symbols for nginx (extras)
  Nginx (engine x) is a web server created by Igor Sysoev and kindly provided to
  the open-source community. This server can be used as standalone HTTP server
@@ -239,14 +215,9 @@ Description: Debugging symbols for nginx (extras)
 Package: nginx-naxsi
 Architecture: any
 Priority: extra
-Depends: nginx-common (= ${source:Version}),
-         ${misc:Depends},
-         ${shlibs:Depends}
-Provides: httpd,
-          nginx
-Conflicts: nginx-extras,
-           nginx-full,
-           nginx-light
+Depends: nginx-common (= ${source:Version}), ${misc:Depends}, ${shlibs:Depends}
+Provides: httpd, nginx
+Conflicts: nginx-extras, nginx-full, nginx-light
 Description: nginx web server with naxsi 0.44 included
  Nginx (engine x) is a web server created by Igor Sysoev and kindly provided to
  the open-source community. This server can be used as standalone HTTP server
@@ -262,9 +233,11 @@ Description: nginx web server with naxsi 0.44 included
    Geo, Gzip, Headers, Index, Limit Requests, Limit Zone, Log, Map, Memcached,
    Proxy, Referer, Rewrite, SCGI, Split Clients, SSI, Upstream, User ID, UWSGI
  Optional HTTP Modules:
-   IPv6
+   Gzip Precompression, IPv6, Stub Status, SSL
+ Mail Modules:
+   None
  Third Party Modules:
-   Naxsi, Cache Purge
+   Naxsi, Cache Purge, Upstream Fair
  Modules added by Dotdeb:
    File AIO, Gzip static, Stub status, Echo, Syslog
 
@@ -272,11 +245,8 @@ Package: nginx-naxsi-dbg
 Architecture: any
 Section: debug
 Priority: extra
-Depends: nginx-naxsi (= ${binary:Version}),
-         ${misc:Depends}
-Conflicts: nginx-full-dbg,
-           nginx-light-dbg,
-           nginx-extras-dbg
+Depends: nginx-naxsi (= ${binary:Version}), ${misc:Depends}
+Conflicts: nginx-extras-dbg, nginx-full-dbg, nginx-light-dbg
 Description: Debugging symbols for nginx (naxsi)
  Nginx (engine x) is a web server created by Igor Sysoev and kindly provided to
  the open-source community. This server can be used as standalone HTTP server
@@ -289,16 +259,9 @@ Description: Debugging symbols for nginx (naxsi)
 
 Package: nginx-passenger
 Architecture: linux-any kfreebsd-any
-Depends: nginx-common (= ${source:Version}),
-         ruby-passenger (>> 3.0.11debian),
-         ${misc:Depends},
-         ${shlibs:Depends}
-Provides: httpd,
-          nginx
-Conflicts: nginx-extras,
-           nginx-full,
-           nginx-light,
-           nginx-naxsi
+Depends: nginx-common (= ${source:Version}), ruby-passenger (>> 3.0.11debian), ${misc:Depends}, ${shlibs:Depends}
+Provides: httpd, nginx
+Conflicts: nginx-extras, nginx-full, nginx-light, nginx-naxsi
 Description: nginx web server with full set of core modules and passenger support
  Nginx (engine x) is a web server created by Igor Sysoev and kindly provided to
  the open-source community. This server can be used as standalone HTTP server
@@ -327,12 +290,8 @@ Package: nginx-passenger-dbg
 Architecture: linux-any kfreebsd-any
 Section: debug
 Priority: extra
-Depends: nginx-passenger (= ${binary:Version}),
-         ${misc:Depends}
-Conflicts: nginx-extras-dbg,
-           nginx-full-dbg,
-           nginx-light-dbg,
-           nginx-naxsi-dbg
+Depends: nginx-passenger (= ${binary:Version}), ${misc:Depends}
+Conflicts: nginx-extras-dbg, nginx-full-dbg, nginx-light-dbg, nginx-naxsi-dbg
 Description: Debugging symbols for nginx (passenger)
  Nginx (engine x) is a web server created by Igor Sysoev and kindly provided to
  the open-source community. This server can be used as standalone HTTP server
