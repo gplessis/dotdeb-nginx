@@ -162,7 +162,7 @@ Package: nginx-extras
 Architecture: any
 Priority: extra
 Depends: nginx-common (= ${source:Version}),
-         ruby-passenger (>> 3.0.11debian),
+         ruby-passenger (>> 3.0.12),
          ${misc:Depends},
          ${perl:Depends},
          ${shlibs:Depends}
@@ -259,7 +259,7 @@ Description: Debugging symbols for nginx (naxsi)
 
 Package: nginx-passenger
 Architecture: linux-any kfreebsd-any
-Depends: nginx-common (= ${source:Version}), ruby-passenger (>> 3.0.11debian), ${misc:Depends}, ${shlibs:Depends}
+Depends: nginx-common (= ${source:Version}), ruby-passenger (>> 3.0.12), ${misc:Depends}, ${shlibs:Depends}
 Provides: httpd, nginx
 Conflicts: nginx-extras, nginx-full, nginx-light, nginx-naxsi
 Description: nginx web server with full set of core modules and passenger support

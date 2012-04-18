@@ -1,5 +1,9 @@
 nginx (1.0.15-1~dotdeb.1) UNRELEASED; urgency=high
 
+  [Guillaume Plessis]
+  * debian/modules/naxsi:
+    + Updated naxsi to 0.45
+
   [Cyril Lavier]
   * debian/copyright:
     + Updated licenses.
@@ -10,9 +14,6 @@ nginx (1.0.15-1~dotdeb.1) UNRELEASED; urgency=high
   * debian/control, debian/rules, debian/copyright,
     debian/modules/nginx-dav-ext-module:
     + Added nginx-dav-ext-module in full and extras.
-  * debian/modules/naxsi:
-    + Updated naxsi to the SVN snapshot (r280) to fix the licence issue with
-      OpenSSL.
 
   [Kartik Mistry]
   * Misc cleanups in debian/control, debian/copyright.
