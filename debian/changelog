@@ -1,113 +1,289 @@
-nginx (1.0.15-1~dotdeb.1) UNRELEASED; urgency=high
+nginx (1.2.0-1~dotdeb.1) stable; urgency=low
 
-  [Guillaume Plessis]
-  * debian/modules/naxsi:
-    + Updated naxsi to 0.45
+  * Rebuilt for Dotdeb
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Mon, 23 Apr 2012 17:44:42 +0200
+
+nginx (1.2.0-1) UNRELEASED; urgency=low
+
+  * New upstream release
+
+ -- Cyril Lavier <cyril.lavier@davromaniak.eu>  Mon, 23 Apr 2012 16:55:28 +0200
+
+nginx (1.1.19-1) unstable; urgency=high
 
   [Cyril Lavier]
+  * New upstream release.
+    + Fixed a buffer overflow in the ngx_http_mp4_module. See: CVE-2012-2089
+      for more details.
   * debian/copyright:
     + Updated licenses.
   * debian/nginx-extras.postinst, debian/nginx-full.postinst,
-    debian/nginx-light.postinst, debian/nginx-naxsi.postinst,
-    debian/nginx-passenger.postinst:
+    debian/nginx-light.postinst, debian/nginx-naxsi.postinst:
     + Removing the debug markers. (Closes: #667894)
   * debian/control, debian/rules, debian/copyright,
     debian/modules/nginx-dav-ext-module:
     + Added nginx-dav-ext-module in full and extras.
+  * debian/modules/naxsi:
+    + Updated naxsi to the SVN snapshot (r280) to fix the licence issue with
+      OpenSSL.
 
   [Kartik Mistry]
   * Misc cleanups in debian/control, debian/copyright.
 
- -- Guillaume Plessis <gui@dotdeb.org>  Thu, 12 Apr 2012 17:54:42 +0200
+ -- Cyril Lavier <cyril.lavier@davromaniak.eu>  Fri, 13 Apr 2012 16:58:59 +0530
 
-nginx (1.0.15-1~dotdeb.0) stable; urgency=high
+nginx (1.1.18-1) unstable; urgency=low
 
-  * New upstream release
-
- -- Guillaume Plessis <gui@dotdeb.org>  Thu, 12 Apr 2012 17:54:42 +0200
-
-nginx (1.0.14-1~dotdeb.1) stable; urgency=high
-
-  * Sync with Debian
-  * New nginx-naxsi and nginx-passenger flavors
-  * Passenger will be removed from nginx-extras in the 1.2 branch
-  * Built with hardening flags
-  * http_perl_module uses the right build flags
-
- -- Guillaume Plessis <gui@dotdeb.org>  Sat, 31 Mar 2012 23:10:42 +0200
-
-nginx (1.0.14-1~dotdeb.0) stable; urgency=high
-
+  [Cyril Lavier]
   * New upstream release.
+  * New binaries introduced: nginx-naxsi, nginx-naxsi-dbg.
+  * debian/modules/nginx-cache-purge:
+    + Added nginx cache purge 1.5 to nginx-naxsi.
+  * debian/rules, debian/control, debian/nginx-naxsi.dirs,
+    debian/nginx-naxsi.install, debian/nginx-naxsi.postinst,
+    debian/nginx-naxsi.postrm, debian/nginx-naxsi.prerm,
+    debian/modules/naxsi, debian/conf/naxsi_core.rules,
+    debian/modules/README.Modules-versions, debian/conf/nginx.conf:
+    + Added nginx-naxsi flavour.
+    + Added naxsi 0.44 to nginx-naxsi.
 
- -- Guillaume Plessis <gui@dotdeb.org>  Thu, 15 Mar 2012 16:54:42 +0100
+ -- Cyril Lavier <cyril.lavier@davromaniak.eu>  Thu, 29 Mar 2012 22:43:07 +0530
 
-nginx (1.0.13-1~dotdeb.0) stable; urgency=low
+nginx (1.1.17-2) unstable; urgency=high
 
+  [Cyril Lavier]
+  * debian/control:
+    + Added build dependency to dpkg-dev (>= 1.15.7). (Closes: #664212)
+  * debian/patches/perl-use-dpkg-buildflags.patch:
+    + Added patch to harden flags for perl module (Thanks to Simon Ruderich
+      for the patch). (Closes: #664090)
+
+  [Kartik Mistry]
+  * Set urgency due to fix for security and RC bugs with 1.17.1-1 upload.
+
+ -- Cyril Lavier <cyril.lavier@davromaniak.eu>  Sun, 18 Mar 2012 09:31:19 +0530
+
+nginx (1.1.17-1) unstable; urgency=medium
+
+  [Kartik Mistry]
+  * New upstream release. (Closes: #664137)
+    + Fixed malformed HTTP responses. See: CVE-2012-1180 for more details.
+  * Set urgency to medium due to security issue.
+
+  [Cyril Lavier]
+  * debian/rules:
+    + Set NUMJOBS to 1 if no value is given
+    + Added Auth PAM module to nginx-extras
+    + Enable hardened flags for perl module (Thanks to Simon Ruderich for
+      the patch) (Closes: #664090).
+  * debian/conf/sites-available/default:
+    + Added the fastcgi_pass for php5-fpm. (Closes: #662997)
+  * debian/nginx-common.postrm, debian/rules, debian/nginx-common.postinst,
+    debian/nginx-common.prerm, debian/nginx-common.service:
+    + Added the systemd support. Thanks to Michael Stapelberg for the patch.
+      (Closes: #662799)
+
+ -- Kartik Mistry <kartik@debian.org>  Fri, 16 Mar 2012 10:27:38 +0530
+
+nginx (1.1.16-1) unstable; urgency=low
+
+  [Cyril Lavier]
+  * Modified the parallel build to avoid random FTBFS in Ubuntu.
+  * New upstream release.
+  * debian/modules:
+    + Updated nginx-upload-progress to 0.8.3-2-g03cbf1f.
+  * debian/control:
+    + Added myself as uploader.
+    + Added libpam0g-dev to Build-Depends.
+    + Use wrap-and-sort to wrap control file fields.
+
+  [Michael Lustfield]
+  * debian/nginx-common.postinst:
+    + Changed postinst to not change permissions on all log files.
+      (Closes: #658492)
+  * debian/rules:
+    + Added Auth PAM module at debian/modules/nginx-auth-pam. (Closes: #660408)
+
+  [Kartik Mistry]
+  * debian/control:
+    + Added conflict between -dbg packages as seen by Lintian.
+    + Updated Standards-Version to 3.9.3
+  * debian/copyright:
+    + Updated for copyright-format 1.0
+    + Updated upstream copyright year and details.
+  * debian/rules:
+    + Moved nginx-auth-pam module to nginx-full package.
+
+ -- Kartik Mistry <kartik@debian.org>  Sun, 04 Mar 2012 10:31:21 +0530
+
+nginx (1.1.14-1) unstable; urgency=low
+
+  [Cyril Lavier]
+  * New upstream release.
+  * debian/rules:
+    + Resolved the lintian errors "unstripped-binary-or-object" with a
+      cleaner correction (Thanks to Steven Chamberlain for the patch).
+    + Added a check on the parallel building to force NUMJOBS to 1 if
+      the value 0 is given.
+  * debian/modules:
+    + Updated nginx-lua module to version 0.4.1.
+
+  [Kartik Mistry]
+  * debian/rules, debian/control, debian/copyright,
+    debian/modules/nginx-upload-module:
+    + Added Upload module to nginx-extras, updated long description and
+      copyright. (Closes: #654593)
+  * debian/modules/README.modules:
+    + Added Homepage information for some modules.
+  * debian/rules:
+    + Enable hardened build flags, Thanks to Moritz Muehlenhoff for patch.
+      (Closes: #658186)
+
+ -- Kartik Mistry <kartik@debian.org>  Wed, 01 Feb 2012 17:50:05 +0530
+
+nginx (1.1.12-1) unstable; urgency=low
+
+  [Kartik Mistry]
+  * debian/control:
+    + Set myself as Maintainer, Jose Parrella as Uploaders with approval from
+      team.
+  * debian/copyright:
+    + Fixed DEP5 URL.
+    + Updated debian/* copyright.
+  * debian/modules:
+    + Updated nginx-lua module to version 0.3.1rc43
+
+  [Cyril Lavier]
+  * New upstream release.
+  * debian/conf/sites-available/default:
+    + Added a / in the alias directive. (Closes: #653160)
+  * debian/rules:
+    + Added necessary lines for parallel building.
+
+ -- Kartik Mistry <kartik@debian.org>  Sun, 01 Jan 2012 17:21:02 +0530
+
+nginx (1.1.11-1) unstable; urgency=low
+
+  [Kartik Mistry]
+  * New upstream release.
+  * debian/control:
+    + Set priority to extra for nginx-light and nginx-extras binaries
+      (Policy: Section 2.5)
+  * debian/patches/607418-ipv6-addresses.diff:
+    + Removed. Merged upstream with 1.1.9 release.
+  * debian/copyright:
+    + Updated upstream copyright year, updated Michael's email address, misc
+      changes for format.
+
+  [Michael Lustfield]
+  * debian/conf/fastcgi_params:
+    + Changed $server_https to $https per new feature in 1.1.11.
+  * debian/conf/nginx.conf:
+    + Removed map for $server_https as it's no longer needed.
+
+ -- Kartik Mistry <kartik@debian.org>  Wed, 14 Dec 2011 09:45:40 +0530
+
+nginx (1.1.8-2) unstable; urgency=low
+
+  * debian/modules/chunkin-nginx-module:
+    + Reinclude HttpChunkin Module with new upstream version (closes: #638814)
+  * debian/control:
+    + Add myself to uploaders list.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Thu, 24 Nov 2011 14:16:50 +0530
+
+nginx (1.1.8-1) unstable; urgency=low
+
+  [Kartik Mistry]
+  * New upstream release.
+  * debian/modules/chunkin-nginx-module:
+    + Removed as of now, as it breaks with Perl 5.14 (Closes: #649061)
+
+  [Michael Lustfield]
+  * debian/control:
+    + Added Map module to nginx-light modules list.
+  * debian/rules:
+    + Removed --without-http_map_module form nginx-light.
+  * debian/nginx-common.install:
+    + Changed ufw profile installation (LP: #825349).
+      - debian/ufw.profile -> debian/ufw/nginx.
+  * debian/nginx-common.preinst:
+    + Cleanup of moved nginx profile.
+  * debian/conf/nginx.conf:
+    + Added a default map for $server_https (on|off).
+  * debian/conf/fastcgi_params:
+    + Pass HTTPS so $_SERVER['HTTPS'] is set (LP: #857831).
+  * debian/conf/mime.types:
+    + Added json type (LP: #883440).
+  * debian/conf/sites-available/default:
+    + Added notes about PHP (Closes: #642995).
+    + Changed location /doc from root to alias.
+    + Changed location /doc to /doc/ for people that don't bother reading or
+      learning anything about Nginx configuration files (LP: #840358).
+
+ -- Kartik Mistry <kartik@debian.org>  Fri, 18 Nov 2011 23:44:00 +0530
+
+nginx (1.1.4-2) unstable; urgency=low
+
+  [Kartik Mistry]
+  * debian/modules:
+    + Updated nginx-upload-progress module, Thanks to upstream for fixing issue
+      that FTBFS nginx on kFreeBSD-* archs.
+    + Updated nginx-lua module to latest upstream.
+
+ -- Kartik Mistry <kartik@debian.org>  Mon, 26 Sep 2011 10:17:04 +0530
+
+nginx (1.1.4-1) unstable; urgency=low
+
+  [Kartik Mistry]
+  * New upstream release.
+  * debian/rules:
+    + Added 'HTTPStubStatus' module in nginx-light also (Closes: #639661).
+    + Added 'HTTP MP4' module in nginx-extras. (Closes: #642022).
+  * Add new modules, Thanks to Dmitry E. Oboukhov <unera@debian.org>:
+    + NginxHttpHeadersMore Module (closes: #638820).
+    + HttpChunkin Module (closes: #638814).
+  * Renamed debian/modules/versions to debian/modules/README.modules-version,
+    added missing homepage and version information.
+
+ -- Kartik Mistry <kartik@debian.org>  Sun, 25 Sep 2011 13:44:48 +0530
+
+nginx (1.1.2-1) unstable; urgency=low
+
+  [ Kartik Mistry ]
   * New upstream release
-  * Sync with Nginx Debian packages
-  * nginx-upload-module added to nginx-extras
-  * nginx-auth-pam added to nginx-extras and nginx-full
-  * http_secure_link_module added to nginx-full
-  * file-aio support for all nginx flavours
-  * scripts for adding/disabling sites on nginx
+  * debian/control:
+    + Added missing 'http-push' module in long description of nginx-extras.
+      (Closes: #638924)
+    + Removed 'File AIO' module from description, which we don't provide.
+      (Closes: #639360)
+    + Added 'HTTP Sub Module' in long description of nginx-extras, nginx-full.
+    + Updated Breaks/Replaces fields.
 
- -- Guillaume Plessis <gui@dotdeb.org>  Mon,  5 Mar 2012 18:50:42 +0100
+  [ Michael Lustfield ]
+  * debian/copyright:
+    + Updated email address for Michael Lustfield
+  * debian/control:
+    + Updated email address for Michael Lustfield
+    + Updated Breaks on nginx-common to address conflicting versions
 
-nginx (1.0.12-1~dotdeb.0) stable; urgency=low
+ -- Kartik Mistry <kartik@debian.org>  Wed, 07 Sep 2011 12:15:36 +0530
 
+nginx (1.1.0-1) unstable; urgency=low
+
+  [ Kartik Mistry ]
   * New upstream release
-  * Add the Cache purge module
-  * Use default_server instead of default in sites-available/default
+  * debian/control:
+    + Added 'Upload Progress' module in long description of nginx-extras
+      (Closes: #635313)
+  * debian/rules, debian/modules:
+    + Removed deprecated module: nginx-secure-download
+  * debian/modules:
+    + Updated nginx-lua module to version: v0.2.1rc2
+    + Updated nginx-echo module to version: v0.37rc1
 
- -- Guillaume Plessis <gui@dotdeb.org>  Tue,  7 Feb 2012 16:55:42 +0100
-
-nginx (1.0.11-1~dotdeb.1) stable; urgency=low
-
-  * New upstream release
-  * Built against Passenger 3.0.11
-  * Add the Push Stream module
-  # Removes the buggy HTTP Push module
-
- -- Guillaume Plessis <gui@dotdeb.org>  Fri, 16 Dec 2011 17:37:42 +0100
-
-nginx (1.0.10-1~dotdeb.1) stable; urgency=low
-
-  * New upstream release
-
- -- Guillaume Plessis <gui@dotdeb.org>  Tue, 15 Nov 2011 15:21:42 +0100
-
-nginx (1.0.9-1~dotdeb.1) stable; urgency=low
-
-  * New upstream release
-
- -- Guillaume Plessis <gui@dotdeb.org>  Tue,  1 Nov 2011 16:36:42 +0100
-
-nginx (1.0.8-1~dotdeb.1) stable; urgency=low
-
-  * New upstream release
-
- -- Guillaume Plessis <gui@dotdeb.org>  Thu, 20 Oct 2011 16:55:42 +0200
-
-nginx (1.0.6-1~dotdeb.2) stable; urgency=low
-
-  * Add the syslog patch : https://github.com/yaoweibin/nginx_syslog_patch
-  * Build against Passenger 3.0.9
-
- -- Guillaume Plessis <gui@dotdeb.org>  Wed, 14 Sep 2011 14:17:42 +0200
-
-nginx (1.0.6-1~dotdeb.1) stable; urgency=low
-
-  * New upstream release
-  * Remove the deprecated Secure Download module
-
- -- Guillaume Plessis <gui@dotdeb.org>  Tue, 30 Aug 2011 17:33:42 +0200
-
-nginx (1.0.5-1~dotdeb.1) stable; urgency=low
-
-  * Rebuilt for Dotdeb with File AIO and Passenger support
-
- -- Guillaume Plessis <gui@dotdeb.org>  Thu, 21 Jul 2011 22:23:42 +0200
+ -- Kartik Mistry <kartik@debian.org>  Tue, 02 Aug 2011 20:06:43 +0530
 
 nginx (1.0.5-1) unstable; urgency=low
 
