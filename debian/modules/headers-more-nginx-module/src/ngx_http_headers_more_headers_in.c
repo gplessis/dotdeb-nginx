@@ -1,7 +1,8 @@
 /* Copyright (C) agentzh */
 
+#ifndef DDEBUG
 #define DDEBUG 0
-
+#endif
 #include "ddebug.h"
 
 #include "ngx_http_headers_more_headers_in.h"
@@ -44,6 +45,12 @@ static ngx_int_t ngx_http_set_host_header(ngx_http_request_t *r,
 
 static ngx_http_headers_more_set_header_t ngx_http_headers_more_set_handlers[]
         = {
+
+#if (NGX_HTTP_GZIP)
+    { ngx_string("Accept-Encoding"),
+                 offsetof(ngx_http_headers_in_t, accept_encoding),
+                 ngx_http_set_builtin_header },
+#endif
 
     { ngx_string("Host"),
                  offsetof(ngx_http_headers_in_t, host),
@@ -128,29 +135,10 @@ ngx_http_headers_more_exec_input_cmd(ngx_http_request_t *r,
             return NGX_ERROR;
         }
 
-#if 1
-        /* XXX nginx core's ngx_http_range_parse
-         *     function requires null-terminated
-         *     Range header values. so we have to
-         *     work-around it here */
-
-        if (h[i].key.len == sizeof("Range") - 1 &&
-                ngx_strncasecmp(h[i].key.data, (u_char *) "Range",
-                    sizeof("Range") - 1) == 0)
-        {
-            u_char                  *p;
-
-            p = ngx_palloc(r->pool, value.len + 1);
-            if (p == NULL) {
-                return NGX_ERROR;
-            }
-
-            ngx_memcpy(p, value.data, value.len);
-            p[value.len] = '\0';
-
-            value.data = p;
+        if (value.len) {
+            value.len--;  /* remove the trailing '\0' added by
+                             ngx_http_headers_more_parse_header */
         }
-#endif
 
         if (h[i].handler(r, &h[i], &value) != NGX_OK) {
             return NGX_ERROR;
@@ -521,8 +509,7 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
         }
 
         ngx_log_error(NGX_LOG_ERR, cf->log, 0,
-              "%V: invalid option name: \"%V\"",
-              cmd_name, &arg[i]);
+                      "%V: invalid option name: \"%V\"", cmd_name, &arg[i]);
 
         return NGX_CONF_ERROR;
     }
@@ -534,6 +521,7 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
     if (cmd->headers->nelts == 0) {
         ngx_pfree(cf->pool, cmd->headers);
         cmd->headers = NULL;
+
     } else {
         h = cmd->headers->elts;
         for (i = 0; i < cmd->headers->nelts; i++) {

@@ -7,6 +7,16 @@ nginx (1.2.0-1~dotdeb.1) stable; urgency=low
 nginx (1.2.0-1) UNRELEASED; urgency=low
 
   * New upstream release
+  * debian/modules/chunkin-nginx-module:
+    + Updated chunkin-nginx-module to v0.23rc2-3-g85eca98
+  * debian/modules/headers-more-module:
+    + Updated headers-more-module to v0.17rc1-1-g34e2389
+  * debian/modules/nginx-development-kit:
+    + Updated nginx-development-kit to v0.2.17-7-g24202b4
+  * debian/modules/README.Modules-versions
+    + Updated versions for chunkin-nginx-module, headers-more-module,
+      nginx-development-kit
+    + Corrected the URL for nginx-development-kit
 
  -- Cyril Lavier <cyril.lavier@davromaniak.eu>  Mon, 23 Apr 2012 16:55:28 +0200
 

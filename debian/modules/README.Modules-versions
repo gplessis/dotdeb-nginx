@@ -6,15 +6,15 @@ README for Modules versions
 
  chunkin-nginx-module
   https://github.com/agentzh/chunkin-nginx-module
-  Version: v0.23rc1-0-g72c3e3f
+  Version: v0.23rc2-3-g85eca98
 
  headers-more-nginx-module
-  https://github.com/agentzh/headers-more-nginx-module.git
-  Version: b3c6230
+  https://github.com/agentzh/headers-more-nginx-module
+  Version: v0.17rc1-1-g34e2389
 
  nginx-development-kit
-  https://github.com/agentzh/echo-nginx-module.git
-  Version: 0.2.17rc2.tar.gz
+  https://github.com/simpl/ngx_devel_kit/
+  Version: v0.2.17-7-g24202b4
 
  nginx-auth-pam
   https://github.com/rjenster/ngx_http_auth_pam_module.git

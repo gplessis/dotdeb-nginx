@@ -4,11 +4,12 @@
 
 root=`pwd`
 version=$1
+home=~
 force=$2
 
+        #--with-cc=gcc46 \
+
 ngx-build $force $version \
-        --with-cc-opt="-O0 -fprofile-arcs -ftest-coverage" \
-        --with-ld-opt="-fprofile-arcs -ftest-coverage" \
         --without-mail_pop3_module \
         --without-mail_imap_module \
         --without-mail_smtp_module \
@@ -23,8 +24,7 @@ ngx-build $force $version \
       --add-module=$root/../lua-nginx-module \
       --add-module=$root/../echo-nginx-module \
       --add-module=$root $opts \
-      --with-debug \
-    || exit 1
+      --with-debug
       #--add-module=$root/../ndk-nginx-module \
   #--without-http_ssi_module  # we cannot disable ssi because echo_location_async depends on it (i dunno why?!)
 
