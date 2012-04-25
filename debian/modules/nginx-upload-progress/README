@@ -15,7 +15,7 @@ It works because Nginx acts as an accelerator of an upstream server, storing upl
 on disk, before transmitting it to the upstream server. Each individual POST upload request
 should contain a progress unique identifier.
 
-This module is Copyright (c) 2007-2011 Brice Figureau, and is licensed under the BSD license (see LICENSE).
+This module is Copyright (c) 2007-2012 Brice Figureau, and is licensed under the BSD license (see LICENSE).
  * rbtree and shm_zone code is based on Igor Sysoev limit_zone Nginx module.
  * expire header code is based on Igor Sysoev header_filter Nginx module.
 
@@ -25,6 +25,16 @@ http://blog.lighttpd.net/articles/2006/08/01/mod_uploadprogress-is-back
 
 WARNING: 
  * when compiled with --with-debug, this module will produce high number of log messages.
+
+INCOMPATIBLE CHANGES
+====================
+
+v0.9.0:
+
+JSONP is now the default output of the progress probes. If you rely on this module serving
+the deprecated java output use:
+     upload_progress_java_output
+in the progress probe location.
 
 
 Installation
@@ -77,7 +87,7 @@ track_uploads
     The POST _must_ have a query parameter called X-Progress-ID (or an HTTP header of the same name) whose value is the
     unique identifier used to get progress information. If the POST has no such information, the upload will not be tracked.
     The tracked connections are kept at most <timeout> seconds after they have been finished to be able to serve 
-    unseful information to upload progress probes.
+    useful information to upload progress probes.
     WARNING: this directive must be the last directive of the location. It must be in a proxy_pass or 
     fastcgi_pass location.
     
@@ -107,7 +117,7 @@ report_uploads
             upload_progress_template
 
     The HTTP request to this location must have a X-Progress-ID parameter or HTTP header containing a valid
-    unique identifier of an inprogress upload.
+    unique identifier of an in progress upload.
 
 upload_progress_content_type
 ++++++++++++++++++++++++++++
@@ -133,6 +143,14 @@ upload_progress_jsonp_parameter
     :Description:
     This directive allows to change the name of the GET parameter with the jsonp callback name.
 
+upload_progress_java_output
++++++++++++++++++++++++++++
+    :Syntax: upload_progress_java_output
+    :Default: N/A
+    :Context: location
+    :Description:
+    This directive sets everything to output as eval() javascript compatible code.
+
 upload_progress_json_output
 +++++++++++++++++++++++++++
     :Syntax: upload_progress_json_output
@@ -142,7 +160,7 @@ upload_progress_json_output
     This directive sets everything to output as pure json.
 
 upload_progress_jsonp_output
-+++++++++++++++++++++++++++
+++++++++++++++++++++++++++++
     :Syntax: upload_progress_jsonp_output
     :Default: N/A
     :Context: location
@@ -179,10 +197,10 @@ upload_progress_template
 
     Example of jsonp response:
 
-    upload_progress_template starting "$uploadprogress_callback({ 'state' : 'starting'});";
-    upload_progress_template error "$uploadprogress_callback({ 'state' : 'error', 'status' : $uploadprogress_status });";
-    upload_progress_template done "$uploadprogress_callback({ 'state' : 'done'});";
-    upload_progress_template uploading "$uploadprogress_callback({ 'state' : 'uploading', 'received' : $uploadprogress_received, 'size' : $uploadprogress_length });";
+    upload_progress_template starting "$uploadprogress_callback({ \"state\" : \"starting\"});";
+    upload_progress_template error "$uploadprogress_callback({ \"state\" : \"error\", \"status\" : $uploadprogress_status });";
+    upload_progress_template done "$uploadprogress_callback({ \"state\" : \"done\"});";
+    upload_progress_template uploading "$uploadprogress_callback({ \"state\" : \"uploading\", \"received\" : $uploadprogress_received, \"size\" : $uploadprogress_length });";
 
 Configuration Example:
 +++++++++++++++++++++
@@ -302,3 +320,10 @@ http://www.grid.net.ru/nginx/upload.en.html
 You can also use the following javascript libraries client side:
 http://drogomir.com/blog/2008/6/30/upload-progress-script-with-safari-support
 
+Note that when using jQuery AJAX for progress monitoring, such as:
+https://github.com/drogus/jquery-upload-progress
+you should be sure to set a upload_progress template parameter:
+upload_progress_json_output
+or
+upload_progress_jsonp_output
+depending on your jQuery AJAX dataType setting.

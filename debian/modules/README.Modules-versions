@@ -41,7 +41,7 @@ README for Modules versions
   Homepage: https://github.com/masterzen/nginx-upload-progress-module
   https://nodeload.github.com/masterzen/nginx-upload-progress-module/tarball/master
   rm -r debian/nginx-upload-progress/test
-  Version: v0.8.3-2-g03cbf1f
+  Version: v0.9.0-0-ga788dea
 
  nginx-push-stream-module
   Homepage: https://github.com/wandenberg/nginx-push-stream-module
@@ -63,6 +63,7 @@ README for Modules versions
 
  nginx-dav-ext-module
   Homepage: https://github.com/arut/nginx-dav-ext-module
+  Version: v0.0.2-1-ga395479.tar.gz
 
  ruby-passenger
   Homepage: http://www.modrails.com/
