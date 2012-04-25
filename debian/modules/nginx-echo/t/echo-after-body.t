@@ -6,14 +6,18 @@ use Test::Nginx::Socket;
 plan tests => repeat_each() * 2 * blocks();
 
 no_long_string();
+log_level('warn');
 
 #master_on();
+#workers(1);
 
 run_tests();
 
 __DATA__
 
 === TEST 1: sanity
+--- http_config
+    postpone_output 1;
 --- config
     location /echo {
         echo_after_body hello;
@@ -191,4 +195,38 @@ status: 404$
     GET /main
 --- response_body
 hello
+
+
+
+=== TEST 12: echo_after_body + gzip
+--- config
+    gzip             on;
+    gzip_min_length  1;
+    location /main {
+        echo_after_body 'world!';
+        echo_duplicate 1024 'hello';
+    }
+--- request
+    GET /main
+--- response_body_like
+hello
+--- SKIP
+
+
+
+=== TEST 13: echo_after_body + lua output
+--- config
+    #gzip             on;
+    #gzip_min_length  1;
+    location /main {
+        echo_after_body 'world';
+        proxy_pass http://127.0.0.1:$server_port/foo;
+    }
+    location /foo {
+        echo_duplicate 1000 hello;
+    }
+--- request
+    GET /main
+--- response_body_like: world
+--- SKIP
 

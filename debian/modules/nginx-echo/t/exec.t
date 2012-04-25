@@ -3,7 +3,7 @@
 use lib 'lib';
 use Test::Nginx::Socket;
 
-repeat_each(2);
+#repeat_each(2);
 plan tests => repeat_each() * 2 * blocks();
 
 #$Test::Nginx::LWP::LogLevel = 'debug';
@@ -109,16 +109,20 @@ uri: [/foo]
 
 
 
-=== TEST 7: query string ignored for named locations
+=== TEST 7: exec(named location) in subrequests
 --- config
     location /entry {
         echo_location /foo;
         echo_sleep 0.001;
-        echo_location /foo;
+        echo_location /foo2;
     }
   location /foo {
       echo_exec @bar;
   }
+  location /foo2 {
+      echo_exec @bar;
+  }
+
   location @bar {
     proxy_pass http://127.0.0.1:$server_port/bar;
   }
@@ -131,4 +135,91 @@ uri: [/foo]
 --- response_body
 hello
 hello
+
+
+
+=== TEST 8: exec(normal loctions) in subrequests
+--- config
+    location /entry {
+        echo_location /foo;
+        echo_sleep 0.001;
+        echo_location /foo2;
+    }
+  location /foo {
+      echo_exec /baz;
+  }
+  location /foo2 {
+      echo_exec /baz;
+  }
+
+  location /baz {
+    proxy_pass http://127.0.0.1:$server_port/bar;
+  }
+  location /bar {
+    echo_sleep 0.01;
+    echo hello;
+  }
+--- request
+    GET /entry
+--- response_body
+hello
+hello
+
+
+
+=== TEST 9: exec should clear ctx
+--- config
+    location @bar {
+        echo hello;
+        echo world;
+        echo heh;
+    }
+  location /foo {
+      #echo_sleep 0.001;
+      echo_reset_timer;
+      echo_exec @bar;
+  }
+--- request
+    GET /foo
+--- response_body
+hello
+world
+heh
+
+
+
+=== TEST 10: reset ctx
+--- config
+    location @proxy {
+        rewrite_by_lua return;
+        echo hello;
+    }
+    location /main {
+        rewrite_by_lua return;
+        echo_exec @proxy;
+    }
+--- request
+    GET /main
+--- response_body
+hello
+
+
+
+=== TEST 11: yield before exec
+--- config
+    location @bar {
+        echo hello;
+        echo world;
+        echo heh;
+    }
+  location /foo {
+      echo_sleep 0.001;
+      echo_exec @bar;
+  }
+--- request
+    GET /foo
+--- response_body
+hello
+world
+heh
 

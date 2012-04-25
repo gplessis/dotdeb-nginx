@@ -123,9 +123,14 @@ src/shdict.[ch]
 src/body.[ch]
 src/uri.[ch]
 src/socket.[ch]
+src/api.[ch]
 a.patch
 all
 build1[01]
 g
 buildroot/
 src/headerfilterby.[ch]
+*.patch
+analyze
+tsock
+a.c

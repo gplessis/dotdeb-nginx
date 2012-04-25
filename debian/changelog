@@ -8,17 +8,25 @@ nginx (1.2.0-1) UNRELEASED; urgency=low
 
   * New upstream release
   * debian/modules/chunkin-nginx-module:
-    + Updated chunkin-nginx-module to v0.23rc2-3-g85eca98
+    + Updated chunkin-nginx-module to v0.23rc2-3-g85eca98.
   * debian/modules/headers-more-module:
-    + Updated headers-more-module to v0.17rc1-1-g34e2389
+    + Updated headers-more-module to v0.17rc1-1-g34e2389.
   * debian/modules/nginx-development-kit:
-    + Updated nginx-development-kit to v0.2.17-7-g24202b4
+    + Updated nginx-development-kit to v0.2.17-7-g24202b4.
+  * debian/modules/nginx-echo:
+    + Updated nginx-echo to v0.38rc2-2-g18325ec.
+  * debian/modules/nginx-lua:
+    + Updated nginx-lua to v0.5.0rc24-19-g2bb9d6f.
+  * debian/modules/nginx-upstream-fair:
+    + Updated nginx-upstream-fair to a18b409.
   * debian/modules/README.Modules-versions
     + Updated versions for chunkin-nginx-module, headers-more-module,
-      nginx-development-kit
+      nginx-development-kit, nginx-echo, nginx-lua, 
+      nginx-upstream-fair
     + Corrected the URL for nginx-development-kit
+    + Corrected the URL and version number for nginx-auth-pam
 
- -- Cyril Lavier <cyril.lavier@davromaniak.eu>  Mon, 23 Apr 2012 16:55:28 +0200
+ -- Cyril Lavier <cyril.lavier@davromaniak.eu>  Wed, 25 Apr 2012 11:21:42 +0200
 
 nginx (1.1.19-1) unstable; urgency=high
 

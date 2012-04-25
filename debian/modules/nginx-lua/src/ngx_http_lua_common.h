@@ -3,8 +3,6 @@
 #ifndef NGX_HTTP_LUA_COMMON_H
 #define NGX_HTTP_LUA_COMMON_H
 
-#include "ddebug.h"
-
 #include <nginx.h>
 #include <ngx_core.h>
 #include <ngx_http.h>
@@ -12,6 +10,7 @@
 
 #include <assert.h>
 #include <setjmp.h>
+#include <stdint.h>
 
 #include <lua.h>
 #include <lualib.h>
@@ -89,13 +88,13 @@ typedef struct {
 
 
 typedef struct {
-    ngx_buf_tag_t           tag;
-
     ngx_flag_t              force_read_body; /* whether force request body to
                                                 be read */
 
     ngx_flag_t              enable_code_cache; /* whether to enable
                                                   code cache */
+
+    ngx_flag_t              http10_buffering;
 
     ngx_http_handler_pt     rewrite_handler;
     ngx_http_handler_pt     access_handler;
@@ -127,10 +126,22 @@ typedef struct {
     u_char                 *header_filter_src_key;
                                     /* cached key for header_filter_src */
 
+    ngx_msec_t                       keepalive_timeout;
+    ngx_msec_t                       connect_timeout;
+    ngx_msec_t                       send_timeout;
+    ngx_msec_t                       read_timeout;
+
+    size_t                           send_lowat;
+    size_t                           buffer_size;
+
+    ngx_uint_t                       pool_size;
+
 } ngx_http_lua_loc_conf_t;
 
 
 typedef struct {
+    void            *data;
+
     lua_State       *cc;                /*  coroutine to handle request */
 
     int              cc_ref;            /*  reference to anchor coroutine in
@@ -140,7 +151,10 @@ typedef struct {
                                             data in lua registry */
 
     ngx_chain_t             *out;  /* buffered output chain for HTTP 1.0 */
-    ngx_chain_t             *free; /* free bufs */
+    ngx_chain_t             *free_bufs;
+    ngx_chain_t             *busy_bufs;
+    ngx_chain_t             *free_recv_bufs;
+    ngx_chain_t             *flush_buf;
 
     ngx_http_cleanup_pt     *cleanup;
 
@@ -155,10 +169,10 @@ typedef struct {
 
     ngx_str_t       *sr_bodies;   /* all captured subrequest bodies */
 
-    ngx_uint_t       index; /* index of the current subrequest in its
-                               parent request */
+    ngx_uint_t       index;              /* index of the current subrequest
+                                            in its parent request */
 
-    unsigned         waiting;  /* number of subrequests being waited */
+    unsigned         waiting;     /* number of subrequests being waited */
 
     ngx_str_t        exec_uri;
     ngx_str_t        exec_args;
@@ -166,21 +180,21 @@ typedef struct {
     ngx_int_t        exit_code;
     unsigned         exited:1;
 
-    unsigned       headers_sent:1;    /*  1: response header has been sent;
+    unsigned         headers_sent:1;    /*  1: response header has been sent;
                                             0: header not sent yet */
 
-    unsigned       eof:1;             /*  1: last_buf has been sent;
-                                          0: last_buf not sent yet */
+    unsigned         eof:1;             /*  1: last_buf has been sent;
+                                            0: last_buf not sent yet */
 
-    unsigned       done:1;            /*  1: subrequest is just done;
+    unsigned         done:1;            /*  1: subrequest is just done;
                                             0: subrequest is not done
                                             yet or has already done */
 
-    unsigned       capture:1;         /*  1: body of current request is
+    unsigned         capture:1;         /*  1: body of current request is
                                             to be captured;
                                             0: not captured */
 
-    unsigned       read_body_done:1;      /* 1: request body has been all
+    unsigned         read_body_done:1;      /* 1: request body has been all
                                                read; 0: body has not been
                                                all read */
 
@@ -198,7 +212,13 @@ typedef struct {
     unsigned         req_header_cached:1;
 
     unsigned         waiting_flush:1;
+
+    unsigned         socket_busy:1;
+    unsigned         socket_ready:1;
+
     unsigned         aborted:1;
+    unsigned         buffering:1;
+
 } ngx_http_lua_ctx_t;
 
 
@@ -241,8 +261,11 @@ extern ngx_http_output_body_filter_pt ngx_http_lua_next_body_filter;
 /*  regex cache table key in Lua vm registry */
 #define NGX_LUA_REGEX_CACHE "ngx_lua_regex_cache"
 
+/*  socket connection pool table key in Lua vm registry */
+#define NGX_LUA_SOCKET_POOL "ngx_lua_socket_pool"
+
 /*  globals symbol to hold nginx request pointer */
-#define GLOBALS_SYMBOL_REQUEST    "ngx._req"
+#define GLOBALS_SYMBOL_REQUEST    "ngx._r"
 
 /*  globals symbol to hold code chunk handling nginx request */
 #define GLOBALS_SYMBOL_RUNCODE    "ngx._code"

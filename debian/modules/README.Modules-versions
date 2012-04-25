@@ -17,21 +17,21 @@ README for Modules versions
   Version: v0.2.17-7-g24202b4
 
  nginx-auth-pam
-  https://github.com/rjenster/ngx_http_auth_pam_module.git
-  Version: 31 Mar 2011
+  http://web.iti.upv.es/~sto/nginx/
+  Version: 1.2
 
  nginx-echo
-  https://github.com/agentzh/echo-nginx-module.git
-  Version: 0.37rc1
+  https://github.com/agentzh/echo-nginx-module
+  Version: 0.38rc2-2-g18325ec
 
  nginx-lua
   Homepage: https://github.com/chaoslawful/lua-nginx-module
   https://github.com/chaoslawful/lua-nginx-module.git
-  Version: v0.4.1
+  Version: v0.5.0rc24-19-g2bb9d6f
 
  nginx-upstream-fair
   Homepage: https://github.com/gnosek/nginx-upstream-fair
-  Version: 2131c731d00b49c6ac01
+  Version: a18b409
 
  nginx-upload
   Homepage: https://github.com/vkholodkov/nginx-upload-module

@@ -11,12 +11,14 @@ repeat_each(2);
 #log_level('warn');
 #worker_connections(1024);
 
-plan tests => repeat_each() * (blocks() * 2);
+plan tests => repeat_each() * (blocks() * 3 - 1);
 
 $ENV{TEST_NGINX_MEMCACHED_PORT} ||= 11211;
 $ENV{TEST_NGINX_MYSQL_PORT} ||= 3306;
 
-$ENV{LUA_CPATH} ||= '/usr/local/openresty/lualib/?.so;;';
+$ENV{LUA_CPATH} ||=
+    '/usr/local/openresty-debug/lualib/?.so;/usr/local/openresty/lualib/?.so;;';
+
 #$ENV{LUA_PATH} = $ENV{HOME} . '/work/JSON4Lua-0.9.30/json/?.lua';
 
 no_long_string();
@@ -34,6 +36,8 @@ __DATA__
 GET /lua
 --- error_code: 403
 --- response_body_like: 403 Forbidden
+--- no_error_log
+[error]
 
 
 
@@ -46,6 +50,8 @@ GET /lua
 GET /lua
 --- error_code: 404
 --- response_body_like: 404 Not Found
+--- no_error_log
+[error]
 
 
 
@@ -56,8 +62,11 @@ GET /lua
     }
 --- request
 GET /lua
---- error_code:
---- response_body:
+--- error_log
+attempt to call ngx.exit after sending out the headers
+--- no_error_log
+alert
+--- ignore_response
 
 
 
@@ -82,6 +91,8 @@ GET /api?user=agentzh
 --- error_code: 200
 --- response_body
 Logged in
+--- no_error_log
+[error]
 
 
 
@@ -105,6 +116,8 @@ Logged in
 GET /api?user=agentz
 --- error_code: 403
 --- response_body_like: 403 Forbidden
+--- no_error_log
+[error]
 
 
 
@@ -173,6 +186,8 @@ ngx.var.uid = res[1].uid;
 GET /api?uid=32
 --- response_body
 Logged in 56
+--- no_error_log
+[error]
 
 
 
@@ -241,6 +256,8 @@ ngx.var.uid = res[1].uid;
 GET /api?uid=32
 --- response_body
 Logged in 56
+--- no_error_log
+[error]
 
 
 
@@ -320,6 +337,8 @@ ngx.var.uid = res[1].uid;
 GET /api?uid=32
 --- response_body
 Logged in 56
+--- no_error_log
+[error]
 
 
 
@@ -417,6 +436,8 @@ GET /lua
 --- error_code: 200
 --- response_body
 Hi
+--- no_error_log
+[error]
 
 
 
@@ -438,6 +459,8 @@ GET /lua
 --- error_code: 200
 --- response_body
 hello
+--- no_error_log
+[error]
 
 
 
@@ -452,6 +475,8 @@ hello
 GET /lua
 --- error_code: 501
 --- response_body_like: 501 Method Not Implemented
+--- no_error_log
+[error]
 
 
 
@@ -466,4 +491,6 @@ GET /lua
 GET /lua
 --- error_code: 501
 --- response_body_like: 501 Method Not Implemented
+--- no_error_log
+[error]
 

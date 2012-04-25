@@ -305,7 +305,6 @@ helloworld
 Content-Length: 6
 --- response_body
 hello
-world
 
 
 
@@ -325,4 +324,16 @@ world
 --- response_body
 4
 --- SKIP
+
+
+
+=== TEST 23: HEAD
+--- config
+    location /echo {
+        echo hello;
+        echo world;
+    }
+--- request
+    HEAD /echo
+--- response_body
 

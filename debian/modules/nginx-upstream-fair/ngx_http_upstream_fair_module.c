@@ -610,7 +610,7 @@ ngx_http_upstream_init_fair(ngx_conf_t *cf, ngx_http_upstream_srv_conf_t *us)
     n = peers->number;
 
     shm_name = ngx_palloc(cf->pool, sizeof *shm_name);
-    shm_name->len = sizeof("upstream_fair");
+    shm_name->len = sizeof("upstream_fair") - 1;
     shm_name->data = (unsigned char *) "upstream_fair";
 
     if (ngx_http_upstream_fair_shm_size == 0) {
@@ -645,6 +645,7 @@ ngx_http_upstream_init_fair(ngx_conf_t *cf, ngx_http_upstream_srv_conf_t *us)
 static void
 ngx_http_upstream_fair_update_nreq(ngx_http_upstream_fair_peer_data_t *fp, int delta, ngx_log_t *log)
 {
+#if (NGX_DEBUG)
     ngx_uint_t                          nreq;
     ngx_uint_t                          total_nreq;
 
@@ -655,6 +656,7 @@ ngx_http_upstream_fair_update_nreq(ngx_http_upstream_fair_peer_data_t *fp, int d
         "[upstream_fair] nreq for peer %ui @ %p/%p now %d, total %d, delta %d",
         fp->current, fp->peers, fp->peers->peer[fp->current].shared, nreq,
         total_nreq, delta);
+#endif
 }
 
 /*
@@ -679,7 +681,7 @@ ngx_http_upstream_fair_update_nreq(ngx_http_upstream_fair_peer_data_t *fp, int d
 #define SCHED_COUNTER_BITS 20
 #define SCHED_NREQ_MAX ((~0UL) >> SCHED_COUNTER_BITS)
 #define SCHED_COUNTER_MAX ((1 << SCHED_COUNTER_BITS) - 1)
-#define SCHED_SCORE(nreq,delta) (((nreq) << SCHED_COUNTER_BITS) | (~(delta)))
+#define SCHED_SCORE(nreq,delta) (((nreq) << SCHED_COUNTER_BITS) | (~(delta) & SCHED_COUNTER_MAX))
 #define ngx_upstream_fair_min(a,b) (((a) < (b)) ? (a) : (b))
 
 static ngx_uint_t

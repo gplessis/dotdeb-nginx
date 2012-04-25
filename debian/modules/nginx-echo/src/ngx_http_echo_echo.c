@@ -1,4 +1,6 @@
+#ifndef DDEBUG
 #define DDEBUG 0
+#endif
 #include "ddebug.h"
 
 #include "ngx_http_echo_echo.h"
@@ -66,6 +68,7 @@ ngx_http_echo_exec_echo_sync(ngx_http_request_t *r,
     if (cl == NULL) {
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
+
     cl->buf  = buf;
     cl->next = NULL;
 
@@ -275,9 +278,10 @@ ngx_http_echo_exec_echo_duplicate(ngx_http_request_t *r,
 
     if (count == 0 || str->len == 0) {
         rc = ngx_http_echo_send_header_if_needed(r, ctx);
-        if (r->header_only || rc >= NGX_HTTP_SPECIAL_RESPONSE) {
+        if (rc == NGX_ERROR || rc > NGX_OK || r->header_only) {
             return rc;
         }
+
         return NGX_OK;
     }
 

@@ -1,4 +1,6 @@
+#ifndef DDEBUG
 #define DDEBUG 0
+#endif
 #include "ddebug.h"
 
 #include "ngx_http_echo_util.h"
@@ -53,11 +55,7 @@ ngx_http_echo_exec_echo_location_async(ngx_http_request_t *r,
     }
 
     rc = ngx_http_echo_send_header_if_needed(r, ctx);
-    if (r->header_only) {
-        return NGX_HTTP_INTERNAL_SERVER_ERROR;
-    }
-
-    if (rc >= NGX_HTTP_SPECIAL_RESPONSE) {
+    if (rc == NGX_ERROR || rc > NGX_OK || r->header_only) {
         return rc;
     }
 
@@ -117,8 +115,7 @@ ngx_http_echo_exec_echo_location(ngx_http_request_t *r,
     }
 
     rc = ngx_http_echo_send_header_if_needed(r, ctx);
-
-    if (r->header_only || rc >= NGX_HTTP_SPECIAL_RESPONSE) {
+    if (rc == NGX_ERROR || rc > NGX_OK || r->header_only) {
         return rc;
     }
 

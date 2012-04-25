@@ -402,6 +402,7 @@ content length: 5
 
 
 === TEST 21: let subrequest to read the main request's request body
+--- SKIP
 --- config
     location /main {
         echo_subrequest_async POST /sub;
@@ -559,4 +560,19 @@ hi(world);
     GET /main?c=hi
 --- response_body chop
 hi(world people);
+
+
+
+=== TEST 29: sanity (HEAD)
+--- config
+    location /main {
+        echo_subrequest_async GET /sub;
+        echo_subrequest_async GET /sub;
+    }
+    location /sub {
+        echo hello;
+    }
+--- request
+    HEAD /main
+--- response_body
 

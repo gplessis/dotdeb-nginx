@@ -1,7 +1,7 @@
 # vi:filetype=
 
 use lib 'lib';
-use Test::Nginx::LWP;
+use Test::Nginx::Socket;
 
 plan tests => 2 * blocks();
 
@@ -18,8 +18,8 @@ __DATA__
     GET /echo
 --- response_body eval
 "GET /echo HTTP/1.1\r
-Host: localhost:\$ServerPortForClient\r
-User-Agent: Test::Nginx::LWP\r
+Host: localhost\r
+Connection: Close\r
 
 "
 
@@ -35,12 +35,12 @@ User-Agent: Test::Nginx::LWP\r
     GET /echo
 --- response_body eval
 "GET /echo HTTP/1.1\r
-Host: localhost:\$ServerPortForClient\r
-User-Agent: Test::Nginx::LWP\r
+Host: localhost\r
+Connection: Close\r
 
 GET /echo HTTP/1.1\r
-Host: localhost:\$ServerPortForClient\r
-User-Agent: Test::Nginx::LWP\r
+Host: localhost\r
+Connection: Close\r
 
 "
 
@@ -124,8 +124,8 @@ body here
 haha
 --- response_body eval
 "POST /echoback HTTP/1.1\r
-Host: localhost:\$ServerPortForClient\r
-User-Agent: Test::Nginx::LWP\r
+Host: localhost\r
+Connection: Close\r
 Content-Length: 14\r
 
 body here
@@ -160,4 +160,20 @@ haha
     GET /status
 --- response_body
 status: 
+
+
+
+=== TEST 10: echo_request_body (empty body)
+--- config
+    location /body {
+      echo_read_request_body;
+      echo_request_body;
+    }
+    location /main {
+        proxy_pass http://127.0.0.1:$server_port/body;
+    }
+--- request eval
+"POST /main"
+--- response_body eval
+""
 

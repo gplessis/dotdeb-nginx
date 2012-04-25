@@ -2,14 +2,15 @@
 use lib 'lib';
 use Test::Nginx::Socket;
 
+#master_on();
+workers(1);
 #worker_connections(1014);
-#master_process_enabled(1);
 #log_level('warn');
+#master_process_enabled(1);
 
 repeat_each(2);
-#repeat_each(1);
 
-plan tests => repeat_each() * (blocks() * 2);
+plan tests => repeat_each() * (blocks() * 2 + 8);
 
 $ENV{TEST_NGINX_MEMCACHED_PORT} ||= 11211;
 
@@ -385,7 +386,6 @@ cached: hello
 
             res = ngx.location.capture("/memc", { share_all_vars = true });
             ngx.say("cached: " .. res.body);
-
         ';
     }
 --- request
@@ -699,6 +699,8 @@ header foo: [bar]
 hello, a
 hello, b
 hello, c
+--- error_log
+lua reuse free buf memory
 
 
 
@@ -797,4 +799,249 @@ nil
 GET /lua
 --- response_body
 bar
+
+
+
+=== TEST 32: test memcached with subrequests
+--- http_config
+    upstream memc {
+        server 127.0.0.1:$TEST_NGINX_MEMCACHED_PORT;
+        keepalive 100 single;
+    }
+--- config
+    location /memc {
+        set $memc_key some_key;
+        set $memc_exptime 600;
+        memc_pass memc;
+    }
+
+    location /t {
+        content_by_lua '
+            res = ngx.location.capture("/memc",
+                { method = ngx.HTTP_PUT, body = "hello 1234" });
+            -- ngx.say("PUT: " .. res.status);
+
+            res = ngx.location.capture("/memc");
+            ngx.say("some_key: " .. res.body);
+        ';
+    }
+--- request
+GET /t
+--- response_body
+some_key: hello 1234
+--- error_log
+lua reuse free buf chain, but reallocate memory because
+--- no_error_log
+[error]
+
+
+
+=== TEST 33: main POST, sub GET (main does not read the body)
+--- config
+    location /other {
+        default_type 'foo/bar';
+        content_by_lua '
+            ngx.req.read_body()
+            ngx.say(ngx.var.request_method)
+            ngx.say(ngx.req.get_body_data())
+        ';
+    }
+
+    location /foo {
+        proxy_pass http://127.0.0.1:$server_port/other;
+        #proxy_pass http://127.0.0.1:8892/other;
+    }
+
+    location /lua {
+        content_by_lua '
+            res = ngx.location.capture("/foo",
+                { method = ngx.HTTP_GET });
+
+            ngx.print(res.body)
+        ';
+    }
+--- request
+POST /lua
+hello, world
+--- response_body
+GET
+nil
+--- no_error_log
+[error]
+
+
+
+=== TEST 34: main POST, sub GET (main has read the body)
+--- config
+    location /other {
+        default_type 'foo/bar';
+        content_by_lua '
+            ngx.req.read_body()
+            ngx.say(ngx.var.request_method)
+            ngx.say(ngx.req.get_body_data())
+        ';
+    }
+
+    location /foo {
+        proxy_pass http://127.0.0.1:$server_port/other;
+        #proxy_pass http://127.0.0.1:8892/other;
+    }
+
+    location /lua {
+        content_by_lua '
+            ngx.req.read_body()
+
+            res = ngx.location.capture("/foo",
+                { method = ngx.HTTP_GET });
+
+            ngx.print(res.body)
+        ';
+    }
+--- request
+POST /lua
+hello, world
+--- response_body
+GET
+nil
+--- no_error_log
+[error]
+
+
+
+=== TEST 35: main POST, sub POST (inherit bodies directly)
+--- config
+    location /other {
+        default_type 'foo/bar';
+        content_by_lua '
+            ngx.req.read_body()
+            ngx.say(ngx.var.request_method)
+            ngx.say(ngx.req.get_body_data())
+        ';
+    }
+
+    location /foo {
+        proxy_pass http://127.0.0.1:$server_port/other;
+        #proxy_pass http://127.0.0.1:8892/other;
+    }
+
+    location /lua {
+        content_by_lua '
+            ngx.req.read_body()
+
+            res = ngx.location.capture("/foo",
+                { method = ngx.HTTP_POST });
+
+            ngx.print(res.body)
+        ';
+    }
+--- request
+POST /lua
+hello, world
+--- response_body
+POST
+hello, world
+--- no_error_log
+[error]
+
+
+
+=== TEST 36: main POST, sub PUT (inherit bodies directly)
+--- config
+    location /other {
+        default_type 'foo/bar';
+        content_by_lua '
+            ngx.req.read_body()
+            ngx.say(ngx.var.request_method)
+            ngx.say(ngx.req.get_body_data())
+        ';
+    }
+
+    location /foo {
+        proxy_pass http://127.0.0.1:$server_port/other;
+        #proxy_pass http://127.0.0.1:8892/other;
+    }
+
+    location /lua {
+        content_by_lua '
+            ngx.req.read_body()
+
+            res = ngx.location.capture("/foo",
+                { method = ngx.HTTP_PUT });
+
+            ngx.print(res.body)
+        ';
+    }
+--- request
+POST /lua
+hello, world
+--- response_body
+PUT
+hello, world
+--- no_error_log
+[error]
+
+
+
+=== TEST 37: recursive calls
+--- config
+    location /t {
+        content_by_lua '
+            ngx.location.capture("/t")
+        ';
+    }
+--- request
+    GET /t
+--- ignore_response
+--- error_log
+subrequests cycle while processing "/t"
+
+
+
+=== TEST 38: OPTIONS
+--- config
+    location /other {
+        default_type 'foo/bar';
+        echo $echo_request_method;
+    }
+
+    location /lua {
+        content_by_lua '
+            res = ngx.location.capture("/other",
+                { method = ngx.HTTP_OPTIONS });
+
+            ngx.print(res.body)
+        ';
+    }
+--- request
+GET /lua
+--- response_body
+OPTIONS
+--- no_error_log
+[error]
+
+
+
+=== TEST 39: OPTIONS with a body
+--- config
+    location /other {
+        default_type 'foo/bar';
+        echo $echo_request_method;
+        echo_request_body;
+    }
+
+    location /lua {
+        content_by_lua '
+            res = ngx.location.capture("/other",
+                { method = ngx.HTTP_OPTIONS, body = "hello world" });
+
+            ngx.print(res.body)
+        ';
+    }
+--- request
+GET /lua
+--- response_body chop
+OPTIONS
+hello world
+--- no_error_log
+[error]
 

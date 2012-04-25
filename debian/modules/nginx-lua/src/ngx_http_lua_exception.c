@@ -3,6 +3,7 @@
 #ifndef DDEBUG
 #define DDEBUG 0
 #endif
+#include "ddebug.h"
 
 #include "ngx_http_lua_exception.h"
 
@@ -22,7 +23,7 @@ jmp_buf ngx_http_lua_exception;
 int
 ngx_http_lua_atpanic(lua_State *L)
 {
-    const char              *s;
+    u_char                  *s;
     ngx_http_request_t      *r;
 
     lua_getglobal(L, GLOBALS_SYMBOL_REQUEST);
@@ -31,19 +32,20 @@ ngx_http_lua_atpanic(lua_State *L)
 
     /*  log Lua VM crashing reason to error log */
     if (r && r->connection && r->connection->log) {
-        s = luaL_checkstring(L, 1);
+        s = (u_char *) lua_tostring(L, 1);
         ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                "(lua-atpanic) Lua VM crashed, reason: %s", s);
+                "lua atpanic: Lua VM crashed, reason: %s", s);
 
     } else {
-        dd("(lua-atpanic) can't output Lua VM crashing reason to error log"
+
+        dd("lua atpanic: can't output Lua VM crashing reason to error log"
                 " due to invalid logging context");
     }
 
     /*  restore nginx execution */
     NGX_LUA_EXCEPTION_THROW(1);
 
-    /* cannot reach here, just to suppress a potential gcc warning */
+    /* impossible to reach here */
     return 0;
 }
 

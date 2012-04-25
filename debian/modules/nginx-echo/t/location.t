@@ -338,6 +338,7 @@ Foo Bar
 
 
 === TEST 17: let subrequest to read the main request's request body
+--- SKIP
 --- config
     location /main {
         echo_location /sub;
@@ -539,4 +540,19 @@ hi(world);
     GET /main?c=hi
 --- response_body chop
 hi(world people);
+
+
+
+=== TEST 25: sanity (HEAD)
+--- config
+    location /main {
+        echo_location /sub;
+        echo_location /sub;
+    }
+    location /sub {
+        echo hello;
+    }
+--- request
+    HEAD /main
+--- response_body
 

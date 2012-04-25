@@ -7,6 +7,7 @@ use Test::Nginx::Socket;
 plan tests => 2 * blocks();
 
 $ENV{TEST_NGINX_HTML_DIR} = html_dir;
+$ENV{TEST_NGINX_CLIENT_PORT} ||= server_port();
 
 run_tests();
 
@@ -446,6 +447,7 @@ Foo Bar
 
 
 === TEST 22: let subrequest to read the main request's request body
+--- SKIP
 --- config
     location /main {
         echo_subrequest POST /sub;
@@ -635,4 +637,45 @@ hi(world);
     GET /main?c=hi
 --- response_body chop
 hi(world people);
+
+
+
+=== TEST 31: sanity (HEAD)
+--- config
+    location /main {
+        echo_subrequest GET /sub;
+        echo_subrequest GET /sub;
+    }
+    location /sub {
+        echo hello;
+    }
+--- request
+    HEAD /main
+--- response_body
+
+
+
+=== TEST 32: POST subrequest to ngx_proxy
+--- config
+    location /hello {
+       default_type text/plain;
+       echo_subrequest POST '/proxy' -q 'foo=Foo&bar=baz' -b 'request_body=test&test=3';
+    }
+
+    location /proxy {
+        proxy_pass http://127.0.0.1:$TEST_NGINX_CLIENT_PORT/sub;
+        #proxy_pass http://127.0.0.1:1113/sub;
+    }
+
+    location /sub {
+        echo_read_request_body;
+        echo "sub method: $echo_request_method";
+        # we don't need to call echo_read_client_body explicitly here
+        echo "sub body: $echo_request_body";
+    }
+--- request
+    GET /hello
+--- response_body
+sub method: POST
+sub body: request_body=test&test=3
 
