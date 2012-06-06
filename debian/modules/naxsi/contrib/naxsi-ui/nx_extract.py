@@ -13,12 +13,15 @@ import sys
 import datetime
 import time
 import cgi
+import os
 
 
 glob_allow=True
 glob_rules_file="/etc/nginx/naxsi_core.rules"
 glob_conf_file = ''
-
+glob_username = ''
+glob_pass = ''
+glob_fileList = []
 
 class rules_extractor(object):
    def __init__(self, page_hit, rules_hit, rules_file, conf_file='naxsi-ui.conf'):
@@ -134,36 +137,7 @@ class rules_extractor(object):
       self.rules_list = self.final_rules
       self.opti_rules_back()
       return self.base_rules, self.final_rules
-            
-   def write_rules(self, filename = '/tmp/naxsi_wl.rules'):
-      try:
-         fd = open(filename, 'w')
-      except:
-         print 'Cant open rules file !'
-         return
-      r = '########### Rules Before Optimisation ##################\n'
-      pprint.pprint(self.base_rules)
-      for i in self.base_rules:
-         r += '#BasicRule wl' + i['id'] + ' "mz:$URL:' + i['url'] + '|' + i['arg'] + '";\n'
-      r += '########### End Of Rules Before Optimisation ###########\n'
-      fd.write(r)
-      print r
-      r = ''
-      if not len(self.final_rules):
-         for i in self.rules_list:
-            r += 'BasicRule wl:' + i['id'] + ' "mz:$URL:' + i['url'] + '|' + i['arg'] + '";\n'
-         print r.rstrip()
-         fd.write(r)
-      else:
-         for i in self.final_rules:
-            r += 'BasicRule wl:' + i['id'] + ' "mz:'
-            if i['url'] is not None:
-               r += '$URL:' + i['url'] + '|'
-            r += i['arg'] + '";\n'
-         fd.write(r)
-         print r.rstrip()
-      fd.close()
-      
+                  
    def generate_stats(self):
       stats = ""
       self.cursor.execute("select count(distinct md5) as uniq_exception from exception")
@@ -178,7 +152,7 @@ class rules_extractor(object):
 
                
 
-class InterceptHandler(http.Request):   
+class InterceptHandler(http.Request):
    def create_js_array(self, res):
       array = '['
       for i in res:
@@ -213,7 +187,25 @@ class InterceptHandler(http.Request):
       myarray = self.create_js_array(mydict)
       return myarray, total_hit
 
+   def check_auth(self):
+      user = self.getUser()
+      passwd = self.getPassword()
+
+      if user != glob_user or passwd != glob_pass:
+         self.setResponseCode(401)
+         self.setHeader('WWW-Authenticate', 'Basic realm="NAXSI Web Interface"')
+         self.setHeader('content-type', 'text/html')
+         self.write('<h1>Unauthorized User</h1>')
+         self.finish()
+         return -1
+
+      return 42
+
    def handle_request(self):
+
+      if self.check_auth() == -1:
+         return
+
       self.ex = rules_extractor(0,0, None)
 
       if self.path == '/get_rules':
@@ -305,6 +297,12 @@ class InterceptHandler(http.Request):
          try:
             if self.path.endswith('.js'):
                self.setHeader('content-type', 'text/javascript')
+            
+            if '.' + self.path not in glob_fileList:
+               self.setResponseCode(403)
+               self.finish()
+               return
+
             fd = open(self.path[1:], 'rb')
             for i in fd:
                self.write(i)
@@ -324,7 +322,14 @@ class InterceptFactory(http.HTTPFactory):
       
 def usage():
    print 'Usage : python nx_extract /path/to/conf/file'
-   
+
+def build_file_list(path):
+   rootdir = path
+   for root, subFolders, files in os.walk(rootdir):
+      for file in files:
+         glob_fileList.append(os.path.join(root,file))
+
+
 if __name__  == '__main__':
    if len(sys.argv) != 2:
       usage()
@@ -342,7 +347,23 @@ if __name__  == '__main__':
       glob_rules_file = conf.get('nx_extract', 'rules_path')
    except:
       print "No rules path in conf file ! Using default (/etc/nginx/sec-rules/core.rules)"
+
+   try:
+      glob_user = conf.get('nx_extract', 'username')
+   except:
+      print 'No username for web access ! Nx_extract will exit.'
+      exit(-1)
+
+   try:
+      glob_pass = conf.get('nx_extract', 'password')
+   except:
+      print 'No password for web access ! Nx_extract will exit.'
+      exit(-1)
    fd.close()
-         
+
+
+
+   build_file_list('.')
+
    reactor.listenTCP(port, InterceptFactory())
    reactor.run()
