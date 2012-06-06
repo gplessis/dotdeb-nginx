@@ -72,8 +72,6 @@ static ngx_command_t  ngx_http_auth_pam_commands[] = {
       NGX_HTTP_LOC_CONF_OFFSET,
       offsetof(ngx_http_auth_pam_loc_conf_t, service_name),
       NULL },
-      
-      ngx_null_command
 };
 
 
@@ -195,47 +193,6 @@ ngx_http_auth_pam_handler(ngx_http_request_t *r)
     return ngx_http_auth_pam_authenticate(r, ctx, &ctx->passwd, alcf);
 }
 
-/**
- * create a key value pair from the given key and value string
- */
-static void set_to_pam_env(pam_handle_t *pamh, ngx_http_request_t *r, char *key, char *value) {
-
-	if (key != NULL && value != NULL) {
-		size_t size = strlen(key) + strlen(value) + 1 * sizeof(char);
-		char *key_value_pair = ngx_palloc(r->pool, size);
-		sprintf(key_value_pair, "%s=%s", key, value);
-
-		pam_putenv(pamh, key_value_pair);
-	}
-}
-
-/**
- * creates a '\0' terminated string from the given ngx_str_t
- *
- * @param source nginx string structure with data and length
- * @param pool pool of the request used for memory allocation
- */
-static char* ngx_strncpy_s(ngx_str_t source, ngx_pool_t *pool) {
-	// allocate memory in pool
-	char* destination = ngx_palloc(pool, source.len + 1);
-	strncpy(destination, (char *) source.data, source.len);
-	// add null terminator
-	destination[source.len] = '\0';
-	return destination;
-}
-
-/**
- * enrich pam environment with request parameters
- */
-static void add_request_info_to_pam_env(pam_handle_t *pamh, ngx_http_request_t *r) {
-
-	char *request_info = ngx_strncpy_s(r->request_line, r->pool);
-	char *host_info = ngx_strncpy_s(r->headers_in.host->value, r->pool);
-
-	set_to_pam_env(pamh, r, "REQUEST", request_info);
-	set_to_pam_env(pamh, r, "HOST", host_info);
-}
-
 static ngx_int_t
 ngx_http_auth_pam_authenticate(ngx_http_request_t *r,
     ngx_http_auth_pam_ctx_t *ctx, ngx_str_t *passwd, void *conf)
@@ -295,8 +252,6 @@ ngx_http_auth_pam_authenticate(ngx_http_request_t *r,
 		      pam_strerror(pamh, rc));
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
-
-    add_request_info_to_pam_env(pamh, r);
 
     /* try to authenticate user, log error on failure */
     if ((rc = pam_authenticate(pamh,

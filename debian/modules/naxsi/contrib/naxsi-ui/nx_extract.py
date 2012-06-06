@@ -1,20 +1,28 @@
-from __future__ import print_function
+from ConfigParser import ConfigParser
+from twisted.web import http
+from twisted.internet import protocol
+from twisted.internet import reactor, threads
+from ordereddict import OrderedDict # don't lose compatibility with python < 2.7
+
 import MySQLdb
 import MySQLConnector
 import pprint
 import re
 import getopt
 import sys
-from twisted.web import http
-from twisted.internet import protocol
-from twisted.internet import reactor
+import datetime
+import time
+import cgi
 
-glob_allow=False
+
+glob_allow=True
 glob_rules_file="/etc/nginx/naxsi_core.rules"
+glob_conf_file = ''
+
 
 class rules_extractor(object):
-   def __init__(self, page_hit, rules_hit, rules_file):
-      self.db = MySQLConnector.MySQLConnector().connect()
+   def __init__(self, page_hit, rules_hit, rules_file, conf_file='naxsi-ui.conf'):
+      self.db = MySQLConnector.MySQLConnector(glob_conf_file).connect()
       self.cursor = self.db.cursor(MySQLdb.cursors.DictCursor)
       self.rules_list = []
       self.final_rules = []
@@ -22,15 +30,10 @@ class rules_extractor(object):
       self.page_hit = page_hit
       self.rules_hit = rules_hit
       self.core_msg = {}
-      if glob_allow is True and rules_file is not None:
-         print("glob allow from"+rules_file)
-         self.extract_core(rules_file)
-      else:
-         if glob_rules_file is not None:
-            self.extract_core(glob_rules_file)
+      self.extract_core(glob_rules_file)
    def extract_core(self, rules_file):
       try:
-         fd = open(rules_file, 'r')
+         fd = open(glob_rules_file, 'r')
          for i in fd:
             if i.startswith('MainRule'):
                pos = i.find('id:')
@@ -39,7 +42,7 @@ class rules_extractor(object):
          fd.close()
       except:
          pass
-   
+
    def gen_basic_rules(self,url=None, srcip=None, dsthost=None,
                 rule_id=None, exception_md5=None,
                 exception_id=None):
@@ -100,21 +103,21 @@ class rules_extractor(object):
                self.rules_list.remove(bla)
             lr -= len(matching)
             i = 0
-            print("*) "+str(len(matching))+" hits for same mz:"+arg_type+':'+arg_name+" and id:"+str(id))
-            print("removed "+str(len(matching))+" items from biglist, now :"+str(len(self.rules_list)))
+            print "*) "+str(len(matching))+" hits for same mz:"+arg_type+':'+arg_name+" and id:"+str(id)
+            print "removed "+str(len(matching))+" items from biglist, now :"+str(len(self.rules_list))
             continue
          matching = filter(lambda l: url == l['url'] and l['arg'] == arg_type + ':' + arg_name, self.rules_list)
          if len(matching) >= self.rules_hit:
             #whitelist all id on url with arg_name and arg_type -> BasicRule wl:0 "mz:$url:xxx|argtype:argname"
             self.final_rules.append({'url': url, 'id': str(0), 'arg': arg_type + ':' + arg_name})
-            print("about to del "+str(len(matching))+" items from biglist, now :"+str(len(self.rules_list)))
+            print "about to del "+str(len(matching))+" items from biglist, now :"+str(len(self.rules_list))
             for bla in matching:
                self.rules_list.remove(bla)
             lr -= len(matching)
             i = 0
-            print("*) "+str(len(matching))+" hits for same mz:"+str(url)+'|'+str(arg_type)+':'+str(arg_name)+" and id:"+str(id))
-            print("removed "+str(len(matching))+" items from biglist, now :"+str(len(self.rules_list)))
-            print(" current LR:"+str(lr))
+            print "*) "+str(len(matching))+" hits for same mz:"+str(url)+'|'+str(arg_type)+':'+str(arg_name)+" and id:"+str(id)
+            print "removed "+str(len(matching))+" items from biglist, now :"+str(len(self.rules_list))
+            print " current LR:"+str(lr)
             continue
          i += 1
       if self.rules_list == self.final_rules:
@@ -131,57 +134,12 @@ class rules_extractor(object):
       self.rules_list = self.final_rules
       self.opti_rules_back()
       return self.base_rules, self.final_rules
-      
-   def opti_rules(self):
-      lr = len(self.rules_list)
-      i = 0
-      while i < lr:
-         matching = []
-         if (self.rules_list[i]['arg'].split(':')[0] != "URL"):
-            arg_type, arg_name = tuple(self.rules_list[i]['arg'].split(':'))
-         else:
-            arg_name = ""
-            arg_type = "URL"
-         id = self.rules_list[i]['id']
-         url = self.rules_list[i]['url']
-         matching = filter(lambda l: id == l['id'] and l['arg'] == arg_type + ':' + arg_name, self.rules_list)
-         if len(matching) >= self.page_hit:
-            #whitelist the ids on every url with arg_name and arg_type -> BasicRule wl:id "mz:argtype:argname"
-            self.final_rules.append({'url': None, 'id': id, 'arg': arg_type + ':' + arg_name})
-            for bla in matching:
-               self.rules_list.remove(bla)
-            lr -= len(matching)
-            i = -1
-#         else:
-         matching = filter(lambda l: url == l['url'] and l['arg'] == arg_type + ':' + arg_name, self.rules_list)
-         if len(matching) >= self.rules_hit:
-            #whitelist all id on url with arg_name and arg_type -> BasicRule wl:0 "mz:argtype:argname"
-            self.final_rules.append({'url': url, 'id': str(0), 'arg': arg_type + ':' + arg_name})
-            for bla in matching:
-               self.rules_list.remove(bla)
-            lr -= len(matching)
-            i = -1
-         i += 1
-      if self.rules_list == self.final_rules:
-         return self.base_rules, self.final_rules
-      #append rules that cant be optimized
-      self.final_rules += self.rules_list
-      #remove duplicate
-      tmp_list = []
-      for i in self.final_rules:
-         if i not in tmp_list:
-            tmp_list.append(i)
-      self.final_rules = tmp_list
-     #try to reoptimize
-      self.rules_list = self.final_rules
-      self.opti_rules()
-      return self.base_rules, self.final_rules
-      
+            
    def write_rules(self, filename = '/tmp/naxsi_wl.rules'):
       try:
          fd = open(filename, 'w')
       except:
-         print('Cant open rules file !')
+         print 'Cant open rules file !'
          return
       r = '########### Rules Before Optimisation ##################\n'
       pprint.pprint(self.base_rules)
@@ -189,12 +147,12 @@ class rules_extractor(object):
          r += '#BasicRule wl' + i['id'] + ' "mz:$URL:' + i['url'] + '|' + i['arg'] + '";\n'
       r += '########### End Of Rules Before Optimisation ###########\n'
       fd.write(r)
-      print(r)
+      print r
       r = ''
       if not len(self.final_rules):
          for i in self.rules_list:
             r += 'BasicRule wl:' + i['id'] + ' "mz:$URL:' + i['url'] + '|' + i['arg'] + '";\n'
-         print(r.rstrip())
+         print r.rstrip()
          fd.write(r)
       else:
          for i in self.final_rules:
@@ -203,7 +161,7 @@ class rules_extractor(object):
                r += '$URL:' + i['url'] + '|'
             r += i['arg'] + '";\n'
          fd.write(r)
-         print(r.rstrip())
+         print r.rstrip()
       fd.close()
       
    def generate_stats(self):
@@ -217,35 +175,70 @@ class rules_extractor(object):
       self.cursor.execute("select count(distinct md5) as uniq_exception_mon from http_monitor where md5 is not NULL")
       uniq_exception = self.cursor.fetchall()[0]['uniq_exception_mon']
       return "<ul><li>There is currently %s unique exceptions.</li></ul><ul><li>There is currently %s different peers that triggered rules.</li></ul><ul><li>There is currently %s peers being monitored</li></ul><ul><li>There is currently %s exceptions being monitored</li></ul>" % (uniq_ex, uniq_peer, uniq_peer_mon, uniq_exception)
+
                
 
-class InterceptHandler(http.Request):
-   def process(self):
+class InterceptHandler(http.Request):   
+   def create_js_array(self, res):
+      array = '['
+      for i in res:
+         date_begin = str(i).split('-')
+         date_begin[1] = str(int(date_begin[1]) - 1)
+         date_begin = ','.join(date_begin)
+         array += '[Date.UTC(' + date_begin  + '),' + str(res[i]) + '],'
+      if array != '[':
+         array = array[:-1] + ']'
+      else:
+         array += ']'
+      return array
+
+   def build_dict(self, res):
+      d = OrderedDict()
+      for i in res:
+         if i['d'] not in d.keys():
+            d[i['d']] = i['ex']
+      return d
+
+
+   def build_js_array(self, id_beg = None, id_end = None):
+      if id_beg is None or id_end is None:
+         self.ex.cursor.execute('select date(date) as d, count(exception_id) as ex from connections group by date(date)')
+      else:
+         self.ex.cursor.execute('select date(date) as d, count(co.exception_id) as ex from connections as co join match_zone as m on (co.match_id = m.match_id) where m.rule_id >= %s and m.rule_id <= %s group by date(date);', (str(id_beg), str(id_end)))
+      count = self.ex.cursor.fetchall()      
+      mydict = self.build_dict(count)
+      total_hit = 0
+      for i in count:
+         total_hit += i['ex']
+      myarray = self.create_js_array(mydict)
+      return myarray, total_hit
+
+   def handle_request(self):
+      self.ex = rules_extractor(0,0, None)
+
       if self.path == '/get_rules':
-         self.setHeader('content-type', 'text/plain')         
+         self.setHeader('content-type', 'text/plain')
          ex = rules_extractor(int(self.args.get('page_hit', ['10'])[0]), 
                               int(self.args.get('rules_hit', ['10'])[0]), 
-                              self.args.get('rules_file', [None])[0])
+                              glob_rules_file)
          ex.gen_basic_rules()
          base_rules, opti_rules = ex.opti_rules_back()
          r = '########### Rules Before Optimisation ##################\n'
+
          for i in base_rules:
             r += '#%s hits on rule %s (%s) on url %s from %s different peers\n' % (i['count'], i['id'], 
                                                                                    ex.core_msg.get(i['id'], 
                                                                                                    'Unknown id. Check the path to the core rules file and/or the content.'), 
                                                                                    i['url'], i['cnt_peer'])
             r += '#BasicRule wl:' + i['id'] + ' "mz:$URL:' + i['url'] 
-            #ugly hack :D
             if '|NAME' in i['arg']:
                i['arg'] = i['arg'].split('|')[0] + '_VAR|NAME'
             if i['arg'] is not None and len(i['arg']) > 0:
                r += '|' + i['arg']
             r +=  '";\n'
          r += '########### End Of Rules Before Optimisation ###########\n'
+
          for i in opti_rules:
-            #ugly hack :D
-#            if '|NAME' in i['arg']:
-#               i['arg'] = i['arg'].split('|')[0] + '_VAR|NAME'
             r += 'BasicRule wl:' + i['id'] + ' "mz:'
             if i['url'] is not None and len(i['url']) > 0:
                r += '$URL:' + i['url']
@@ -255,67 +248,60 @@ class InterceptHandler(http.Request):
                else:
                   r += i['arg']
             r += '";\n'
+
          self.write(r)
+         self.finish()
+
       elif self.path == '/':
-         ex = rules_extractor(0,0, None)
-         helpmsg = """<html>
-  <head>
-    <title>Naxsi Rules Extractor</title>
-  </head>
-  <body>
-    <p style="text-align:center"><b>Naxsi Rules Extractor</b></p>
-    <h3>How to extract generated rules from the database : </h3>
-    <ul>
-      <li>
-	A GET request on /get_rules will display the generated rules. Non-optimised rules will be displayed in comment.
-      </li>
-    </ul>
-    <h3>The available args on /get_rules are : </h3>
-    <ul>
-      <li>
-	<p>
-	<b>rules_file</b> : Path to the core rules file of naxsi (typically /etc/nginx/conf/naxsi_core.rules).<br />
-	This arg is used to display the message associated with the rule (ie, will display "double quote" if the rule 1001 is whitelisted).<br />
-	If this arg is not present, an error message will be displayed.	
-	</p>
-      </li>
-      <li>
-	<p>
-	<b>page_hit</b> :  Minimum number of pages triggering the same event before proposing the optimisation (ie, if there is more than 10 urls that trigger a rule, the rule will be whitelisted on every url).<br />
-	Default to 10.
-	</p>
-      </li>
-      <li>
-	<p>
-	  <b>rules_hit</b> : Minimum number of rules hitting the same event on the same page before proposing optimisation (ie, if there is more than 10 differents rules triggered on the same url, all rules will be whitelisted on that url)<br />
-	  Default to 10.
-	</p>
-      </li>
-    </ul>
-    <h3>Example : </h3>
-<ul>
-<li>
-      Optimise the rules if more than 7 exceptions on the same arg are triggered on a page (whitelist all rules on the arg on this page) : 
-    <a href="http://__HOSTNAME__/get_rules?rules_hit=7">http://__HOSTNAME__/get_rules?rules_hit=7</a><br />
-</li>
-<li>
-      Optimise the rules if more than 7 exceptions on the same arg are triggered on a page (whitelist all rules on the arg on this page) or if more than 10 pages trigger the same rule (whitelist the rule on every page): 
-    <a href="http://__HOSTNAME__/get_rules?rules_hit=7&page_hit=10">http://__HOSTNAME__/get_rules?rules_hit=7&page_hit=10</a><br />
-</li>
-</ul>
-    <h3>Statistics : </h3>
-    __STATS__
-  </body>
-</html>
-"""
-         helpmsg = helpmsg.replace('__STATS__', ex.generate_stats())
+         fd = open('index.tpl', 'r')
+         helpmsg = ''
+         for i in fd:
+            helpmsg += i
+         fd.close()
+         helpmsg = helpmsg.replace('__STATS__', self.ex.generate_stats())
          helpmsg = helpmsg.replace('__HOSTNAME__', self.getHeader('Host'))
          self.setHeader('content-type', 'text/html')
          self.write(helpmsg)
+         self.finish()
+
       elif self.path == '/graphs':
-         self.write('Coming Soon :)')
+         fd = open('graphs.tpl')
+         html = ''
+         for i in fd:
+            html += i
+         fd.close()
+
+         array_excep, _ = self.build_js_array()
+         sqli_array, sql_count = self.build_js_array(1000, 1099)
+         xss_array, xss_count = self.build_js_array(1300, 1399)
+         rfi_array, rfi_count = self.build_js_array(1100, 1199)
+         upload_array, upload_count = self.build_js_array(1500, 1599)
+         dt_array, dt_count = self.build_js_array(1200, 1299)
+         evade_array, evade_count = self.build_js_array(1400, 1499)
+         intern_array, intern_count = self.build_js_array(0, 10)
+
+         self.ex.cursor.execute('select p.peer_ip as ip, count(exception_id) as c from connections join peer as p on (src_peer_id = p.peer_id) group by p.peer_ip order by count(distinct exception_id) DESC limit 10;')
+         top_ten = self.ex.cursor.fetchall()
+         top_ten_html = '<table class="table table-bordered" border="1" ><thead><tr><th>IP</th><th>Rule Hits</th></tr></thead><tbody>'
+         for i in top_ten:
+            top_ten_html += '<tr><td>' + cgi.escape(i['ip']) + ' </td><td> ' + str(i['c']) + '</td></tr>'
+         top_ten_html += '</tbody></table>'
+
+         self.ex.cursor.execute('select distinct url, count(exception_id) as c from exception  group by url order by count(exception_id) DESC limit 10;')
+         top_ten_page = self.ex.cursor.fetchall()
+         top_ten_page_html = '<table class="table table-bordered" border="1" ><thead><tr><th>URI</th><th>Exceptions Count</th></tr></thead><tbody>'
+
+         for i in top_ten_page:
+            top_ten_page_html += '<tr><td>' + cgi.escape(i['url']) + ' </td><td> ' + str(i['c']) + '</td></tr>'
+         top_ten_page_html += '</tbody></table>'
+
+         dict_replace = {'__TOPTEN__': top_ten_html, '__TOPTENPAGE__': top_ten_page_html, '__TOTALEXCEP__': array_excep, '__SQLCOUNT__': str(sql_count),  '__XSSCOUNT__': str(xss_count), '__DTCOUNT__': str(dt_count), '__RFICOUNT__': str(rfi_count), '__EVCOUNT__': str(evade_count), '__UPCOUNT__': str(upload_count), '__INTCOUNT__': str(intern_count), '__SQLIEXCEP__': sqli_array, '__XSSEXCEP__': xss_array, '__RFIEXCEP__': rfi_array, '__DTEXCEP__': dt_array, '__UPLOADEXCEP__': upload_array, '__EVADEEXCEP__': evade_array, '__INTERNEXCEP__': intern_array}
+
+         html = reduce(lambda html,(b, c): html.replace(b, c), dict_replace.items(), html)
+         self.write(html)
+         self.finish()
+
       else:
-         #yeah that's ugly :(
          try:
             if self.path.endswith('.js'):
                self.setHeader('content-type', 'text/javascript')
@@ -325,7 +311,10 @@ class InterceptHandler(http.Request):
             fd.close()
          except IOError, e:
             pass
-      self.finish()
+         self.finish()
+
+   def process(self):
+      threads.deferToThread(self.handle_request)
 
 class InterceptProtocol(http.HTTPChannel):
    requestFactory = InterceptHandler
@@ -334,27 +323,26 @@ class InterceptFactory(http.HTTPFactory):
    protocol = InterceptProtocol
       
 def usage():
-   print('Usage : python nx_extract [-h,--help] [-p|--port portnumber] '
-         '[-r|--rules /path/to/naxsi_core.rules] [-a|--allow allow user to specify rules path]')
-
+   print 'Usage : python nx_extract /path/to/conf/file'
+   
 if __name__  == '__main__':
-    try:
-       opts, args = getopt.getopt(sys.argv[1:], 'hp:r:a', ['help','port', 'rules', 'allow'])
-    except getopt.GetoptError, err:
-       print(str(err))
-       usage()
-       sys.exit(42)    
-    port = 8081
-    for o, a in opts:
-       if o in ('-h', '--help'):
-          usage()
-          sys.exit(0)
-       if o in ('-p', '--port'):
-          port = int(a)
-       if o in ('-r', '--rules'):
-          glob_rules_file = a
-       if o in ('-a', '--allow'):
-          glob_allow = True
-       
-    reactor.listenTCP(port, InterceptFactory())
-    reactor.run()
+   if len(sys.argv) != 2:
+      usage()
+      exit(42)
+   glob_conf_file = sys.argv[1]
+   fd = open(sys.argv[1], 'r')
+   conf = ConfigParser()
+   conf.readfp(fd)
+   try:
+      port = int(conf.get('nx_extract', 'port'))
+   except:
+      print "No port in conf file ! Using default port (8081)"
+      port = 8081
+   try:
+      glob_rules_file = conf.get('nx_extract', 'rules_path')
+   except:
+      print "No rules path in conf file ! Using default (/etc/nginx/sec-rules/core.rules)"
+   fd.close()
+         
+   reactor.listenTCP(port, InterceptFactory())
+   reactor.run()

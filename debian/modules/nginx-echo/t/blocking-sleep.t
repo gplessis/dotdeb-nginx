@@ -1,7 +1,7 @@
 # vi:filetype=
 
 use lib 'lib';
-use Test::Nginx::LWP;
+use Test::Nginx::Socket;
 
 plan tests => 2 * blocks();
 
@@ -138,4 +138,19 @@ trees
 --- response_body
 hi
 trees
+
+
+
+=== TEST 10: blocking sleep by variable
+--- config
+    location ~ ^/sleep/(.+) {
+        echo before...;
+        echo_blocking_sleep $1;
+        echo after...;
+    }
+--- request
+    GET /sleep/0.01
+--- response_body
+before...
+after...
 

@@ -1,0 +1,5 @@
+Template: nginx-naxsi-ui/dbhost
+Type: string
+Default: localhost
+_Description: Host were the database is located:
+ If you leave this field empty, the default host ('localhost') will be used.

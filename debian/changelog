@@ -1,8 +1,8 @@
-nginx (1.2.0-1~dotdeb.1) stable; urgency=low
+nginx (1.2.1-1~dotdeb.0) stable; urgency=low
 
-  * Rebuilt for Dotdeb
+  * New upstream release
 
- -- Guillaume Plessis <gui@dotdeb.org>  Mon, 23 Apr 2012 17:44:42 +0200
+ -- Guillaume Plessis <gui@dotdeb.org>  Wed,  6 Jun 2012 11:27:42 +0200
 
 nginx (1.2.0-1) UNRELEASED; urgency=low
 
@@ -10,17 +10,19 @@ nginx (1.2.0-1) UNRELEASED; urgency=low
   * debian/modules/chunkin-nginx-module:
     + Updated chunkin-nginx-module to v0.23rc2-3-g85eca98.
   * debian/modules/headers-more-module:
-    + Updated headers-more-module to v0.17rc1-1-g34e2389.
+    + Updated headers-more-module to v0.17rc1-4-g33a82ed.
   * debian/modules/nginx-development-kit:
     + Updated nginx-development-kit to v0.2.17-7-g24202b4.
   * debian/modules/nginx-echo:
-    + Updated nginx-echo to v0.38rc2-2-g18325ec.
+    + Updated nginx-echo to v0.38rc2-7-g080c0a1.
   * debian/modules/nginx-lua:
-    + Updated nginx-lua to v0.5.0rc24-19-g2bb9d6f.
+    + Updated nginx-lua to v0.5.0rc25-5-g8d28785.
   * debian/modules/nginx-upstream-fair:
     + Updated nginx-upstream-fair to a18b409.
   * debian/modules/nginx-upload-progress:
     + Updated nginx-upload-progress to v0.9.0-0-ga788dea.
+  * debian/modules/naxsi:
+    + Updated naxsi to 0.46
   * debian/modules/README.Modules-versions.
     + Updated versions for chunkin-nginx-module, headers-more-module,
       nginx-development-kit, nginx-echo, nginx-lua, 
@@ -28,8 +30,23 @@ nginx (1.2.0-1) UNRELEASED; urgency=low
     + Corrected the URL for nginx-development-kit.
     + Corrected the URL and version number for nginx-auth-pam.
     + Corrected the version number for nginx-dav-ext-module.
+  * debian/naxsi-ui-extract, debian/naxsi-ui-intercept,
+    debian/nginx-naxsi-ui.*, debian/rules:
+    + Added nginx-naxsi-ui package containing the learning daemon
+      and the WebUI.
+  * debian/nginx-common.nginx.default, debian/nginx-common.nginx.init:
+    + Renamed files to be compliant with the nginx-naxsi-ui package.
+  * debian/po:
+    + Added needed files for using po-debconf.
+    + Added French translation.
 
- -- Cyril Lavier <cyril.lavier@davromaniak.eu>  Wed, 25 Apr 2012 11:21:42 +0200
+  [Michael Lustfield]
+  * debian/conf/uwsgi_params:
+    + Added UWSGI_SCHEME to uwsgi_params. (Closes: #664878)
+  * debian/conf/sites-available/default:
+    + Added allow directive for ipv6 localhost. (Closes: #664271)
+
+ -- Cyril Lavier <cyril.lavier@davromaniak.eu>  Mon, 07 May 2012 22:51:42 +0200
 
 nginx (1.1.19-1) unstable; urgency=high
 

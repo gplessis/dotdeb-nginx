@@ -1,0 +1,2 @@
+debian/modules/naxsi/contrib/naxsi-ui/* usr/share/nginx-naxsi/naxsi-ui
+debian/naxsi-ui-* usr/sbin

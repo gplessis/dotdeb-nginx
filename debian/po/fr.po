@@ -1,0 +1,31 @@
+# Template PO for nginx-naxsi-ui
+# Copyright (C) 2012 Cyril Lavier
+# This file is distributed under the same license as the nginx-naxsi-ui package.
+# Cyril Lavier <cyril.lavier@davromaniak.eu>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nginx\n"
+"Report-Msgid-Bugs-To: nginx@packages.debian.org\n"
+"POT-Creation-Date: 2012-05-07 22:33+0200\n"
+"PO-Revision-Date: 2012-05-07 22:33+0200\n"
+"Last-Translator: Cyril Lavier <cyril.lavier@davromaniak.eu>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+
+#. Type: string
+#. Description
+#: ../nginx-naxsi-ui.templates:1001
+msgid "Host were the database is located:"
+msgstr "Serveur qui héberge la base de données"
+
+#. Type: string
+#. Description
+#: ../nginx-naxsi-ui.templates:1001
+msgid ""
+"If you leave this field empty, the default host ('localhost') will be used."
+msgstr "Si vous ne renseignez pas ce champ, 'localhost' sera utilisé"

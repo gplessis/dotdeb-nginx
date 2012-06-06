@@ -10,7 +10,7 @@ README for Modules versions
 
  headers-more-nginx-module
   https://github.com/agentzh/headers-more-nginx-module
-  Version: v0.17rc1-1-g34e2389
+  Version: v0.17rc1-4-g33a82ed
 
  nginx-development-kit
   https://github.com/simpl/ngx_devel_kit/
@@ -22,12 +22,12 @@ README for Modules versions
 
  nginx-echo
   https://github.com/agentzh/echo-nginx-module
-  Version: 0.38rc2-2-g18325ec
+  Version: v0.38rc2-7-g080c0a1
 
  nginx-lua
   Homepage: https://github.com/chaoslawful/lua-nginx-module
   https://github.com/chaoslawful/lua-nginx-module.git
-  Version: v0.5.0rc24-19-g2bb9d6f
+  Version: v0.5.0rc25-5-g8d28785
 
  nginx-upstream-fair
   Homepage: https://github.com/gnosek/nginx-upstream-fair
@@ -55,7 +55,7 @@ README for Modules versions
 
  naxsi
   Homepage: http://code.google.com/p/naxsi/
-  Version: 0.45
+  Version: 0.46
 
  nginx-cache-purge
   Homepage: http://labs.frickle.com/nginx_ngx_cache_purge/
@@ -63,7 +63,7 @@ README for Modules versions
 
  nginx-dav-ext-module
   Homepage: https://github.com/arut/nginx-dav-ext-module
-  Version: v0.0.2-1-ga395479.tar.gz
+  Version: v0.0.2-2-g54cebc1.tar.gz
 
  ruby-passenger
   Homepage: http://www.modrails.com/

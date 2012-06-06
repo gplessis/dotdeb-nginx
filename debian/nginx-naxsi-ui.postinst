@@ -1,0 +1,33 @@
+#!/bin/bash
+# postinst maintainer script for nginx-naxsi-ui
+
+set -e
+
+. /usr/share/debconf/confmodule
+. /usr/share/dbconfig-common/dpkg/postinst.mysql
+
+dbc_go nginx-naxsi-ui $@
+
+. /etc/dbconfig-common/nginx-naxsi-ui.conf
+
+db_get nginx-naxsi-ui/mysql/app-pass && dbpassword=$RET
+db_get nginx-naxsi-ui/dbhost && dbhost=$RET
+
+cat << EOF > /etc/nginx/naxsi-ui.conf
+[mysql]
+username=naxsi_ui
+password=$dbc_dbpass
+hostname=$dbhost
+dbname=naxsi_ui
+
+[nx_extract]
+port = 8081
+rules_path=/etc/nginx/naxsi.rules
+
+[nx_intercept]
+port = 8080
+EOF
+
+#DEBHELPER#
+
+exit 0

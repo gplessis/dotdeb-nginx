@@ -92,19 +92,5 @@ Use the following ``/etc/pam.d/nginx_restricted`` file::
 And add the users allowed to authenticate to the ``/etc/nginx/restricted_users``
 (remember that the web server user has to be able to read this file).
 
-PAM Environment
----------------
-
-The plugin set's the following additional environment variables when using ``pam_exec.so``
-as pam module for authentication:
-
-	REQUEST=GET /some/url?foo&bar HTTP/1.1
-	HOST=localhost:8000
-
-You may use this information for request based authentication.
-You need a recent pam release (>= version 1.0.90) to expose environment
-variables to pam_exec (Ubuntu 8.04 has a too old pam version here!).
-
-
 .. ......
 .. SVN Id: $Id: README 4488 2010-11-15 11:35:32Z sto $

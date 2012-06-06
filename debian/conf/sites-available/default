@@ -39,13 +39,13 @@ server {
 		alias /usr/share/doc/;
 		autoindex on;
 		allow 127.0.0.1;
+		allow ::1;
 		deny all;
 	}
 
-	# Only for nginx-naxsi : process denied requests
+	# Only for nginx-naxsi used with nginx-naxsi-ui : process denied requests
 	#location /RequestDenied {
-		# For example, return an error code
-		#return 418;
+	#	proxy_pass http://127.0.0.1:8080;    
 	#}
 
 	#error_page 404 /404.html;

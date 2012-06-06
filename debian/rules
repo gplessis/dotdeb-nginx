@@ -312,8 +312,10 @@ binary-indep: install
 	dh_installman -i
 	dh_installchangelogs -i -k CHANGES
 	dh_installdocs -i
+	dh_installdebconf
 	dh_installexamples -i
-	dh_installinit -r --no-start -i --init-script=nginx
+	dh_installinit -r --no-start -i --name=nginx
+	dh_installinit -r --no-start -i --name=nginx-naxsi-ui
 	cp debian/logrotate debian/nginx-common/etc/logrotate.d/nginx
 	mkdir -p debian/nginx-common/lib/systemd/system
 	cp debian/nginx-common.service debian/nginx-common/lib/systemd/system/nginx.service
