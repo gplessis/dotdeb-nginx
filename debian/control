@@ -320,7 +320,7 @@ Package: nginx-passenger
 Architecture: linux-any kfreebsd-any
 Depends:
  nginx-common (= ${source:Version}),
- ruby-passenger (>> 3.0.12),
+ ruby-passenger (>> 3.0.13),
  ${misc:Depends},
  ${shlibs:Depends}
 Provides:

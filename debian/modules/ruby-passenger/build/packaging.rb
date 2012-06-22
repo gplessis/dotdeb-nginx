@@ -1,5 +1,5 @@
 #  Phusion Passenger - http://www.modrails.com/
-#  Copyright (c) 2010 Phusion
+#  Copyright (c) 2010, 2011, 2012 Phusion
 #
 #  "Phusion Passenger" is a trademark of Hongli Lai & Ninh Bui.
 #
@@ -42,7 +42,7 @@ spec = Gem::Specification.new do |s|
 	s.require_paths = ["lib"]
 	s.add_dependency 'rake', '>= 0.8.1'
 	s.add_dependency 'fastthread', '>= 1.0.1'
-	s.add_dependency 'daemon_controller', '>= 0.2.5'
+	s.add_dependency 'daemon_controller', '>= 1.0.0'
 	s.add_dependency 'rack'
 	s.files = FileList[*Packaging::GLOB] - FileList[*Packaging::EXCLUDE_GLOB]
 	s.executables = Packaging::USER_EXECUTABLES + Packaging::SUPER_USER_EXECUTABLES
@@ -103,8 +103,8 @@ task :fakeroot => [:apache2, :nginx] + Packaging::ASCII_DOCS do
 	# We don't use CONFIG['archdir'] and the like because we want
 	# the files to be installed to /usr, and the Ruby interpreter
 	# on the packaging machine might be in /usr/local.
-	fake_libdir = "#{fakeroot}/usr/lib/ruby/vendor_ruby"
-	fake_native_support_dir = "#{fakeroot}/usr/lib/ruby/vendor_ruby/#{CONFIG['ruby_version']}/#{CONFIG['arch']}"
+	fake_libdir = "#{fakeroot}/usr/lib/ruby/#{CONFIG['ruby_version']}"
+	fake_native_support_dir = "#{fakeroot}/usr/lib/ruby/#{CONFIG['ruby_version']}/#{CONFIG['arch']}"
 	fake_agents_dir = "#{fakeroot}#{NATIVELY_PACKAGED_AGENTS_DIR}"
 	fake_helper_scripts_dir = "#{fakeroot}#{NATIVELY_PACKAGED_HELPER_SCRIPTS_DIR}"
 	fake_resources_dir = "#{fakeroot}/usr/share/phusion-passenger"
