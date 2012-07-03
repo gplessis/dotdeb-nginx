@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2009-2011, FRiCKLE <info@frickle.com>
- * Copyright (c) 2009-2011, Piotr Sikora <piotr.sikora@frickle.com>
+ * Copyright (c) 2009-2012, FRiCKLE <info@frickle.com>
+ * Copyright (c) 2009-2012, Piotr Sikora <piotr.sikora@frickle.com>
  * All rights reserved.
  *
  * This project was fully funded by yo.se.
@@ -171,6 +171,10 @@ typedef struct {
     ngx_uint_t                     header_params;
 #  endif /* nginx_version >= 8040 */
 
+#  if defined(nginx_version) && (nginx_version >= 1001004)
+    ngx_flag_t                     keep_conn;
+#  endif /* nginx_version >= 1001004 */
+
     ngx_http_complex_value_t       cache_key;
 
 #  if (NGX_PCRE)
@@ -287,6 +291,10 @@ typedef struct {
     ngx_array_t                   *proxy_values;
 
     ngx_array_t                   *redirects;
+#  if defined(nginx_version) && (nginx_version >= 1003001)
+    ngx_array_t                   *cookie_domains;
+    ngx_array_t                   *cookie_paths;
+#  endif /* nginx_version >= 1003001 */
 
     ngx_str_t                      body_source;
 
@@ -299,6 +307,10 @@ typedef struct {
     ngx_http_proxy_vars_t          vars;
 
     ngx_flag_t                     redirect;
+
+#  if defined(nginx_version) && (nginx_version >= 1001004)
+    ngx_uint_t                     http_version;
+#  endif /* nginx_version >= 1001004 */
 
     ngx_uint_t                     headers_hash_max_size;
     ngx_uint_t                     headers_hash_bucket_size;
