@@ -32,7 +32,7 @@
 #ifndef __FOO_H__
 #define __FOO_H__
 
-#define NAXSI_VERSION "0.46-1"
+#define NAXSI_VERSION "0.47"
 
 #include <nginx.h>
 #include <ngx_config.h>
@@ -223,6 +223,7 @@ typedef struct
   ngx_int_t	sc_score;
   ngx_flag_t	block:1;
   ngx_flag_t	allow:1;
+  ngx_flag_t	log:1;
 } ngx_http_special_score_t;
 
 /*
@@ -237,7 +238,7 @@ typedef struct
   ngx_int_t	cmp;
   ngx_flag_t	block:1;
   ngx_flag_t	allow:1;
-  //ngx_flag_t	log:1;  /*unused*/
+  ngx_flag_t	log:1;
 } ngx_http_check_rule_t;
 
 /* TOP level rule structure */
@@ -262,6 +263,7 @@ typedef struct
   // end of specific score tag stuff
   ngx_flag_t			block:1;
   ngx_flag_t			allow:1;
+  ngx_flag_t			log:1;
   /* flag set if we're linked FROM or TO another rule  */
   ngx_flag_t			lnk_to:1;
   ngx_flag_t			lnk_from:1;
@@ -329,9 +331,11 @@ typedef struct
   ngx_flag_t		args_var:1;
   /* matched on URL */
   ngx_flag_t		url:1;
+  /* matched in filename [name] of args*/
+  ngx_flag_t		file_ext:1;
   /* matched within the 'NAME' */
   ngx_flag_t		target_name:1;
-
+  
   ngx_str_t		*name;
   ngx_http_rule_t	*rule;
 } ngx_http_matched_rule_t;
@@ -344,6 +348,7 @@ typedef struct
   ngx_array_t	*special_scores;
   ngx_int_t	score;
   // blocking flags
+  ngx_flag_t	log:1;
   ngx_flag_t	block:1;
   ngx_flag_t	allow:1;
   // state

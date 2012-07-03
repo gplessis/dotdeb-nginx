@@ -10,7 +10,7 @@ package:
 	mkdir ../../naxsi-$(VERS)
 	cp -R ../naxsi_src ../../naxsi-$(VERS)
 	cp -R ../naxsi_config ../../naxsi-$(VERS)
-	cp -R ../contrib ../../naxsi-$(VERS)
+	cp -R ../contrib/naxsi-ui ../../naxsi-$(VERS)
 	cp -R ../t ../../naxsi-$(VERS)
 	cp ../COPYING ../../naxsi-$(VERS)
 	cp ../README.txt ../../naxsi-$(VERS)
