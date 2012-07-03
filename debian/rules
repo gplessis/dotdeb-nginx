@@ -82,6 +82,7 @@ config.status.full: config.env.full config.sub config.guess
 	    --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
 	    --lock-path=/var/lock/nginx.lock \
 	    --pid-path=/var/run/nginx.pid \
+	    --with-pcre-jit \
 	    --with-debug \
 	    --with-file-aio \
 	    --with-http_addition_module \
@@ -120,6 +121,7 @@ config.status.light: config.env.light config.sub config.guess
 	    --http-proxy-temp-path=/var/lib/nginx/proxy \
 	    --lock-path=/var/lock/nginx.lock \
 	    --pid-path=/var/run/nginx.pid \
+	    --with-pcre-jit \
 	    --with-file-aio \
 	    --with-http_gzip_static_module \
 	    --with-http_ssl_module \
@@ -153,6 +155,7 @@ config.status.extras: config.env.extras config.sub config.guess
 	    --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
 	    --lock-path=/var/lock/nginx.lock \
 	    --pid-path=/var/run/nginx.pid \
+	    --with-pcre-jit \
 	    --with-debug \
 	    --with-file-aio \
 	    --with-http_addition_module \
@@ -204,16 +207,17 @@ config.status.naxsi: config.env.naxsi config.sub config.guess
 	    --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
 	    --lock-path=/var/lock/nginx.lock \
 	    --pid-path=/var/run/nginx.pid \
+	    --with-pcre-jit \
 	    --with-file-aio \
 	    --with-http_gzip_static_module \
 	    --with-http_ssl_module \
-	    --with-http_stub_status_module \
 	    --without-mail_pop3_module \
 	    --without-mail_smtp_module \
 	    --without-mail_imap_module \
 	    --without-http_uwsgi_module \
 	    --without-http_scgi_module \
 	    --with-ipv6 \
+	    --with-http_stub_status_module \
 	    --add-module=$(MODULESDIR)/nginx-echo \
 	    --add-module=$(MODULESDIR)/nginx-upstream-fair \
 	    --add-module=$(MODULESDIR)/nginx-syslog \
@@ -235,6 +239,7 @@ config.status.passenger: config.env.passenger config.sub config.guess
 	    --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
 	    --lock-path=/var/lock/nginx.lock \
 	    --pid-path=/var/run/nginx.pid \
+	    --with-pcre-jit \
 	    --with-debug \
 	    --with-file-aio \
 	    --with-http_addition_module \

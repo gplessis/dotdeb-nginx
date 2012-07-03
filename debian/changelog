@@ -7,15 +7,91 @@ nginx (1.2.2-1~dotdeb.0) stable; urgency=low
 
  -- Guillaume Plessis <gui@dotdeb.org>  Tue, 03 Jul 2012 14:33:42 +0200
 
-nginx (1.2.1-1~dotdeb.0) stable; urgency=low
+nginx (1.2.1-2) unstable; urgency=medium
 
-  * New upstream release
+  [Cyril Lavier]
+  * Urgency set to medium, security bug in naxsi module, fix via upstream.
+  * debian/modules/naxsi:
+    + Updated naxsi module to version 0.46-1 fixing the following security
+      issue : potential file disclosure in nx_extract.
 
- -- Guillaume Plessis <gui@dotdeb.org>  Wed,  6 Jun 2012 11:27:42 +0200
+ -- Cyril Lavier <cyril.lavier@davromaniak.eu>  Wed, 27 Jun 2012 13:52:03 +0200
 
-nginx (1.2.0-1) UNRELEASED; urgency=low
+nginx (1.2.1-1) unstable; urgency=medium
 
-  * New upstream release
+  [Kartik Mistry]
+  * Urgency set to medium, RC bug fix.
+  * New upstream release (Closes: #677396)
+  * debian/nginx.1:
+    + Updated with description taken from debian/control.
+  * debian/po/cs.po:
+    + Added Czech translation of PO debconf template.
+      (Closes: #673120, #678659)
+  * debian/po/da.po:
+    + Added Danish translation of PO debconf template.
+      (Closes: #674461, #677806)
+  * debian/po/it.po:
+    + Added Italian translation of PO debconf template. (Closes: #679185)
+  * debian/po/nl.po:
+    + Added Dutch translation of PO debconf template. (Closes: #675314)
+  * debian/po/pl.po:
+    + Added Polish translation of PO debconf template. (Closes: #678156)
+  * debian/po/pt.po:
+    + Added Portuguese translation of PO debconf template.
+      (Closes: #674609, #679149)
+  * debian/po/sk.po:
+    + Added Slovak translation of PO debconf template. (Closes: #677282)
+  * debian/po/sv.po:
+    + Added Swedish translation of PO debconf template.
+      (Closes: #675107, #677032)
+  * debian/copyright:
+    + Removed duplicate Copyright fields.
+  * debian/modules/nginx-lua:
+    + Updated to latest upstream git tag 0.5.0rc29-6446ee71b8, Fix for worker
+      process crashes (Closes: #674928)
+  * debian/nginx-naxsi-ui.templates, debian/po/templates.pot:
+    + Updated debconf template after review from l10n-english team.
+      (Closes: #675237)
+    + Do not add empty line.
+  * debian/po/*.po:
+    + Refreshed after template update.
+
+  [Cyril Lavier]
+  * debian/rules:
+    + Added status module to nginx-naxsi. (Closes: #672998)
+  * debian/control:
+    + Updated nginx-naxsi module list.
+    + Updated nginx-full module list. (Closes: #677128)
+  * debian/po/de.po:
+    + Added German translation of PO debconf template.
+      (Closes: #673861, #677790)
+  * debian/po/ru.po:
+    + Added Russian translation of PO debconf template. (Closes: #674188)
+  * debian/po/es.po:
+    + Added Spanish translation of PO debconf template. (Closes: #678915)
+  * debian/po/gl.po:
+    + Added Galician translation of PO debconf template. (Closes: #678910)
+  * debian/nginx-naxsi-ui.postrm, debian/nginx-naxsi-ui.prerm:
+    + Added postrm and prerm scripts for nginx-naxsi-ui. (Closes: #673787)
+
+  [Michael Lustfield]
+  * debian/nginx-common.preinst:
+    + Copied install stuff to upgrade in case statement. (LP: #1014506)
+  * debian/rules
+    + Added --with-pcre-jit to build. (LP: #915344)
+  * debian/conf/sites-available/default:
+    + Changed default try_files example. (LP: #969207)
+  * debian/nginx-*.postrm:
+    + Changed a few things so files are only purged on purge. (Closes: #678060)
+      - Thanks Jeroen Dekkers <jeroen@dekkers.ch>
+
+ -- Kartik Mistry <kartik@debian.org>  Wed, 27 Jun 2012 09:24:50 +0530
+
+nginx (1.2.0-1) unstable; urgency=low
+
+  [Cyril Lavier]
+  * New upstream release. (Closes: #670306)
+    + 1.2.x is stable release now.
   * debian/modules/chunkin-nginx-module:
     + Updated chunkin-nginx-module to v0.23rc2-3-g85eca98.
   * debian/modules/headers-more-module:
@@ -32,15 +108,11 @@ nginx (1.2.0-1) UNRELEASED; urgency=low
     + Updated nginx-upload-progress to v0.9.0-0-ga788dea.
   * debian/modules/naxsi:
     + Updated naxsi to 0.46
-  * debian/modules/README.Modules-versions.
-    + Updated versions for chunkin-nginx-module, headers-more-module,
-      nginx-development-kit, nginx-echo, nginx-lua, 
-      nginx-upstream-fair and nginx-upload-progress.
-    + Corrected the URL for nginx-development-kit.
-    + Corrected the URL and version number for nginx-auth-pam.
-    + Corrected the version number for nginx-dav-ext-module.
+  * debian/modules/README.Modules-versions:
+    + Updated versions and URLs for modules.
   * debian/naxsi-ui-extract, debian/naxsi-ui-intercept,
-    debian/nginx-naxsi-ui.*, debian/rules:
+    debian/nginx-naxsi-ui.*, debian/naxsi-ui-extract.1,
+    debian/naxsi-ui-intercept.1, debian/rules:
     + Added nginx-naxsi-ui package containing the learning daemon
       and the WebUI.
   * debian/nginx-common.nginx.default, debian/nginx-common.nginx.init:
@@ -48,6 +120,8 @@ nginx (1.2.0-1) UNRELEASED; urgency=low
   * debian/po:
     + Added needed files for using po-debconf.
     + Added French translation.
+  * debian/control:
+    + Applied the modifications given after the review by Justin Rye.
 
   [Michael Lustfield]
   * debian/conf/uwsgi_params:
@@ -55,7 +129,19 @@ nginx (1.2.0-1) UNRELEASED; urgency=low
   * debian/conf/sites-available/default:
     + Added allow directive for ipv6 localhost. (Closes: #664271)
 
- -- Cyril Lavier <cyril.lavier@davromaniak.eu>  Mon, 07 May 2012 22:51:42 +0200
+  [Kartik Mistry]
+  * debian/control:
+    + wrap-and-sort.
+  * debian/copyright:
+    + Added missing copyrights, minor formatting fixes.
+  * debian/nginx-common.nginx.init:
+    + Added ulimit for restarts, Thanks to Daniel Roschka
+      <danielroschka@phoenitydawn.de> for patch. (Closes: #673580)
+  * debian/conf/sites-available/default:
+    + Added patch to fix deprecated "listen" directive, Thanks to
+      Guillaume Plessis <gui@dotdeb.org> for patch. (Closes: #672632)
+
+ -- Kartik Mistry <kartik@debian.org>  Mon, 14 May 2012 11:15:00 +0530
 
 nginx (1.1.19-1) unstable; urgency=high
 

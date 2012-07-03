@@ -1,0 +1,6 @@
+#!/bin/bash
+cd /usr/share/nginx-naxsi/naxsi-ui/
+python nx_intercept.py -c /etc/nginx/naxsi-ui.conf &
+somepid=$!
+echo $somepid > /var/run/nginx-naxsi-ui_intercept.pid
+wait $somepid

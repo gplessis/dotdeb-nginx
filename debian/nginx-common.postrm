@@ -14,7 +14,11 @@ case "$1" in
     fi
     ;;
 
-  purge|remove|failed-upgrade|abort-install|abort-upgrade|disappear)
+  purge)
+    rm -rf /var/lib/nginx /var/log/nginx /etc/nginx
+    ;;
+
+  remove|failed-upgrade|abort-install|abort-upgrade|disappear)
     ;;
 
   *)

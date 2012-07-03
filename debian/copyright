@@ -1,11 +1,11 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: nginx
+Upstream-Name: Nginx
 Source: http://nginx.net/
 Upstream-Contact: Igor Sysoev <igor@sysoev.ru>
 
 Files: *
 Copyright: 2002-2012 Igor Sysoev
-Copyright: 2011,2012 Nginx, Inc.
+           2011,2012 Nginx, Inc.
 License:
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -27,35 +27,51 @@ License:
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 
 Files: contrib/geo2nginx.pl
-Copyright: © 2005, Andrei Nigmatulin
+Copyright: 2005, Andrei Nigmatulin
 License:
  Same as upstream license.
 
 Files: modules/nginx-upstream-fair/ngx_http_upstream_fair_module.c
-Copyright: © 2007, Igor Sysoev, Grzegorz Nosek
+Copyright: 2007, Igor Sysoev, Grzegorz Nosek
 License:
  Same as upstream license.
 
 Files: modules/nginx-development-kit/*
-Copyright: © Marcus Clyne
+Copyright: Marcus Clyne
 License:
  Same as upstream license.
 
 Files: modules/nginx-http-push/*
-Copyright: © 2009, Leo Ponomarev
+Copyright: 2009, Leo Ponomarev
 License:
  Same as upstream license.
 
 Files: modules/nginx-upload-progress/ngx_http_uploadprogress_module.c
-Copyright: © 2007, Brice Figureau
-Copyright: © 2002-2007, Igor Sysoev
+Copyright: 2007, Brice Figureau
+           2002-2007, Igor Sysoev
 License:
  Same as upstream license.
 
 Files: modules/agentzh-chunkin-nginx-module-*/*
  modules/agentzh-headers-more-nginx-module-*/*
-Copyright: © 2009, Taobao Inc., Alibaba Group <http://www.taobao.com>.
-Copyright: © 2009, 2010, 2011, Zhang "agentzh" Yichun (章亦春) <agentzh@gmail.com>.
+Copyright: 2009, Taobao Inc., Alibaba Group <http://www.taobao.com>.
+           2009-2011, Zhang "agentzh" Yichun (章亦春) <agentzh@gmail.com>.
+License:
+ Same as upstream license.
+
+Files: modules/nginx-auth-pam/*
+Copyright: 2008-2010, Sergio Talens Oliag <sto@iti.upv.es>
+License:
+ Same as upstream license.
+
+Files: modules/nginx-cache-purge
+Copyright: 2009-2011, FRiCKLE <info@frickle.com>,
+           2009-2011, Piotr Sikora <piotr.sikora@frickle.com>
+License:
+ Same as upstream license.
+
+Files: modules/nginx-dav-ext-module/
+Copyright: 2012, Arutyunyan Roman <arut@qip.ru>
 License:
  Same as upstream license.
 
@@ -89,6 +105,12 @@ License:
 Files: modules/naxsi
 Copyright: 2012, Thibault Koechlin
 License: GPL-2+ with OpenSSL exception
+
+Files: modules/naxsi/contrib/fp-reporter/fp-reporter.php
+Copyright: 2011, Thibault 'bui' Koechlin, Didier Conchaudron
+License: GPL-2+ with OpenSSL exception
+
+License: GPL-2+ with OpenSSL exception
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 2 of the License, or
@@ -120,14 +142,13 @@ License: GPL-2+ with OpenSSL exception
  Public Licenses can be found in "/usr/share/common-licenses/GPL-2" and
  "/usr/share/common-licenses/GPL-3"
 
-Files: modules/nginx-cache-purge
-Copyright: 2009-2011, FRiCKLE <info@frickle.com>,
-           2009-2011, Piotr Sikora <piotr.sikora@frickle.com>
-License:
- Same as upstream license.
-
-Files: modules/nginx-dav-ext-module/
-Copyright: 2012, Arutyunyan Roman <arut@qip.ru>
+Files: debian/*
+Copyright: 2006-2010, Jose Parrella <joseparrella@cantv.net>,
+                        Fabio Tranchitella <kobold@debian.org>,
+           2009-2012, Kartik Mistry <kartik@debian.org>,
+           2012, Michael Lustfield <michael@lustfield.net>,
+                 Dmitry E. Oboukhov <unera@debian.org>,
+                 Cyril Lavier <cyril.lavier@davromaniak.eu>.
 License:
  Same as upstream license.
 
@@ -151,13 +172,3 @@ License:
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
-
-Files: debian/*
-Copyright: © 2006-2010, Jose Parrella <joseparrella@cantv.net>,
-                        Fabio Tranchitella <kobold@debian.org>,
-           © 2009-2012, Kartik Mistry <kartik@debian.org>,
-           © 2012, Michael Lustfield <michael@lustfield.net>,
-                   Dmitry E. Oboukhov <unera@debian.org>,
-                   Cyril Lavier <cyril.lavier@davromaniak.eu>.
-License:
- Same as upstream license.

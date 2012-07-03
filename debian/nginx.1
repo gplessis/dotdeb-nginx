@@ -1,13 +1,13 @@
 .TH "nginx" "1" "" "" ""
 .SH "NAME"
-nginx \- small, but very powerful and efficient web server
+nginx \- small, powerful, scalable web/proxy server
 .SH "SYNOPSIS"
 \fBnginx\fR [\fIoptions\fR] <\fIconfiguration file\fR>
 .SH "DESCRIPTION"
 .PP
-\fBnginx\fR is a server that can be used as standalone HTTP server and as
-a reverse proxy server before some Apache or another big server to reduce
-load to backend servers by many concurrent HTTP\-sessions.
+\fBNginx\fR ("engine X") is a high\-performance web and reverse proxy server
+created by Igor Sysoev. It can be used both as a standalone web server and as a
+proxy to reduce the load on back\-end HTTP or mail servers.
 .SH "OPTIONS"
 .TP
 A summary of options is included below:
@@ -37,7 +37,7 @@ Specifies a particular configuration file for nginx to load.
 Tests nginx configuration and exit.
 .TP
 .SH "SEE ALSO"
-Website: <http://nginx.net/>
+Website: <http://nginx.org/>
 .TP
 .SH "AUTHORS"
 \fBnginx\fR was written by Igor Sysoev <igor@sysoev.ru>.

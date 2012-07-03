@@ -2,137 +2,124 @@ Source: nginx
 Section: httpd
 Priority: optional
 Maintainer: Guillaume Plessis <gui@dotdeb.org>
-Build-Depends:
- autotools-dev,
- debhelper (>= 7),
- hardening-wrapper,
- dpkg-dev (>= 1.15.7),
- libexpat-dev,
- libev-dev,
- libgd2-noxpm-dev,
- libgeoip-dev,
- liblua5.1-dev,
- libmhash-dev,
- libpam0g-dev,
- libpcre3-dev,
- libperl-dev,
- libssl-dev,
- libxslt1-dev,
- po-debconf,
- rake,
- ruby1.8-dev | ruby1.9.1-dev,
- rubygems,
- zlib1g-dev
+Build-Depends: autotools-dev,
+               debhelper (>= 7),
+               hardening-wrapper,
+               dpkg-dev (>= 1.15.7),
+               libexpat-dev,
+               libev-dev,
+               libgd2-noxpm-dev,
+               libgeoip-dev,
+               liblua5.1-dev,
+               libmhash-dev,
+               libpam0g-dev,
+               libpcre3-dev,
+               libperl-dev,
+               libssl-dev,
+               libxslt1-dev,
+               po-debconf,
+               rake,
+               ruby1.8-dev | ruby1.9.1-dev,
+               rubygems,
+               zlib1g-dev
 Standards-Version: 3.9.3
 Homepage: http://nginx.net
-Vcs-Svn: svn://svn.debian.org/svn/collab-maint/deb-maint/nginx/trunk
-Vcs-Browser: http://svn.debian.org/wsvn/collab-maint/deb-maint/nginx/trunk
+Vcs-Git: git://anonscm.debian.org/collab-maint/nginx.git
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=collab-maint/nginx.git;a=summary
 
 Package: nginx
 Architecture: all
-Depends:
- nginx-full | nginx-light,
- ${misc:Depends}
-Description: small, but very powerful and efficient web server and mail proxy
- Nginx (engine x) is a web server created by Igor Sysoev and kindly provided to
- the open-source community. This server can be used as standalone HTTP server
- and as a reverse proxy server before some Apache or another big server to
- reduce load to backend servers by many concurrent HTTP-sessions.
+Depends: nginx-full | nginx-light,
+         ${misc:Depends}
+Description: small, powerful, scalable web/proxy server
+ Nginx ("engine X") is a high-performance web and reverse proxy server
+ created by Igor Sysoev. It can be used both as a standalone web server
+ and as a proxy to reduce the load on back-end HTTP or mail servers.
  .
- This is a dummy package that selects nginx-full by default, but also can be
- installed with nginx-light for upgrading to nginx-light directly.
+ This is a dependency package to install either nginx-full (by default) or
+  nginx-light.
 
 Package: nginx-doc
 Architecture: all
 Section: doc
-Depends:
- lsb-base (>= 3.2-14),
- ${misc:Depends}
-Description: small, but very powerful and efficient web server (documentation)
- Nginx (engine x) is a web server created by Igor Sysoev and kindly provided to
- the open-source community. This server can be used as standalone HTTP server
- and as a reverse proxy server before some Apache or another big server to
- reduce load to backend servers by many concurrent HTTP-sessions.
+Depends: lsb-base (>= 3.2-14),
+         ${misc:Depends}
+Description: small, powerful, scalable web/proxy server - documentation
+ Nginx ("engine X") is a high-performance web and reverse proxy server
+ created by Igor Sysoev. It can be used both as a standalone web server
+ and as a proxy to reduce the load on back-end HTTP or mail servers.
  .
  This package provides extra documentation to help unleash the power of Nginx.
 
 Package: nginx-common
 Architecture: all
-Depends:
- lsb-base (>= 3.2-14),
- ${misc:Depends}
-Replaces:
- nginx (<< 0.8.54-4),
- nginx-extras (<< 0.8.54-4),
- nginx-full (<< 0.8.54-4),
- nginx-light (<< 0.8.54-4)
-Breaks:
- nginx (<< 0.8.54-4),
- nginx-extras (<< 0.8.54-4),
- nginx-full (<< 0.8.54-4),
- nginx-light (<< 0.8.54-4)
-Description: small, but very powerful and efficient web server (common files)
- Nginx (engine x) is a web server created by Igor Sysoev and kindly provided to
- the open-source community. This server can be used as standalone HTTP server
- and as a reverse proxy server before some Apache or another big server to
- reduce load to backend servers by many concurrent HTTP-sessions.
+Depends: lsb-base (>= 3.2-14),
+         ${misc:Depends}
+Replaces: nginx (<< 0.8.54-4),
+          nginx-extras (<< 0.8.54-4),
+          nginx-full (<< 0.8.54-4),
+          nginx-light (<< 0.8.54-4)
+Breaks: nginx (<< 0.8.54-4),
+        nginx-extras (<< 0.8.54-4),
+        nginx-full (<< 0.8.54-4),
+        nginx-light (<< 0.8.54-4)
+Description: small, powerful, scalable web/proxy server - common files
+ Nginx ("engine X") is a high-performance web and reverse proxy server
+ created by Igor Sysoev. It can be used both as a standalone web server
+ and as a proxy to reduce the load on back-end HTTP or mail servers.
  .
- This package contains base configuration files used across multiple packaged
- versions of Nginx (nginx-full, nginx-light, nginx-extras, nginx-naxsi).
+ This package contains base configuration files used by all versions of
+ nginx.
 
 Package: nginx-full
 Architecture: any
-Depends:
- nginx-common (= ${source:Version}),
- ${misc:Depends},
- ${shlibs:Depends}
-Provides:
- httpd,
- nginx
-Conflicts:
- nginx-extras,
- nginx-light,
- nginx-naxsi
-Description: nginx web server with full set of core modules
- Nginx (engine x) is a web server created by Igor Sysoev and kindly provided to
- the open-source community. This server can be used as standalone HTTP server
- and as a reverse proxy server before some Apache or another big server to
- reduce load to backend servers by many concurrent HTTP-sessions.
+Depends: nginx-common (= ${source:Version}),
+         ${misc:Depends},
+         ${shlibs:Depends}
+Provides: httpd,
+          nginx
+Conflicts: nginx-extras,
+           nginx-light,
+           nginx-naxsi,
+           nginx-passenger
+Description: nginx web/proxy server (standard version)
+ Nginx ("engine X") is a high-performance web and reverse proxy server
+ created by Igor Sysoev. It can be used both as a standalone web server
+ and as a proxy to reduce the load on back-end HTTP or mail servers.
  .
- It can also act as a POP3/IMAP mail proxy with SSL and TLS SNI support. This
- package has the standard set of modules enabled.
+ This package provides a version of nginx with the complete set of
+ standard modules included (but omitting some of those included in
+ nginx-extras).
  .
- MODULES INCLUDED:
- Standard HTTP Modules:
-   Core, Access, Auth Basic, Auto Index, Browser, Charset, Empty GIF, FastCGI,
-   Geo, Gzip, Headers, Index, Limit Requests, Limit Zone, Log, Map, Memcached,
-   Proxy, Referer, Rewrite, SCGI, Split Clients, SSI, Upstream, User ID, UWSGI
- Optional HTTP Modules:
-   Addition, Debug, GeoIP, Gzip Precompression, HTTP Sub, Image Filter, IPv6,
-   RealIP, Stub Status, WebDAV, XSLT
- Mail Modules:
-   Mail Core, IMAP, POP3, SMTP, SSL
- Third Party Modules:
-   Echo, Upstream Fair Queue, DAV Ext
- Modules added by Dotdeb:
-   File AIO, Secure link, Syslog, Cache purge
+ STANDARD HTTP MODULES: Core, Access, Auth Basic, Auto Index, Browser,
+ Charset, Empty GIF, FastCGI, Geo, Gzip, Headers, Index, Limit Requests,
+ Limit Zone, Log, Map, Memcached, Proxy, Referer, Rewrite, SCGI,
+ Split Clients, SSI, Upstream, User ID, UWSGI.
+ .
+ OPTIONAL HTTP MODULES: Addition, Debug, GeoIP, Gzip Precompression,
+ HTTP Sub, Image Filter, IPv6, Real IP, SSL, Stub Status, Substitution,
+ WebDAV, XSLT.
+ .
+ MAIL MODULES: Mail Core, IMAP, POP3, SMTP, SSL.
+ .
+ THIRD PARTY MODULES: Auth PAM, DAV Ext, Echo, Upstream Fair Queue.
+ .
+ MODULES ADDED BY DOTDEB : File AIO, Secure link, Syslog, Cache purge
 
 Package: nginx-full-dbg
 Architecture: any
 Section: debug
 Priority: extra
-Depends:
- nginx-full (= ${binary:Version}),
- ${misc:Depends}
-Conflicts:
- nginx-extras-dbg,
- nginx-light-dbg,
- nginx-naxsi-dbg
-Description: Debugging symbols for nginx (full)
- Nginx (engine x) is a web server created by Igor Sysoev and kindly provided to
- the open-source community. This server can be used as standalone HTTP server
- and as a reverse proxy server before some Apache or another big server to
- reduce load to backend servers by many concurrent HTTP-sessions.
+Depends: nginx-full (= ${binary:Version}),
+         ${misc:Depends}
+Conflicts: nginx-extras-dbg,
+           nginx-light-dbg,
+           nginx-naxsi-dbg,
+           nginx-passenger-dbg
+Description: nginx web/proxy server (standard version) - debugging symbols
+ Nginx ("engine X") is a high-performance web and reverse proxy server
+ created by Igor Sysoev. It can be used both as a standalone web server
+ and as a proxy to reduce the load on back-end HTTP or mail servers.
  .
  This package provides debugging symbols for nginx-full, to assist in debugging
  issues that you may find. It should not be required for normal operation.
@@ -140,55 +127,46 @@ Description: Debugging symbols for nginx (full)
 Package: nginx-light
 Architecture: any
 Priority: extra
-Depends:
- nginx-common (= ${source:Version}),
- ${misc:Depends},
- ${shlibs:Depends}
-Provides:
- httpd,
- nginx
-Conflicts:
- nginx-extras,
- nginx-full,
- nginx-naxsi
-Description: nginx web server with minimal set of core modules
- Nginx (engine x) is a web server created by Igor Sysoev and kindly provided to
- the open-source community. This server can be used as standalone HTTP server
- and as a reverse proxy server before some Apache or another big server to
- reduce load to backend servers by many concurrent HTTP-sessions.
+Depends: nginx-common (= ${source:Version}),
+         ${misc:Depends},
+         ${shlibs:Depends}
+Provides: httpd,
+          nginx
+Conflicts: nginx-extras,
+           nginx-full,
+           nginx-naxsi,
+           nginx-passenger
+Description: nginx web/proxy server (basic version)
+ Nginx ("engine X") is a high-performance web and reverse proxy server
+ created by Igor Sysoev. It can be used both as a standalone web server
+ and as a proxy to reduce the load on back-end HTTP or mail servers.
  .
- This package provides a very light version of Nginx which lacks many of the
- features and modules of it's full counterpart.
+ This package provides a very light version of nginx with only the
+ minimal set of features and modules.
  .
- MODULES INCLUDED:
- Standard HTTP Modules:
-   Core, Access, Auth Basic, Auto Index, Charset, Empty GIF, FastCGI, Gzip,
-   Headers, Index, Log, Map, Proxy, Rewrite, Split Clients, Upstream, User ID
- Optional HTTP Modules:
-   Gzip Precompression, IPv6, Stub Status, SSL
- Mail Modules:
-   None
- Third Party Modules:
-   Echo
- Modules added by Dotdeb:
-   File AIO
+ STANDARD HTTP MODULES: Core, Access, Auth Basic, Auto Index, Charset,
+ Empty GIF, FastCGI, Gzip, Headers, Index, Log, Map, Proxy, Rewrite, Upstream.
+ .
+ OPTIONAL HTTP MODULES: Gzip Precompression, IPv6, SSL, Stub Status.
+ .
+ THIRD PARTY MODULES: Echo.
+ .
+ MODULES ADDED BY DOTDEB : File AIO
 
 Package: nginx-light-dbg
 Architecture: any
 Section: debug
 Priority: extra
-Depends:
- nginx-light (= ${binary:Version}),
- ${misc:Depends}
-Conflicts:
- nginx-extras-dbg,
- nginx-full-dbg,
- nginx-naxsi-dbg
-Description: Debugging symbols for nginx (light)
- Nginx (engine x) is a web server created by Igor Sysoev and kindly provided to
- the open-source community. This server can be used as standalone HTTP server
- and as a reverse proxy server before some Apache or another big server to
- reduce load to backend servers by many concurrent HTTP-sessions.
+Depends: nginx-light (= ${binary:Version}),
+         ${misc:Depends}
+Conflicts: nginx-extras-dbg,
+           nginx-full-dbg,
+           nginx-naxsi-dbg,
+           nginx-passenger-dbg
+Description: nginx web/proxy server (basic version) - debugging symbols
+ Nginx ("engine X") is a high-performance web and reverse proxy server
+ created by Igor Sysoev. It can be used both as a standalone web server
+ and as a proxy to reduce the load on back-end HTTP or mail servers.
  .
  This package provides debugging symbols for nginx-light, to assist in
  debugging issues that you may find. It should not be required for normal
@@ -197,62 +175,56 @@ Description: Debugging symbols for nginx (light)
 Package: nginx-extras
 Architecture: any
 Priority: extra
-Depends:
- nginx-common (= ${source:Version}),
- ${misc:Depends},
- ${perl:Depends},
- ${shlibs:Depends}
-Provides:
- httpd,
- nginx
-Conflicts:
- nginx-full,
- nginx-light,
- nginx-naxsi
-Description: nginx web server with full set of core modules and extras
- Nginx (engine x) is a web server created by Igor Sysoev and kindly provided to
- the open-source community. This server can be used as standalone HTTP server
- and as a reverse proxy server before some Apache or another big server to
- reduce load to backend servers by many concurrent HTTP-sessions.
+Depends: nginx-common (= ${source:Version}),
+         ${misc:Depends},
+         ${perl:Depends},
+         ${shlibs:Depends}
+Provides: httpd,
+          nginx
+Conflicts: nginx-full,
+           nginx-light,
+           nginx-naxsi,
+           nginx-passenger
+Description: nginx web/proxy server (extended version)
+ Nginx ("engine X") is a high-performance web and reverse proxy server
+ created by Igor Sysoev. It can be used both as a standalone web server
+ and as a proxy to reduce the load on back-end HTTP or mail servers.
  .
- This package provides the standard version of Nginx. It also includes extra
- features and modules such as the perl module which allows the addition of
- perl in configuration files.
+ This package provides a version of nginx with the standard modules, plus
+ extra features and modules such as the Perl module, which allows the
+ addition of Perl in configuration files.
  .
- MODULES INCLUDED:
- Standard HTTP Modules:
-   Core, Access, Auth Basic, Auto Index, Browser, Charset, Empty GIF, FastCGI,
-   Geo, Gzip, Headers, Index, Limit Requests, Limit Zone, Log, Map, Memcached,
-   Proxy, Referer, Rewrite, SCGI, Split Clients, SSI, Upstream, User ID, UWSGI
- Optional HTTP Modules:
-   Addition, Debug, WebDAV, Flash Streaming Video, GeoIP, Gzip Precompression,
-   HTTP Sub, Image Filter, MP4, RealIP, Stub Status, SSL, XSLT, IPv6, Embedded
-   Perl, Secure Link, Random Index
- Mail Modules:
-   Mail Core, POP3, IMAP, SMTP, SSL
- Third Party Modules:
-   Echo, Embedded Lua, http push, Nginx Development Kit, Upload module,
-   Upload Progress, HttpHeadersMore, Upstream Fair Queue, Chunkin, Auth PAM,
-   DAV Ext
- Modules added by Dotdeb:
-   File AIO, Syslog, Cache purge
+ STANDARD HTTP MODULES: Core, Access, Auth Basic, Auto Index, Browser,
+ Charset, Empty GIF, FastCGI, Geo, Gzip, Headers, Index, Limit Requests,
+ Limit Zone, Log, Map, Memcached, Proxy, Referer, Rewrite, SCGI,
+ Split Clients, SSI, Upstream, User ID, UWSGI.
+ .
+ OPTIONAL HTTP MODULES: Addition, Debug, Embedded Perl, FLV, GeoIP,
+ Gzip Precompression, Image Filter, IPv6, MP4, Random Index, Real IP,
+ Secure Link, SSL, Stub Status, Substitution, WebDAV, XSLT.
+ .
+ MAIL MODULES: Mail Core, IMAP, POP3, SMTP, SSL.
+ .
+ THIRD PARTY MODULES: Auth PAM, Chunkin, DAV Ext, Echo, Embedded Lua,
+ HttpHeadersMore, http push, Nginx Development Kit, Upload module,
+ Upload Progress, Upstream Fair Queue.
+ .
+ MODULES ADDED BY DOTDEB : File AIO, Syslog, Cache purge
 
 Package: nginx-extras-dbg
 Architecture: any
 Section: debug
 Priority: extra
-Depends:
- nginx-extras (= ${binary:Version}),
- ${misc:Depends}
-Conflicts:
- nginx-full-dbg,
- nginx-light-dbg,
- nginx-naxsi-dbg
-Description: Debugging symbols for nginx (extras)
- Nginx (engine x) is a web server created by Igor Sysoev and kindly provided to
- the open-source community. This server can be used as standalone HTTP server
- and as a reverse proxy server before some Apache or another big server to
- reduce load to backend servers by many concurrent HTTP-sessions.
+Depends: nginx-extras (= ${binary:Version}),
+         ${misc:Depends}
+Conflicts: nginx-full-dbg,
+           nginx-light-dbg,
+           nginx-naxsi-dbg,
+           nginx-passenger-dbg
+Description: nginx web/proxy server (extended version) - debugging symbols
+ Nginx ("engine X") is a high-performance web and reverse proxy server
+ created by Igor Sysoev. It can be used both as a standalone web server
+ and as a proxy to reduce the load on back-end HTTP or mail servers.
  .
  This package provides debugging symbols for nginx-extras, to assist in
  debugging issues that you may find. It should not be required for normal
@@ -261,146 +233,134 @@ Description: Debugging symbols for nginx (extras)
 Package: nginx-naxsi
 Architecture: any
 Priority: extra
-Depends:
- nginx-common (= ${source:Version}),
- ${misc:Depends},
- ${shlibs:Depends}
-Provides:
- httpd,
- nginx
-Conflicts:
- nginx-extras,
- nginx-full,
- nginx-light
-Description: nginx web server with naxsi 0.44 included
- Nginx (engine x) is a web server created by Igor Sysoev and kindly provided to
- the open-source community. This server can be used as standalone HTTP server
- and as a reverse proxy server before some Apache or another big server to
- reduce load to backend servers by many concurrent HTTP-sessions.
+Depends: nginx-common (= ${source:Version}),
+         ${misc:Depends},
+         ${shlibs:Depends}
+Provides: httpd,
+          nginx
+Conflicts: nginx-extras,
+           nginx-full,
+           nginx-light,
+           nginx-passenger
+Description: nginx web/proxy server (version with naxsi)
+ Nginx ("engine X") is a high-performance web and reverse proxy server
+ created by Igor Sysoev. It can be used both as a standalone web server
+ and as a proxy to reduce the load on back-end HTTP or mail servers.
  .
- This package provides the standard version of Nginx, including the naxsi Web
- Application Firewall.
+ This package provides a version of nginx with the basic modules, plus
+ the naxsi Web Application Firewall module.
  .
- MODULES INCLUDED:
- Standard HTTP Modules:
-   Core, Access, Auth Basic, Auto Index, Browser, Charset, Empty GIF, FastCGI,
-   Geo, Gzip, Headers, Index, Limit Requests, Limit Zone, Log, Map, Memcached,
-   Proxy, Referer, Rewrite, SCGI, Split Clients, SSI, Upstream, User ID, UWSGI
- Optional HTTP Modules:
-   Gzip Precompression, IPv6, Stub Status, SSL
- Mail Modules:
-   None
- Third Party Modules:
-   Naxsi, Cache Purge, Upstream Fair
- Modules added by Dotdeb:
-   File AIO, Gzip static, Stub status, Echo, Syslog
+ STANDARD HTTP MODULES: Core, Access, Auth Basic, Auto Index, Browser,
+ Charset, Core, Empty GIF, FastCGI, Geo, Gzip, Headers, Index,
+ Limit Requests, Limit Zone, Log, Map, Memcached, Proxy, Referer,
+ Rewrite, Split Clients, SSI, Upstream, User ID.
+ .
+ OPTIONAL HTTP MODULES: IPv6, SSL, Stub Status.
+ .
+ THIRD PARTY MODULES: Naxsi, Cache Purge, Upstream Fair.
+ .
+ MODULES ADDED BY DOTDEB : File AIO, Gzip static, Stub status, Echo, Syslog
 
 Package: nginx-naxsi-dbg
 Architecture: any
 Section: debug
 Priority: extra
-Depends:
- nginx-naxsi (= ${binary:Version}),
- ${misc:Depends}
-Conflicts:
- nginx-extras-dbg,
- nginx-full-dbg,
- nginx-light-dbg
-Description: Debugging symbols for nginx (naxsi)
- Nginx (engine x) is a web server created by Igor Sysoev and kindly provided to
- the open-source community. This server can be used as standalone HTTP server
- and as a reverse proxy server before some Apache or another big server to
- reduce load to backend servers by many concurrent HTTP-sessions.
+Depends: nginx-naxsi (= ${binary:Version}),
+         ${misc:Depends}
+Conflicts: nginx-extras-dbg,
+           nginx-full-dbg,
+           nginx-light-dbg,
+           nginx-passenger-dbg
+Description: nginx web/proxy server (version with naxsi) - debugging symbols
+ Nginx ("engine X") is a high-performance web and reverse proxy server
+ created by Igor Sysoev. It can be used both as a standalone web server
+ and as a proxy to reduce the load on back-end HTTP or mail servers.
  .
  This package provides debugging symbols for nginx-naxsi, to assist in
- debugging issues that you may find. It should not be required for normal
- operation.
-
-Package: nginx-passenger
-Architecture: linux-any kfreebsd-any
-Depends:
- nginx-common (= ${source:Version}),
- ruby-passenger (>> 3.0.13),
- ${misc:Depends},
- ${shlibs:Depends}
-Provides:
- httpd,
- nginx
-Conflicts:
- nginx-extras,
- nginx-full,
- nginx-light,
- nginx-naxsi
-Description: nginx web server with full set of core modules and passenger support
- Nginx (engine x) is a web server created by Igor Sysoev and kindly provided to
- the open-source community. This server can be used as standalone HTTP server
- and as a reverse proxy server before some Apache or another big server to
- reduce load to backend servers by many concurrent HTTP-sessions.
- .
- It can also act as a POP3/IMAP mail proxy with SSL and TLS SNI support. This
- package has the standard set of modules enabled and also passenger support.
- .
- MODULES INCLUDED:
- Standard HTTP Modules:
-   Core, Access, Auth Basic, Auto Index, Browser, Charset, Empty GIF, FastCGI,
-   Geo, Gzip, Headers, Index, Limit Requests, Limit Zone, Log, Map, Memcached,
-   Proxy, Referer, Rewrite, SCGI, Split Clients, SSI, Upstream, User ID, UWSGI
- Optional HTTP Modules:
-   Addition, Debug, GeoIP, Gzip Precompression, HTTP Sub, Image Filter, IPv6,
-   RealIP, Stub Status, WebDAV, XSLT
- Mail Modules:
-   Mail Core, IMAP, POP3, SMTP, SSL
- Third Party Modules:
-   Echo, Upstream Fair Queue, Passenger
- Modules added by Dotdeb:
-   File AIO, Secure link, Auth PAM, Headers more, Syslog, Cache purge
-
-Package: nginx-passenger-dbg
-Architecture: linux-any kfreebsd-any
-Section: debug
-Priority: extra
-Depends:
- nginx-passenger (= ${binary:Version}),
- ${misc:Depends}
-Conflicts:
- nginx-extras-dbg,
- nginx-full-dbg,
- nginx-light-dbg,
- nginx-naxsi-dbg
-Description: Debugging symbols for nginx (passenger)
- Nginx (engine x) is a web server created by Igor Sysoev and kindly provided to
- the open-source community. This server can be used as standalone HTTP server
- and as a reverse proxy server before some Apache or another big server to
- reduce load to backend servers by many concurrent HTTP-sessions.
- .
- This package provides debugging symbols for nginx-passenger, to assist in
  debugging issues that you may find. It should not be required for normal
  operation.
 
 Package: nginx-naxsi-ui
 Architecture: all
 Priority: extra
-Depends:
- daemon,
- dbconfig-common,
- nginx-naxsi (>= ${source:Version}),
- python-mysqldb,
- python-twisted-web,
- ${misc:Depends}
-Recommends:
- mysql-server
-Provides:
- httpd,
- naxsi,
- nginx
-Conflicts:
- nginx-extras,
- nginx-full,
- nginx-light
-Description: naxsi UI for nginx-naxsi
- naxsi-ui is the autolearn daemon and the webUI for the package nginx-naxsi.
+Depends: daemon,
+         dbconfig-common,
+         nginx-naxsi (>= ${source:Version}),
+         python-mysqldb,
+         python-twisted-web,
+         ${misc:Depends}
+Recommends: mysql-server
+Provides: httpd,
+          naxsi,
+          nginx
+Conflicts: nginx-extras,
+           nginx-full,
+           nginx-light,
+           nginx-passenger
+Description: nginx web/proxy server - naxsi configuration front-end
+ Nginx ("engine X") is a high-performance web and reverse proxy server
+ created by Igor Sysoev. It can be used both as a standalone web server
+ and as a proxy to reduce the load on back-end HTTP or mail servers.
  .
- The intercepter receives requests from naxsi, it listens on the tcp port 8080
+ This package provides the autolearning daemon and web user interface for
+ nginx's naxsi module.
  .
- The extractor reads the database and prints reports about blocked requests.
- It runs on the tcp port 8081.
+ It includes an interceptor (listening on TCP port 8080), which monitors
+ HTTP requests from naxsi, and an extractor (running on TCP port 8081),
+ which reads the database and prints reports about blocked requests.
+
+Package: nginx-passenger
+Architecture: linux-any kfreebsd-any
+Priority: extra
+Depends: nginx-common (= ${source:Version}),
+         ruby-passenger (>> 3.0.13),
+         ${misc:Depends},
+         ${shlibs:Depends}
+Provides: httpd,
+          nginx
+Conflicts: nginx-extras,
+           nginx-full,
+           nginx-light,
+           nginx-naxsi
+Description: nginx web/proxy server (Passenger version)
+ Nginx ("engine X") is a high-performance web and reverse proxy server
+ created by Igor Sysoev. It can be used both as a standalone web server
+ and as a proxy to reduce the load on back-end HTTP or mail servers.
+ .
+ This package provides a version of nginx with the standard modules, plus
+ extra features and modules such as the Passenger module, which allows
+ running Ruby on Rails applications.
+ .
+ STANDARD HTTP MODULES: Core, Access, Auth Basic, Auto Index, Browser,
+ Charset, Empty GIF, FastCGI, Geo, Gzip, Headers, Index, Limit Requests,
+ Limit Zone, Log, Map, Memcached, Proxy, Referer, Rewrite, SCGI,
+ Split Clients, SSI, Upstream, User ID, UWSGI.
+ .
+ OPTIONAL HTTP MODULES: Addition, Debug, GeoIP, Gzip Precompression,
+ HTTP Sub, Image Filter, IPv6, Real IP, Stub Status, WebDAV, XSLT.
+ .
+ MAIL MODULES: Mail Core, IMAP, POP3, SMTP, SSL.
+ .
+ THIRD PARTY MODULES: Echo, Upstream Fair Queue, Passenger.
+ .
+ MODULES ADDED BY DOTDEB : File AIO, Secure link, Auth PAM, Headers more,
+ Syslog, Cache purge
+
+Package: nginx-passenger-dbg
+Architecture: linux-any kfreebsd-any
+Section: debug
+Priority: extra
+Depends: nginx-passenger (= ${binary:Version}),
+         ${misc:Depends}
+Conflicts: nginx-extras-dbg,
+           nginx-full-dbg,
+           nginx-light-dbg,
+           nginx-naxsi-dbg
+Description: nginx web/proxy server (Passenger version) - debugging symbols
+ Nginx ("engine X") is a high-performance web and reverse proxy server
+ created by Igor Sysoev. It can be used both as a standalone web server
+ and as a proxy to reduce the load on back-end HTTP or mail servers.
+ .
+ This package provides debugging symbols for nginx-passenger, to assist in
+ debugging issues that you may find. It should not be required for normal
+ operation.

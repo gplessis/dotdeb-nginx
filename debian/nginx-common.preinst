@@ -17,6 +17,10 @@ case "$1" in
       rm -f /etc/ufw/applications.d/nginx/ufw.profile
       rmdir /etc/ufw/applications.d/nginx
     fi
+    rm -f /etc/logrotate.d/nginx-full
+    rm -f /etc/logrotate.d/nginx-light
+    rm -f /etc/logrotate.d/nginx-extras
+    rm -f /etc/logrotate.d/nginx-common
     ;;
 
   abort-upgrade)

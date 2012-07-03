@@ -29,7 +29,7 @@ server {
 
 	location / {
 		# First attempt to serve request as file, then
-		# as directory, then fall back to index.html
+		# as directory, then fall back to displaying a 404.
 		try_files $uri $uri/ /index.html;
 		# Uncomment to enable naxsi on this location
 		# include /etc/nginx/naxsi.rules
@@ -90,7 +90,7 @@ server {
 #	index index.html index.htm;
 #
 #	location / {
-#		try_files $uri $uri/ /index.html;
+#		try_files $uri $uri/ =404;
 #	}
 #}
 
@@ -115,6 +115,6 @@ server {
 #	ssl_prefer_server_ciphers on;
 #
 #	location / {
-#		try_files $uri $uri/ /index.html;
+#		try_files $uri $uri/ =404;
 #	}
 #}

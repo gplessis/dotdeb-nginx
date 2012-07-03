@@ -1,5 +1,15 @@
+# These templates have been reviewed by the debian-l10n-english
+# team
+#
+# If modifications/additions/rewording are needed, please ask
+# debian-l10n-english@lists.debian.org for advice.
+#
+# Even minor modifications require translation updates and such
+# changes should be coordinated with translators and reviewers.
+#
 Template: nginx-naxsi-ui/dbhost
 Type: string
 Default: localhost
-_Description: Host were the database is located:
- If you leave this field empty, the default host ('localhost') will be used.
+_Description: Database host for naxsi:
+ Please specify the hostname of the server that will host the database
+ for the naxsi web application firewall.
