@@ -3,6 +3,8 @@ debian/modules/naxsi/contrib/naxsi-ui/bootstrap/img/glyphicons-halflings-white.p
 debian/modules/ruby-passenger/doc/images/passenger_architecture.png
 debian/modules/ruby-passenger/doc/images/conservative_spawning.png
 debian/modules/ruby-passenger/doc/images/by_sa.png
+debian/modules/ruby-passenger/doc/images/many_web_framework_protocols.png
+debian/modules/ruby-passenger/doc/images/rack.png
 debian/modules/ruby-passenger/doc/images/typical_isolated_web_application.png
 debian/modules/ruby-passenger/doc/images/spawn_server_architecture.png
 debian/modules/ruby-passenger/doc/images/phusion_banner.png
