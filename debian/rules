@@ -7,7 +7,7 @@ DEB_BUILD_HARDENING_PIE = 0
 export DEB_BUILD_HARDENING DEB_BUILD_HARDENING_PIE
 
 CFLAGS = `dpkg-buildflags --get CFLAGS`
-CFLAGS += -Wall
+CFLAGS += -Wall -DFORTIFY_SOURCE=2 -fstack-protector
 CFLAGS += `dpkg-buildflags --get CPPFLAGS`
 LDFLAGS = `dpkg-buildflags --get LDFLAGS`
 # export necessary for (hardening) flags for perl

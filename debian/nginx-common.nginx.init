@@ -2,8 +2,8 @@
 
 ### BEGIN INIT INFO
 # Provides:          nginx
-# Required-Start:    $local_fs $remote_fs $network $syslog
-# Required-Stop:     $local_fs $remote_fs $network $syslog
+# Required-Start:    $local_fs $remote_fs $network $syslog $named
+# Required-Stop:     $local_fs $remote_fs $network $syslog $named
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: starts the nginx web server
@@ -45,14 +45,14 @@ case "$1" in
 			ulimit $ULIMIT
 		fi
 		start-stop-daemon --start --quiet --pidfile /var/run/$NAME.pid \
-		    --exec $DAEMON -- $DAEMON_OPTS || true
+			--exec $DAEMON -- $DAEMON_OPTS || true
 		echo "$NAME."
 		;;
 
 	stop)
 		echo -n "Stopping $DESC: "
 		start-stop-daemon --stop --quiet --pidfile /var/run/$NAME.pid \
-		    --exec $DAEMON || true
+			--retry --exec $DAEMON || true
 		echo "$NAME."
 		;;
 
@@ -67,8 +67,8 @@ case "$1" in
 			# Set the ulimits
 			ulimit $ULIMIT
 		fi
-		start-stop-daemon --start --quiet --pidfile \
-		    /var/run/$NAME.pid --exec $DAEMON -- $DAEMON_OPTS || true
+		start-stop-daemon --start --quiet --pidfile --retry \
+			/var/run/$NAME.pid --exec $DAEMON -- $DAEMON_OPTS || true
 		echo "$NAME."
 		;;
 
@@ -76,7 +76,7 @@ case "$1" in
 		echo -n "Reloading $DESC configuration: "
 		test_nginx_config
 		start-stop-daemon --stop --signal HUP --quiet --pidfile /var/run/$NAME.pid \
-		    --exec $DAEMON || true
+			--exec $DAEMON || true
 		echo "$NAME."
 		;;
 
