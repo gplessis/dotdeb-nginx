@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nginx\n"
 "Report-Msgid-Bugs-To: nginx@packages.debian.org\n"
-"POT-Creation-Date: 2012-06-17 20:16+0530\n"
+"POT-Creation-Date: 2012-07-12 12:34-0600\n"
 "PO-Revision-Date: 2012-06-12 23:15+0100\n"
 "Last-Translator: Ivan Masár <helix84@centrum.sk>\n"
 "Language-Team: Slovak <debian-l10n-slovak@lists.debian.org>\n"
@@ -19,17 +19,15 @@ msgstr ""
 #. Type: string
 #. Description
 #: ../nginx-naxsi-ui.templates:1001
-#| msgid ""
-#| "Please specify the hostname of the server that will host the database for "
-#| "the naxsi web application firewall."
-msgid "Please specify the hostname of the server that will host the database"
-msgstr ""
-"Prosím, zadajte názov servera, ktorý bude hostiteľom databázy webového "
-"aplikačného firewallu naxsi."
+msgid "Database host for naxsi:"
+msgstr "Hostiteľ databázy naxsi:"
 
 #. Type: string
 #. Description
 #: ../nginx-naxsi-ui.templates:1001
-#| msgid "Database host for naxsi:"
-msgid "Database host for naxsi:);"
-msgstr "Hostiteľ databázy naxsi:"
+msgid ""
+"Please specify the hostname of the server that will host the database for "
+"the naxsi web application firewall."
+msgstr ""
+"Prosím, zadajte názov servera, ktorý bude hostiteľom databázy webového "
+"aplikačného firewallu naxsi."

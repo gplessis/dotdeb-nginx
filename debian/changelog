@@ -1,11 +1,13 @@
-nginx (1.2.2-1~dotdeb.0) stable; urgency=low
+nginx (1.2.1-2.1) unstable; urgency=low
 
-  * New upstream release
-  * Naxsi 0.47
-  * Passenger 3.0.13
-  * Nginx cache purge 1.6
+  * Non-maintainer upload to deal with the goal of 100% translated
+    debconf templates for 7 languages in wheezy.
+  * Drop nasty ^M characters from the templates file. They break
+    debconf-updatepo and therefore translations. Closes: #681381
+  * As a consequence, fix translations as some of them had been
+    "updated" in the meantime wrt broken templates
 
- -- Guillaume Plessis <gui@dotdeb.org>  Tue, 03 Jul 2012 14:33:42 +0200
+ -- Christian Perrier <bubulle@debian.org>  Thu, 12 Jul 2012 21:23:57 +0200
 
 nginx (1.2.1-2) unstable; urgency=medium
 

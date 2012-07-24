@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nginx 1.2.0-2\n"
 "Report-Msgid-Bugs-To: nginx@packages.debian.org\n"
-"POT-Creation-Date: 2012-06-17 20:16+0530\n"
+"POT-Creation-Date: 2012-07-12 12:34-0600\n"
 "PO-Revision-Date: 2012-06-13 23:11+0200\n"
 "Last-Translator: Chris Leick <c.leick@vollbio.de>\n"
 "Language-Team: German <debian-l10n-german@lists.debian.org>\n"
@@ -20,17 +20,15 @@ msgstr ""
 #. Type: string
 #. Description
 #: ../nginx-naxsi-ui.templates:1001
-#| msgid ""
-#| "Please specify the hostname of the server that will host the database for "
-#| "the naxsi web application firewall."
-msgid "Please specify the hostname of the server that will host the database"
-msgstr ""
-"Bitte geben Sie den Rechnernamen des Servers an, der die Datenbank der Web-"
-"Anwendungs-Firewall Naxsi beherbergen soll."
+msgid "Database host for naxsi:"
+msgstr "Datenbankrechner für Naxsi:"
 
 #. Type: string
 #. Description
 #: ../nginx-naxsi-ui.templates:1001
-#| msgid "Database host for naxsi:"
-msgid "Database host for naxsi:);"
-msgstr "Datenbankrechner für Naxsi:"
+msgid ""
+"Please specify the hostname of the server that will host the database for "
+"the naxsi web application firewall."
+msgstr ""
+"Bitte geben Sie den Rechnernamen des Servers an, der die Datenbank der Web-"
+"Anwendungs-Firewall Naxsi beherbergen soll."
