@@ -11,8 +11,6 @@
 
 
 static void ngx_http_lua_cleanup_vm(void *data);
-static char * ngx_http_lua_init_vm(ngx_conf_t *cf,
-        ngx_http_lua_main_conf_t *lmcf);
 
 
 void *
@@ -31,6 +29,16 @@ ngx_http_lua_create_main_conf(ngx_conf_t *cf)
      *      lmcf->lua_cpath = { 0, NULL };
      *      lmcf->regex_cache_entries = 0;
      *      lmcf->shm_zones = NULL;
+     *      lmcf->init_handler = NULL;
+     *      lmcf->init_src = { 0, NULL };
+     *      lmcf->shm_zones_inited = 0;
+     *      lmcf->requires_header_filter = 0;
+     *      lmcf->requires_body_filter = 0;
+     *      lmcf->requires_capture_filter = 0;
+     *      lmcf->requires_rewrite = 0;
+     *      lmcf->requires_access = 0;
+     *      lmcf->requires_log = 0;
+     *      lmcf->requires_shm = 0;
      */
 
     lmcf->pool = cf->pool;
@@ -48,23 +56,13 @@ ngx_http_lua_create_main_conf(ngx_conf_t *cf)
 char *
 ngx_http_lua_init_main_conf(ngx_conf_t *cf, void *conf)
 {
+#if (NGX_PCRE)
     ngx_http_lua_main_conf_t *lmcf = conf;
 
-#if (NGX_PCRE)
     if (lmcf->regex_cache_max_entries == NGX_CONF_UNSET) {
         lmcf->regex_cache_max_entries = 1024;
     }
 #endif
-
-    if (lmcf->lua == NULL) {
-        if (ngx_http_lua_init_vm(cf, lmcf) != NGX_CONF_OK) {
-            ngx_conf_log_error(NGX_LOG_ERR, cf, 0,
-                               "Failed to initialize Lua VM");
-            return NGX_CONF_ERROR;
-        }
-
-        dd("Lua VM initialized!");
-    }
 
     return NGX_CONF_OK;
 }
@@ -91,9 +89,17 @@ ngx_http_lua_create_loc_conf(ngx_conf_t *cf)
      *      conf->content_src_key = NULL
      *      conf->content_handler = NULL;
      *
+     *      conf->log_src = {{ 0, NULL }, NULL, NULL, NULL};
+     *      conf->log_src_key = NULL
+     *      conf->log_handler = NULL;
+     *
      *      conf->header_filter_src = {{ 0, NULL }, NULL, NULL, NULL};
      *      conf->header_filter_src_key = NULL
      *      conf->header_filter_handler = NULL;
+     *
+     *      conf->body_filter_src = {{ 0, NULL }, NULL, NULL, NULL};
+     *      conf->body_filter_src_key = NULL
+     *      conf->body_filter_handler = NULL;
      */
 
     conf->force_read_body   = NGX_CONF_UNSET;
@@ -107,6 +113,8 @@ ngx_http_lua_create_loc_conf(ngx_conf_t *cf)
     conf->send_lowat = NGX_CONF_UNSET_SIZE;
     conf->buffer_size = NGX_CONF_UNSET_SIZE;
     conf->pool_size = NGX_CONF_UNSET_UINT;
+
+    conf->transform_underscores_in_resp_headers = NGX_CONF_UNSET;
 
     return conf;
 }
@@ -136,10 +144,22 @@ ngx_http_lua_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
         conf->content_src_key = prev->content_src_key;
     }
 
+    if (conf->log_src.value.len == 0) {
+        conf->log_src = prev->log_src;
+        conf->log_handler = prev->log_handler;
+        conf->log_src_key = prev->log_src_key;
+    }
+
     if (conf->header_filter_src.value.len == 0) {
         conf->header_filter_src = prev->header_filter_src;
         conf->header_filter_handler = prev->header_filter_handler;
         conf->header_filter_src_key = prev->header_filter_src_key;
+    }
+
+    if (conf->body_filter_src.value.len == 0) {
+        conf->body_filter_src = prev->body_filter_src;
+        conf->body_filter_handler = prev->body_filter_handler;
+        conf->body_filter_src_key = prev->body_filter_src_key;
     }
 
     ngx_conf_merge_value(conf->force_read_body, prev->force_read_body, 0);
@@ -167,6 +187,9 @@ ngx_http_lua_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 
     ngx_conf_merge_uint_value(conf->pool_size, prev->pool_size, 30);
 
+    ngx_conf_merge_value(conf->transform_underscores_in_resp_headers,
+                         prev->transform_underscores_in_resp_headers, 1);
+
     return NGX_CONF_OK;
 }
 
@@ -184,7 +207,7 @@ ngx_http_lua_cleanup_vm(void *data)
 }
 
 
-static char *
+char *
 ngx_http_lua_init_vm(ngx_conf_t *cf, ngx_http_lua_main_conf_t *lmcf)
 {
     ngx_pool_cleanup_t *cln;

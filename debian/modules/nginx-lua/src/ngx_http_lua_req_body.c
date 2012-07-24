@@ -55,9 +55,14 @@ ngx_http_lua_ngx_req_read_body(lua_State *L)
         return luaL_error(L, "expecting 0 arguments but seen %d", n);
     }
 
-    lua_getglobal(L, GLOBALS_SYMBOL_REQUEST);
+    lua_pushlightuserdata(L, &ngx_http_lua_request_key);
+    lua_rawget(L, LUA_GLOBALSINDEX);
     r = lua_touserdata(L, -1);
     lua_pop(L, 1);
+
+    if (r == NULL) {
+        return luaL_error(L, "request object not found");
+    }
 
     r->request_body_in_single_buf = 1;
     r->request_body_in_persistent_file = 1;
@@ -73,6 +78,10 @@ ngx_http_lua_ngx_req_read_body(lua_State *L)
     if (ctx == NULL) {
         return luaL_error(L, "request context is null");
     }
+
+    ngx_http_lua_check_context(L, ctx, NGX_HTTP_LUA_CONTEXT_REWRITE
+                               | NGX_HTTP_LUA_CONTEXT_ACCESS
+                               | NGX_HTTP_LUA_CONTEXT_CONTENT);
 
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
             "lua start to read buffered request body");
@@ -145,9 +154,14 @@ ngx_http_lua_ngx_req_discard_body(lua_State *L)
         return luaL_error(L, "expecting 0 arguments but seen %d", n);
     }
 
-    lua_getglobal(L, GLOBALS_SYMBOL_REQUEST);
+    lua_pushlightuserdata(L, &ngx_http_lua_request_key);
+    lua_rawget(L, LUA_GLOBALSINDEX);
     r = lua_touserdata(L, -1);
     lua_pop(L, 1);
+
+    if (r == NULL) {
+        return luaL_error(L, "request object not found");
+    }
 
     rc = ngx_http_discard_request_body(r);
 
@@ -175,9 +189,14 @@ ngx_http_lua_ngx_req_get_body_data(lua_State *L)
         return luaL_error(L, "expecting 0 arguments but seen %d", n);
     }
 
-    lua_getglobal(L, GLOBALS_SYMBOL_REQUEST);
+    lua_pushlightuserdata(L, &ngx_http_lua_request_key);
+    lua_rawget(L, LUA_GLOBALSINDEX);
     r = lua_touserdata(L, -1);
     lua_pop(L, 1);
+
+    if (r == NULL) {
+        return luaL_error(L, "request object not found");
+    }
 
     if (r->request_body == NULL
         || r->request_body->temp_file
@@ -238,9 +257,14 @@ ngx_http_lua_ngx_req_get_body_file(lua_State *L)
         return luaL_error(L, "expecting 0 arguments but seen %d", n);
     }
 
-    lua_getglobal(L, GLOBALS_SYMBOL_REQUEST);
+    lua_pushlightuserdata(L, &ngx_http_lua_request_key);
+    lua_rawget(L, LUA_GLOBALSINDEX);
     r = lua_touserdata(L, -1);
     lua_pop(L, 1);
+
+    if (r == NULL) {
+        return luaL_error(L, "request object not found");
+    }
 
     if (r->request_body == NULL || r->request_body->temp_file == NULL) {
         lua_pushnil(L);
@@ -286,9 +310,14 @@ ngx_http_lua_ngx_req_set_body_data(lua_State *L)
 
     body.data = (u_char *) luaL_checklstring(L, 1, &body.len);
 
-    lua_getglobal(L, GLOBALS_SYMBOL_REQUEST);
+    lua_pushlightuserdata(L, &ngx_http_lua_request_key);
+    lua_rawget(L, LUA_GLOBALSINDEX);
     r = lua_touserdata(L, -1);
     lua_pop(L, 1);
+
+    if (r == NULL) {
+        return luaL_error(L, "request object not found");
+    }
 
     if (r->request_body == NULL) {
 
@@ -497,9 +526,14 @@ ngx_http_lua_ngx_req_set_body_file(lua_State *L)
 
     dd("clean: %d", (int) clean);
 
-    lua_getglobal(L, GLOBALS_SYMBOL_REQUEST);
+    lua_pushlightuserdata(L, &ngx_http_lua_request_key);
+    lua_rawget(L, LUA_GLOBALSINDEX);
     r = lua_touserdata(L, -1);
     lua_pop(L, 1);
+
+    if (r == NULL) {
+        return luaL_error(L, "request object not found");
+    }
 
     if (r->request_body == NULL) {
 

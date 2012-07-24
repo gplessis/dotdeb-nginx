@@ -14,6 +14,7 @@ $ENV{TEST_NGINX_MEMCACHED_PORT} ||= 11211;
 $ENV{TEST_NGINX_RESOLVER} ||= '8.8.8.8';
 
 #log_level 'warn';
+log_level 'debug';
 
 #no_long_string();
 #no_diff();
@@ -67,7 +68,7 @@ __DATA__
     }
 
     location /foo {
-        echo foo;
+        content_by_lua 'ngx.say("foo")';
         more_clear_headers Date;
     }
 --- request
@@ -135,7 +136,7 @@ close: nil closed
     }
 
     location /foo {
-        echo -n foo;
+        content_by_lua 'ngx.print("foo")';
         more_clear_headers Date;
     }
 --- request
@@ -319,7 +320,7 @@ send: nil closed
 receive: nil closed
 close: nil closed
 --- error_log
-lua socket connect timed out
+lua tcp socket connect timed out
 
 
 
@@ -483,7 +484,7 @@ attempt to send data on a closed socket
     }
 
     location /foo {
-        echo foo;
+        content_by_lua 'ngx.say("foo")';
         more_clear_headers Date;
     }
 --- request
@@ -549,7 +550,7 @@ close: nil closed
     }
 
     location /foo {
-        echo foo;
+        content_by_lua 'ngx.say("foo")';
         more_clear_headers Date;
     }
 --- request
@@ -627,7 +628,7 @@ close: nil closed
     }
 
     location /foo {
-        echo foo;
+        content_by_lua 'ngx.say("foo")';
         more_clear_headers Date;
     }
 --- request
@@ -704,7 +705,7 @@ close: nil closed
     }
 
     location /foo {
-        echo foo;
+        content_by_lua 'ngx.say("foo")';
         more_clear_headers Date;
     }
 --- request
@@ -780,7 +781,7 @@ close: nil closed
     }
 
     location /foo {
-        echo foo;
+        content_by_lua 'ngx.say("foo")';
         more_clear_headers Date;
     }
 --- request
@@ -850,7 +851,7 @@ close: nil closed
     }
 
     location /foo {
-        echo foo;
+        content_by_lua 'ngx.say("foo")';
         more_clear_headers Date;
     }
 --- request
@@ -917,7 +918,7 @@ close: nil closed
     }
 
     location /foo {
-        echo foo;
+        content_by_lua 'ngx.say("foo")';
         more_clear_headers Date;
     }
 --- request
@@ -1022,7 +1023,7 @@ connect() failed (111: Connection refused)
     }
 
     location /foo {
-        echo foo;
+        content_by_lua 'ngx.say("foo")';
         more_clear_headers Date;
     }
 --- request
@@ -1381,7 +1382,7 @@ close: 1 nil
 --- no_error_log
 [error]
 --- error_log eval
-["lua reuse socket upstream", "lua socket reconnect without shutting down"]
+["lua reuse socket upstream", "lua tcp socket reconnect without shutting down"]
 
 
 
@@ -1524,7 +1525,7 @@ GET /t
     }
 
     location /foo {
-        echo foo;
+        content_by_lua 'ngx.say("foo")';
         more_clear_headers Date;
     }
 --- request
