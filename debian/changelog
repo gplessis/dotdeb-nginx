@@ -1,3 +1,11 @@
+nginx (1.2.3-1~dotdeb.0) stable; urgency=medium
+
+  * Naxsi 0.48
+  * Nginx-lua 0.5.8
+  * Passenger 3.0.14
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Tue, 07 Aug 2012 14:59:42 +0200
+
 nginx (1.2.2-0) UNRELEASED; urgency=medium
 
   * debian/nginx-common.nginx.init
