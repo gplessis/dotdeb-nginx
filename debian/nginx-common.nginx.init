@@ -52,7 +52,7 @@ case "$1" in
 	stop)
 		echo -n "Stopping $DESC: "
 		start-stop-daemon --stop --quiet --pidfile /var/run/$NAME.pid \
-			--retry --exec $DAEMON || true
+			 --exec $DAEMON || true
 		echo "$NAME."
 		;;
 
@@ -67,7 +67,7 @@ case "$1" in
 			# Set the ulimits
 			ulimit $ULIMIT
 		fi
-		start-stop-daemon --start --quiet --pidfile --retry \
+		start-stop-daemon --start --quiet --pidfile \
 			/var/run/$NAME.pid --exec $DAEMON -- $DAEMON_OPTS || true
 		echo "$NAME."
 		;;
