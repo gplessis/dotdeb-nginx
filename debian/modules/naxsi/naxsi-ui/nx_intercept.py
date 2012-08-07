@@ -8,8 +8,7 @@ from nx_parser import signature_parser
 import urllib
 import pprint
 import socket
-import MySQLConnector
-import MySQLdb
+import SQLWrapper
 import getopt
 import sys
 import re
@@ -30,25 +29,27 @@ class InterceptHandler(http.Request):
         args['Cookie'] = self.getHeader('Cookie')
         args['Referer'] = self.getHeader('Referer')
         sig = self.getHeader("naxsi_sig")
+        print self
         if sig is None:
-            print "no naxsi_sig header."
+            print "no naxsi_sig header ?"
+            print self
+            self.finish()
             return
         url = sig.split('&uri=')[1].split('&')[0]
+        print "+ "+url
         fullstr = method + ' ' + url + ' ' + ','.join([x + ' : ' + str(args.get(x, 'No Value !')) for x in args.keys()])
         threads.deferToThread(self.background, fullstr, sig)
         self.finish()
         return
 
     def background(self, fullstr, sig):
-        self.db = MySQLConnector.MySQLConnector(filename = conf_path).connect()
-        if self.db is None:
-            raise ValueError("Cannot connect to db.")
-        self.cursor = self.db.cursor()
-        if self.cursor is None:
-            raise ValueError("Cannot connect to db.")
-        parser = signature_parser(self.cursor)
+        wrapper = SQLWrapper.SQLWrapper(conf_path)
+        wrapper.connect()
+        parser = signature_parser(wrapper)
+        parser.wrapper.StartInsert()
         parser.sig_to_db(fullstr, sig)
-        self.db.close()
+        parser.wrapper.StopInsert()
+#        parser.wrapper.close()
 
 class InterceptProtocol(http.HTTPChannel):
     requestFactory = InterceptHandler
@@ -58,60 +59,31 @@ class InterceptFactory(http.HTTPFactory):
 
 
 def usage():
-    print 'Usage: python nx_intercept [-h,--help]  [-a,--add-monitoring ip:1.2.3.4|md5:af794f5e532d7a4fa59c49845af7947e] [-q,--quiet] [-l,--log-file /path/to/logfile] [-c, --conf-file naxsi-ui-learning.conf] '
+    print 'Usage: python nx_intercept [-h,--help]  [-q,--quiet] [-l,--log-file /path/to/logfile] [-c, --conf-file naxsi-ui-learning.conf] '
 
-def add_monitoring(arg, conf_path):
-    l = arg.split('|')
-    ip = None
-    md5 = None
-    for i in l:
-        if i.startswith('ip:'):
-            ip = i[3:]
-        elif i.startswith('md5:'):
-            md5 = i[4:]
-    if md5 is not None and len(md5) != 32:
-        print 'md5 is not valid ! Nothing will be inserted in db !'
-        return
-    if ip is not None:
-        try:
-            socket.inet_aton(ip)
-        except socket.error:
-            print 'ip is not valid ! Nothing will be inserted in db !'
-            return
-    db = MySQLConnector.MySQLConnector(conf_path).connect()
-    cursor = db.cursor()
-    if md5 is not None and ip is not None:
-        cursor.execute("INSERT INTO http_monitor (peer_ip, md5) VALUES (%s, %s)", (ip, md5))
-        return
-    if md5 is not None:
-        cursor.execute("INSERT INTO http_monitor (md5) VALUES (%s)", (md5))
-        return
-    if ip is not None:
-        cursor.execute("INSERT INTO http_monitor (peer_ip) VALUES (%s)", (ip))
-        return
+
 
 def fill_db(files, conf_path):
 
-    mysqlh = MySQLConnector.MySQLConnector(conf_path)
-    db = mysqlh.connect()
+    wrapper = SQLWrapper.SQLWrapper(conf_path)
+    wrapper.connect()
     sig = ''
 
-    if db is None:
-        raise ValueError('Cannot connect to db')
-    cursor = db.cursor()
-    if cursor is None:
-        raise ValueError('Cannot connect to db')
 
-    if re.match("[a-z0-9]+$", mysqlh.dbname) == False:        
+    if re.match("[a-z0-9]+$", wrapper.dbname) == False:
         print 'bad db name :)'
         exit(-2)
     
-    cursor.execute("DROP DATABASE IF EXISTS %s;" % mysqlh.dbname)
-    cursor.execute("CREATE DATABASE %s;" %  mysqlh.dbname)
-    db.select_db(mysqlh.dbname)
+    wrapper.drop_database()
+    wrapper.create_db()
+    
+    wrapper.select_db(wrapper.dbname)
+    #wrapper.exec()
     
     print "Filling db with %s (TABLES WILL BE DROPPED !)" %  ' '.join(files)
-
+#    parser = signature_parser(wrapper)
+    parser = signature_parser(wrapper)
+    parser.wrapper.StartInsert()
     for filename in files:
         with open(filename, 'r') as fd:
             for line in fd:
@@ -125,19 +97,14 @@ def fill_db(files, conf_path):
                     for i in l:
                         s = i.split(':')
                         request_args[s[0]] = urllib.unquote(''.join(s[1:]))
-        #            print 'args are ', request_args
-                    if request_args:
-                        fullstr = request_args['request'][2:-1] + ' Referer : ' + request_args.get('referrer', ' "None"')[2:-1].strip('"\n') + ',Cookie : ' + request_args.get('cookie', ' "None"')[2:-1]
+                    fullstr = request_args.get('request', 'None')[2:-1] + ' Referer : ' + request_args.get('referrer', ' "None"')[2:-1].strip('"\n') + ',Cookie : ' + request_args.get('cookie', ' "None"')[2:-1]
                 if sig != ''  and fullstr != '':
-        #            print "adding %s (%s) " % (sig, fullstr)
-                    parser = signature_parser(cursor)
                     parser.sig_to_db(fullstr, sig, date=date)
-    db.close()
-
+    parser.wrapper.StopInsert()
 
 if __name__ == '__main__':
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'c:ha:l:', ['conf-file', 'help', 'add-monitoring', 'log-file'])
+        opts, args = getopt.getopt(sys.argv[1:], 'c:hl:', ['conf-file', 'help', 'log-file'])
     except getopt.GetoptError, err:
         print str(err)
         usage()

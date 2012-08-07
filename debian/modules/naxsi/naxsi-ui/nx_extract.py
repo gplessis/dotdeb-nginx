@@ -4,10 +4,19 @@ from ConfigParser import ConfigParser
 from twisted.web import http
 from twisted.internet import protocol
 from twisted.internet import reactor, threads
+from twisted.web.server import Site
+from twisted.web.static import File
+from twisted.web.resource import Resource
+from twisted.web.error import NoResource
+from zope.interface import implements
+from twisted.cred.portal import IRealm, Portal
+from twisted.cred.checkers import InMemoryUsernamePasswordDatabaseDontUse, ICredentialsChecker
+from twisted.web.guard import HTTPAuthSessionWrapper, DigestCredentialFactory
+from twisted.web.resource import IResource
+from twisted.cred import credentials
 from ordereddict import OrderedDict # don't lose compatibility with python < 2.7
 
-import MySQLdb
-import MySQLConnector
+import SQLWrapper
 import pprint
 import re
 import getopt
@@ -27,15 +36,19 @@ glob_fileList = []
 
 class rules_extractor(object):
    def __init__(self, page_hit, rules_hit, rules_file, conf_file='naxsi-ui.conf'):
-      self.db = MySQLConnector.MySQLConnector(glob_conf_file).connect()
-      self.cursor = self.db.cursor(MySQLdb.cursors.DictCursor)
-      self.rules_list = []
-      self.final_rules = []
-      self.base_rules = []
-      self.page_hit = page_hit
-      self.rules_hit = rules_hit
-      self.core_msg = {}
-      self.extract_core(glob_rules_file)
+       
+       self.wrapper = SQLWrapper.SQLWrapper(glob_conf_file)
+       self.wrapper.connect()
+       self.wrapper.setRowToDict()
+           
+       self.rules_list = []
+       self.final_rules = []
+       self.base_rules = []
+       self.page_hit = page_hit
+       self.rules_hit = rules_hit
+       self.core_msg = {}
+       self.extract_core(glob_rules_file)
+       
    def extract_core(self, rules_file):
       try:
          fd = open(glob_rules_file, 'r')
@@ -46,122 +59,260 @@ class rules_extractor(object):
                self.core_msg[i[pos + 3:i[pos + 3].find(';') - 1]] = i[pos_msg + 4:][:i[pos_msg + 4:].find('"')]
          fd.close()
       except:
+         print ("Unable to open rules file.")
          pass
 
    def gen_basic_rules(self,url=None, srcip=None, dsthost=None,
                 rule_id=None, exception_md5=None,
                 exception_id=None):
-      tmp_rules = []
-      self.cursor.execute("""select exception.exception_id as id, exception.md5 as md5, exception.url as url, exception.count as count, srcpeer.peer_ip as src, count(distinct srcpeer.peer_ip) as cnt_peer, dstpeer.peer_host as dst, GROUP_CONCAT(distinct "mz:", match_zone.rule_id, ":", "$", match_zone.zone, "_VAR:", match_zone.arg_name)  as match_zones from exception LEFT JOIN  (peer as srcpeer, peer as dstpeer, connections, match_zone)  on (connections.src_peer_id = srcpeer.peer_id and  connections.dst_peer_id = dstpeer.peer_id and  connections.exception_id = exception.exception_id and  match_zone.exception_id = exception.exception_id) GROUP BY id;""")
-      data = self.cursor.fetchall()
-      for row in data:
-         if (url is not None and not re.search(url, row.get("url", ""))):
-            continue
-         if (srcip is not None and not re.search(srcip, row.get("src", ""))):
-            continue
-         if (dsthost is not None and not re.search(dsthost, row.get("dst", ""))):
-            continue
-         if (exception_md5 is not None and not re.search(exception_md5, row.get("md5", ""))):
-            continue
-         tmp_rules.append(row)
-      for i in tmp_rules:
-         if i['match_zones'] is None:
-            continue
-         for j in i['match_zones'].split(','):
-            if len(j.split(':')) < 2:
-               continue
-            da_dict = {}
-            da_dict['url'] = i['url']
-            da_dict['arg'] = ':'.join(j.split(':')[2:])            
-            # fix exception of URL
-            da_dict['arg'] = da_dict['arg'].replace("$URL_VAR:", "URL")
-            da_dict['id'] = j.split(':')[1]
-            da_dict['count'] = i['count']
-            da_dict['cnt_peer'] = i['cnt_peer']
-            if da_dict not in self.rules_list:
-               self.rules_list.append(da_dict)
-      self.base_rules = self.rules_list[:]
+
+     tmp_rules = []
+     #self.rules_list = self.wrapper.getWhitelist()     
+     self.base_rules = self.rules_list[:]
+#     pprint.pprint(self.base_rules)
+
+   def transform_to_dict(self, l):
+      d = {}
+      for i in l:
+         if not d.has_key(i[0]):
+            d[i[0]] = []
+         d[i[0]].append(i[1])
+      #elimininate duplicate ids in each value
+      for i in d:
+         d[i] = list(set(d[i]))
+      return d
+
+
+   def get_partial_match_dict(self, d, to_find):
+      for i, current_dict in enumerate(d):
+        if all(key in current_dict and current_dict[key] == val 
+                for key, val in to_find.iteritems()):
+            return i
+
 
    def opti_rules_back(self):
-      lr = len(self.rules_list)
-      i = 0
-      while i < lr:
-         matching = []
-         if (len(self.rules_list[i]['arg'].split(':')) > 1):
-            arg_type, arg_name = tuple(self.rules_list[i]['arg'].split(':'))
-         else:
-            # Rules targeting URL zone
-            if self.rules_list[i]['arg'] == "URL":
-               arg_name = ""
-               arg_type = "URL"
-            # Internal rules have small IDs
-            elif self.rules_list[i]['id'] < 10:
-               arg_name = ""
-               arg_type = ""
-         id = self.rules_list[i]['id']
-         url = self.rules_list[i]['url']
-         matching = filter(lambda l: (l['arg'] == arg_type + ':' + arg_name) and id == l['id'] , self.rules_list)
-         if len(matching) >= self.page_hit:
-            #whitelist the ids on every url with arg_name and arg_type -> BasicRule wl:id "mz:argtype:argname"
-            self.final_rules.append({'url': None, 'id': id, 'arg': arg_type + ':' + arg_name})
-            for bla in matching:
-               self.rules_list.remove(bla)
-            lr -= len(matching)
-            i = 0
-            print "*) "+str(len(matching))+" hits for same mz:"+arg_type+':'+arg_name+" and id:"+str(id)
-            print "removed "+str(len(matching))+" items from biglist, now :"+str(len(self.rules_list))
-            continue
-         matching = filter(lambda l: url == l['url'] and l['arg'] == arg_type + ':' + arg_name, self.rules_list)
-         if len(matching) >= self.rules_hit:
-            #whitelist all id on url with arg_name and arg_type -> BasicRule wl:0 "mz:$url:xxx|argtype:argname"
-            self.final_rules.append({'url': url, 'id': str(0), 'arg': arg_type + ':' + arg_name})
-            print "about to del "+str(len(matching))+" items from biglist, now :"+str(len(self.rules_list))
-            for bla in matching:
-               self.rules_list.remove(bla)
-            lr -= len(matching)
-            i = 0
-            print "*) "+str(len(matching))+" hits for same mz:"+str(url)+'|'+str(arg_type)+':'+str(arg_name)+" and id:"+str(id)
-            print "removed "+str(len(matching))+" items from biglist, now :"+str(len(self.rules_list))
-            print " current LR:"+str(lr)
-            continue
-         i += 1
-      if self.rules_list == self.final_rules:
-         return self.base_rules, self.final_rules
-      #append rules that cant be optimized
-      self.final_rules += self.rules_list
-      #remove duplicate
-      tmp_list = []
-      for i in self.final_rules:
-         if i not in tmp_list:
-            tmp_list.append(i)
-      self.final_rules = tmp_list
-     #try to reoptimize
-      self.rules_list = self.final_rules
-      self.opti_rules_back()
+      # rules of requests extracting optimized whitelists, from 
+      # more restrictive to less restrictive.
+      opti_select_DESC = [
+         # select on url+var_name+zone+rule_id
+         ("select  count(*) as ct, e.rule_id, e.zone, e.var_name, u.url, count(distinct c.peer_ip) as peer_count, "
+          "(select count(distinct peer_ip) from connections) as ptot, "
+          "(select count(*) from connections) as tot "
+          "from exceptions as e, urls as u, connections as c where c.url_id "
+          "= u.url_id and c.id_exception = e.exception_id GROUP BY u.url, e.var_name,"
+          "e.zone, e.rule_id HAVING (ct) > ((select count(*) from connections)/1000)"),
+         # select on var_name+zone+rule_id (unpredictable URL)
+         ("select  count(*) as ct, e.rule_id, e.zone, e.var_name, '' as url, count(distinct c.peer_ip) as peer_count, "
+          "(select count(distinct peer_ip) from connections) as ptot, "
+          "(select count(*) from connections) as tot "
+          "from exceptions as e, urls as u, connections as c where c.url_id = u.url_id and c.id_exception = "
+          "e.exception_id GROUP BY e.var_name,  e.zone, e.rule_id HAVING (ct) > "
+          "((select count(*) from connections)/1000)"),
+         # select on zone+url+rule_id (unpredictable arg_name)
+         ("select  count(*) as ct, e.rule_id, e.zone, '' as var_name, u.url, count(distinct c.peer_ip) as peer_count, "
+          "(select count(distinct peer_ip) from connections) as ptot, "
+          "(select count(*) from connections) as tot "
+          "from exceptions as e, urls as u, connections as c where c.url_id "
+          "= u.url_id and c.id_exception = e.exception_id GROUP BY u.url, "
+          "e.zone, e.rule_id HAVING (ct) > ((select count(*) from connections)/1000)"),
+        # select on zone+url+var_name (unpredictable id)
+         ("select  count(*) as ct, 0 as rule_id, e.zone, e.var_name, u.url, count(distinct c.peer_ip) as peer_count, "
+          "(select count(distinct peer_ip) from connections) as ptot, "
+          "(select count(*) from connections) as tot "
+          "from exceptions as e, urls as u, connections as c where c.url_id "
+          "= u.url_id and c.id_exception = e.exception_id GROUP BY u.url, "
+          "e.zone, e.var_name HAVING (ct) > ((select count(*) from connections)/1000)")
+         ]
+      
+      for req in opti_select_DESC:
+         self.wrapper.execute(req)
+         res = self.wrapper.getResults()
+         for r in res:
+            #r += "# total_count:"+str(i['count'])+" ("+str(round((i['count'] / float(i['total'])) * 100,2))+"% of total) peer_count:"+str(i['peer_count'])+"\n"
+            if len(r['var_name']) > 0:
+               self.try_append({'url': r['url'], 'rule_id': r['rule_id'], 'zone': r['zone'],  'var_name': r['var_name'], 
+                                'hcount':  r['ct'], 'htotal': r['tot'], 'pcount':r['peer_count'], 'ptotal':r['ptot'],
+                                'pratio': round((r['peer_count'] / float(r['ptot'])) * 100,2),
+                                'hratio': round((r['ct'] / float(r['tot'])) * 100,2)
+                                })
+            else:
+               self.try_append({'url': r['url'], 'rule_id': r['rule_id'], 'zone': r['zone'], 'var_name': '', 
+                                'hcount': r['ct'],  'htotal': r['tot'], 'ptotal':r['ptot'],
+                                'pratio': round((r['peer_count'] / float(r['ptot'])) * 100,2),
+                                'hratio': round((r['ct'] / float(r['tot'])) * 100,2),
+                                'pcount':r['peer_count']})
       return self.base_rules, self.final_rules
-                  
+
+#returns true if whitelist 'target' is already handled by final_rules
+#does a dummy comparison and compares the counters
+   def try_append(self, target, delmatch=False):
+      count=0
+      nb_rule=0
+      for z in self.final_rules[:]:
+         if len(target['url']) > 0 and len(z['url']) > 0 and target['url'] != z['url']:
+            continue
+         if target['rule_id'] != 0 and z['rule_id'] != 0 and target['rule_id'] != z['rule_id']:
+            continue
+         if len(target['zone']) > 0 and len(z['zone']) > 0 and target['zone'] != z['zone']:
+            continue
+         if len(target['var_name']) > 0 and len(z['var_name']) > 0 and target['var_name'] != z['var_name']:
+            continue
+         if delmatch is True:
+            self.final_rules.remove(z)
+         else:
+            nb_rule += 1
+            count += int(z['hcount'])
+      if delmatch is True:
+         return
+      if (target['hcount'] > count) or (target['hcount'] >= count and nb_rule > self.rules_hit):
+         pprint.pprint(target)
+         self.try_append(target, True)
+         self.final_rules.append(target)
+         return
+
    def generate_stats(self):
       stats = ""
-      self.cursor.execute("select count(distinct md5) as uniq_exception from exception")
-      uniq_ex = self.cursor.fetchall()[0]['uniq_exception']
-      self.cursor.execute("select count(distinct peer_ip) as uniq_peer from peer where peer_ip is not NULL")
-      uniq_peer = self.cursor.fetchall()[0]['uniq_peer']
-      self.cursor.execute("select count(distinct peer_ip) as uniq_peer_mon from http_monitor where peer_ip is not NULL")
-      uniq_peer_mon = self.cursor.fetchall()[0]['uniq_peer_mon']
-      self.cursor.execute("select count(distinct md5) as uniq_exception_mon from http_monitor where md5 is not NULL")
-      uniq_exception = self.cursor.fetchall()[0]['uniq_exception_mon']
-      return "<ul><li>There is currently %s unique exceptions.</li></ul><ul><li>There is currently %s different peers that triggered rules.</li></ul><ul><li>There is currently %s peers being monitored</li></ul><ul><li>There is currently %s exceptions being monitored</li></ul>" % (uniq_ex, uniq_peer, uniq_peer_mon, uniq_exception)
+      self.wrapper.execute("select count(distinct exception_id) as uniq_exception from exceptions")
+      uniq_ex = self.wrapper.getResults()[0]['uniq_exception']
+      self.wrapper.execute("select count(distinct peer_ip) as uniq_peer from connections")
+      uniq_peer = self.wrapper.getResults()[0]['uniq_peer']
+      return "<ul><li>There is currently %s unique exceptions.</li></ul><ul><li>There is currently %s different peers that triggered rules.</li></ul>" % (uniq_ex, uniq_peer)
 
-               
 
-class InterceptHandler(http.Request):
+class NaxsiUI(Resource):
+   def __init__(self):
+      Resource.__init__(self)
+      #twisted will handle static content for me
+      self.putChild('bootstrap', File('./bootstrap'))
+      self.putChild('js', File('./js'))
+      #make the correspondance between the path and the object to call
+      self.page_handler = {'/' : Index, '/graphs': GraphView, '/get_rules': GenWhitelist, '/map': WootMap}
+
+   def getChild(self, name, request):
+      handler = self.page_handler.get(request.path)
+      if handler is not None:
+         return handler()
+      else:
+         return NoResource()
+         
+
+class Index(Resource):
+   def __init__(self):
+      Resource.__init__(self)
+      self.ex = rules_extractor(0,0, None)
+
+   def render_GET(self, request):
+      fd = open('index.tpl', 'r')
+      helpmsg = ''
+      for i in fd:
+         helpmsg += i
+      fd.close()
+      helpmsg = helpmsg.replace('__STATS__', self.ex.generate_stats())
+      helpmsg = helpmsg.replace('__HOSTNAME__', request.getHeader('Host'))
+      return helpmsg
+
+
+class WootMap(Resource):
+   isLeaf = True
+   def __init__(self):
+      self.has_geoip = False
+      try:
+         import GeoIP
+         self.has_geoip = True
+      except:
+         print "No GeoIP module, no map"
+         return
+      Resource.__init__(self)
+      self.ex = rules_extractor(0,0, None)
+      self.gi = GeoIP.new(GeoIP.GEOIP_MEMORY_CACHE)
+   def render_GET(self, request):
+      if self.has_geoip is False:
+         return "No GeoIP module/database installed."
+      render = open('map.tpl').read()
+      self.ex.wrapper.execute('select peer_ip as p, count(*) as c from connections group by peer_ip')
+      ips = self.ex.wrapper.getResults()
+      fd = open("country2coords.txt", "r")
+      bycn = {}
+      for ip in ips:
+         country = self.gi.country_code_by_addr(ip['p'])
+         if country is None or len(country) < 2:
+            country = "CN"
+         if country not in bycn:
+            bycn[country] = {'count': int(ip['c']), 'coords': ''}
+            fd.seek(0)
+            for cn in fd:
+               if country in cn:
+                  bycn[country]['coords'] = cn[len(country)+1:-1]
+                  break
+            if len(bycn[country]['coords']) < 1:
+               bycn[country]['coords'] = "37.090240,-95.7128910"
+         else:
+            bycn[country]['count'] += ip['c']
+            pprint.pprint(bycn[country])
+      base_array = 'citymap["__CN__"] = {center: new google.maps.LatLng(__COORDS__), population: __COUNT__};\n'
+      citymap = ''
+      for cn in bycn.keys():
+         citymap += base_array.replace('__CN__', cn).replace('__COORDS__', bycn[cn]['coords']).replace('__COUNT__', 
+                                                                                                       str(bycn[cn]['count']))
+      render = render.replace('__CITYMAP__', citymap)
+      return render
+   
+class GraphView(Resource):
+   isLeaf = True
+   
+   def __init__(self):
+      Resource.__init__(self)
+      self.ex = rules_extractor(0,0, None)
+
+
+   def render_GET(self, request):
+
+      fd = open('graphs.tpl')
+      html = ''
+      for i in fd:
+         html += i
+      fd.close()
+      
+      array_excep, _ = self.build_js_array()
+      sqli_array, sql_count = self.build_js_array(1000, 1099)
+      xss_array, xss_count = self.build_js_array(1300, 1399)
+      rfi_array, rfi_count = self.build_js_array(1100, 1199)
+      upload_array, upload_count = self.build_js_array(1500, 1599)
+      dt_array, dt_count = self.build_js_array(1200, 1299)
+      evade_array, evade_count = self.build_js_array(1400, 1499)
+      intern_array, intern_count = self.build_js_array(0, 10)
+
+      self.ex.wrapper.execute('select peer_ip as ip, count(id_exception) as c from connections group by peer_ip order by count(id_exception) DESC limit 10')
+      top_ten = self.ex.wrapper.getResults()
+      top_ten_html = '<table class="table table-bordered" border="1" ><thead><tr><th>IP</th><th>Rule Hits</th></tr></thead><tbody>'
+      for i in top_ten:
+         top_ten_html += '<tr><td>' + cgi.escape(i['ip']) + ' </td><td> ' + str(i['c']) + '</td></tr>'
+      top_ten_html += '</tbody></table>'
+
+      top_ten_page_html = ''
+
+      self.ex.wrapper.execute('select distinct u.url as url, count(id_exception) as c from connections  join urls as u on (u.url_id = connections.url_id) group by u.url order by count(id_exception) DESC limit 10;')
+      top_ten_page = self.ex.wrapper.getResults()
+      top_ten_page_html = '<table class="table table-bordered" border="1" ><thead><tr><th>URI</th><th>Exceptions Count</th></tr></thead><tbody>'
+      
+      for i in top_ten_page:
+          top_ten_page_html += '<tr><td>' + cgi.escape(i['url']).replace('\'', '\\\'') + ' </td><td> ' + str(i['c']) + '</td></tr>'
+      top_ten_page_html += '</tbody></table>'
+
+      dict_replace = {'__TOPTEN__': top_ten_html, '__TOPTENPAGE__': top_ten_page_html, '__TOTALEXCEP__': array_excep, '__SQLCOUNT__': str(sql_count),  '__XSSCOUNT__': str(xss_count), '__DTCOUNT__': str(dt_count), '__RFICOUNT__': str(rfi_count), '__EVCOUNT__': str(evade_count), '__UPCOUNT__': str(upload_count), '__INTCOUNT__': str(intern_count), '__SQLIEXCEP__': sqli_array, '__XSSEXCEP__': xss_array, '__RFIEXCEP__': rfi_array, '__DTEXCEP__': dt_array, '__UPLOADEXCEP__': upload_array, '__EVADEEXCEP__': evade_array, '__INTERNEXCEP__': intern_array}
+
+      html = reduce(lambda html,(b, c): html.replace(b, c), dict_replace.items(), html)
+      return html
+
    def create_js_array(self, res):
       array = '['
       for i in res:
-         date_begin = str(i).split('-')
-         date_begin[1] = str(int(date_begin[1]) - 1)
-         date_begin = ','.join(date_begin)
-         array += '[Date.UTC(' + date_begin  + '),' + str(res[i]) + '],'
+          
+          d = i.replace('/', '-')
+          date_begin = str(d).split('-')
+          date_begin[1] = str(int(date_begin[1]) - 1)
+          date_begin = ','.join(date_begin)
+          array += '[Date.UTC(' + date_begin  + '),' + str(res[i]).replace('/', '-') + '],'
       if array != '[':
          array = array[:-1] + ']'
       else:
@@ -178,10 +329,10 @@ class InterceptHandler(http.Request):
 
    def build_js_array(self, id_beg = None, id_end = None):
       if id_beg is None or id_end is None:
-         self.ex.cursor.execute('select date(date) as d, count(exception_id) as ex from connections group by date(date)')
+         self.ex.wrapper.execute('select substr(date,1,10) as d, count(id_exception) as ex from connections group by substr(date,1,10)')
       else:
-         self.ex.cursor.execute('select date(date) as d, count(co.exception_id) as ex from connections as co join match_zone as m on (co.match_id = m.match_id) where m.rule_id >= %s and m.rule_id <= %s group by date(date);', (str(id_beg), str(id_end)))
-      count = self.ex.cursor.fetchall()      
+          self.ex.wrapper.execute('select substr(date,1, 10) as d, count(id_exception) as ex from connections join exceptions as e on (e.exception_id = id_exception) where e.rule_id >= %s and e.rule_id <= %s group by substr(date, 1, 10)', (str(id_beg), str(id_end)))
+      count = self.ex.wrapper.getResults()
       mydict = self.build_dict(count)
       total_hit = 0
       for i in count:
@@ -189,147 +340,83 @@ class InterceptHandler(http.Request):
       myarray = self.create_js_array(mydict)
       return myarray, total_hit
 
-   def check_auth(self):
-      user = self.getUser()
-      passwd = self.getPassword()
+class GenWhitelist(Resource):
 
-      if user != glob_user or passwd != glob_pass:
-         self.setResponseCode(401)
-         self.setHeader('WWW-Authenticate', 'Basic realm="NAXSI Web Interface"')
-         self.setHeader('content-type', 'text/html')
-         self.write('<h1>Unauthorized User</h1>')
-         self.finish()
-         return -1
-
-      return 42
-
-   def handle_request(self):
-
-      if self.check_auth() == -1:
+    def render_GET(self, request):
+      request.setHeader('content-type', 'text/plain')
+      ex = rules_extractor(int(request.args.get('page_hit', ['10'])[0]), 
+                           int(request.args.get('rules_hit', ['10'])[0]), 
+                           glob_rules_file)
+      ex.gen_basic_rules()
+      base_rules, opti_rules = ex.opti_rules_back()
+      opti_rules.sort(lambda a,b: (b['hratio']+(b['pratio']*3)) < (a['hratio']+(a['pratio']*3)))
+      pprint.pprint(opti_rules)
+      r = '########### Optimized Rules Suggestion ##################\n'
+      if not len(opti_rules):
+         r+= "#No rules to be generated\n"
          return
+      opti_rules.sort(key=lambda k: (k['hratio'], k['pratio']))
+      _i = len(opti_rules)-1
+      while _i >= 0:
+         i = opti_rules[_i]
+         _i = _i - 1
+         r += ("# total_count:"+str(i['hcount'])+" ("+str(i['hratio'])+
+               "%), peer_count:"+str(i['pcount'])+" ("+str(i['pratio'])+"%)")
+         r += " | "+ex.core_msg.get(str(i['rule_id']), "?")+"\n"
+         if (i['hratio'] < 5 and i['pratio'] < 5) or (i['pratio'] < 5):
+            r += '#'
+         r += 'BasicRule wl:' + str(i['rule_id']) + ' "mz:'
+         if i['url'] is not None and len(i['url']) > 0:
+            r += '$URL:' + i['url']
+         if i['zone'] is not None and len(i['zone']) > 0:
+            if i['url']:
+               r += '|'
+            r += i['zone']
+         if i['var_name'] is not None and len(i['var_name']) > 0:
+            # oooh, that must be bad.
+            r = r[:-len(i['zone'])]+"$"+r[-len(i['zone']):]
+            r += "_VAR:"+i['var_name']
+         r += '";\n'      
+      return r
 
-      self.ex = rules_extractor(0,0, None)
+class HTTPRealm(object):
+   implements(IRealm)
 
-      if self.path == '/get_rules':
-         self.setHeader('content-type', 'text/plain')
-         ex = rules_extractor(int(self.args.get('page_hit', ['10'])[0]), 
-                              int(self.args.get('rules_hit', ['10'])[0]), 
-                              glob_rules_file)
-         ex.gen_basic_rules()
-         base_rules, opti_rules = ex.opti_rules_back()
-         r = '########### Rules Before Optimisation ##################\n'
+   def requestAvatar(self, avatarID, mind, *interfaces):
+      return (IResource, NaxsiUI(), lambda: None)
 
-         for i in base_rules:
-            r += '#%s hits on rule %s (%s) on url %s from %s different peers\n' % (i['count'], i['id'], 
-                                                                                   ex.core_msg.get(i['id'], 
-                                                                                                   'Unknown id. Check the path to the core rules file and/or the content.'), 
-                                                                                   i['url'], i['cnt_peer'])
-            r += '#BasicRule wl:' + i['id'] + ' "mz:$URL:' + i['url'] 
-            if '|NAME' in i['arg']:
-               i['arg'] = i['arg'].split('|')[0] + '_VAR|NAME'
-            if i['arg'] is not None and len(i['arg']) > 0:
-               r += '|' + i['arg']
-            r +=  '";\n'
-         r += '########### End Of Rules Before Optimisation ###########\n'
+def daemonize (stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
+    try: 
+        pid = os.fork() 
+        if pid > 0:
+            sys.exit(0)
+    except OSError, e: 
+        sys.stderr.write ("fork #1 failed: (%d) %s\n" % (e.errno, e.strerror) )
+        sys.exit(1)
 
-         for i in opti_rules:
-            r += 'BasicRule wl:' + i['id'] + ' "mz:'
-            if i['url'] is not None and len(i['url']) > 0:
-               r += '$URL:' + i['url']
-            if i['arg'] is not None and len(i['arg']) > 0:
-               if i['url'] is not None and len(i['url']):
-                  r += '|'+i['arg']
-               else:
-                  r += i['arg']
-            r += '";\n'
+#    os.chdir("/") 
+    os.umask(0) 
+    os.setsid() 
 
-         self.write(r)
-         self.finish()
+    try: 
+        pid = os.fork() 
+        if pid > 0:
+            sys.exit(0)
+    except OSError, e: 
+        sys.stderr.write ("fork #2 failed: (%d) %s\n" % (e.errno, e.strerror) )
+        sys.exit(1)
 
-      elif self.path == '/':
-         fd = open('index.tpl', 'r')
-         helpmsg = ''
-         for i in fd:
-            helpmsg += i
-         fd.close()
-         helpmsg = helpmsg.replace('__STATS__', self.ex.generate_stats())
-         helpmsg = helpmsg.replace('__HOSTNAME__', self.getHeader('Host'))
-         self.setHeader('content-type', 'text/html')
-         self.write(helpmsg)
-         self.finish()
+    si = open(stdin, 'r')
+    so = open(stdout, 'a+')
+    se = open(stderr, 'a+', 0)
+    os.dup2(si.fileno(), sys.stdin.fileno())
+    os.dup2(so.fileno(), sys.stdout.fileno())
+    os.dup2(se.fileno(), sys.stderr.fileno())
+         
 
-      elif self.path == '/graphs':
-         fd = open('graphs.tpl')
-         html = ''
-         for i in fd:
-            html += i
-         fd.close()
-
-         array_excep, _ = self.build_js_array()
-         sqli_array, sql_count = self.build_js_array(1000, 1099)
-         xss_array, xss_count = self.build_js_array(1300, 1399)
-         rfi_array, rfi_count = self.build_js_array(1100, 1199)
-         upload_array, upload_count = self.build_js_array(1500, 1599)
-         dt_array, dt_count = self.build_js_array(1200, 1299)
-         evade_array, evade_count = self.build_js_array(1400, 1499)
-         intern_array, intern_count = self.build_js_array(0, 10)
-
-         self.ex.cursor.execute('select p.peer_ip as ip, count(exception_id) as c from connections join peer as p on (src_peer_id = p.peer_id) group by p.peer_ip order by count(distinct exception_id) DESC limit 10;')
-         top_ten = self.ex.cursor.fetchall()
-         top_ten_html = '<table class="table table-bordered" border="1" ><thead><tr><th>IP</th><th>Rule Hits</th></tr></thead><tbody>'
-         for i in top_ten:
-            top_ten_html += '<tr><td>' + cgi.escape(i['ip']) + ' </td><td> ' + str(i['c']) + '</td></tr>'
-         top_ten_html += '</tbody></table>'
-
-         self.ex.cursor.execute('select distinct url, count(exception_id) as c from exception  group by url order by count(exception_id) DESC limit 10;')
-         top_ten_page = self.ex.cursor.fetchall()
-         top_ten_page_html = '<table class="table table-bordered" border="1" ><thead><tr><th>URI</th><th>Exceptions Count</th></tr></thead><tbody>'
-
-         for i in top_ten_page:
-            top_ten_page_html += '<tr><td>' + cgi.escape(i['url']) + ' </td><td> ' + str(i['c']) + '</td></tr>'
-         top_ten_page_html += '</tbody></table>'
-
-         dict_replace = {'__TOPTEN__': top_ten_html, '__TOPTENPAGE__': top_ten_page_html, '__TOTALEXCEP__': array_excep, '__SQLCOUNT__': str(sql_count),  '__XSSCOUNT__': str(xss_count), '__DTCOUNT__': str(dt_count), '__RFICOUNT__': str(rfi_count), '__EVCOUNT__': str(evade_count), '__UPCOUNT__': str(upload_count), '__INTCOUNT__': str(intern_count), '__SQLIEXCEP__': sqli_array, '__XSSEXCEP__': xss_array, '__RFIEXCEP__': rfi_array, '__DTEXCEP__': dt_array, '__UPLOADEXCEP__': upload_array, '__EVADEEXCEP__': evade_array, '__INTERNEXCEP__': intern_array}
-
-         html = reduce(lambda html,(b, c): html.replace(b, c), dict_replace.items(), html)
-         self.write(html)
-         self.finish()
-
-      else:
-         try:
-            if self.path.endswith('.js'):
-               self.setHeader('content-type', 'text/javascript')
-            
-            if '.' + self.path not in glob_fileList:
-               self.setResponseCode(403)
-               self.finish()
-               return
-
-            fd = open(self.path[1:], 'rb')
-            for i in fd:
-               self.write(i)
-            fd.close()
-         except IOError, e:
-            pass
-         self.finish()
-
-   def process(self):
-      threads.deferToThread(self.handle_request)
-
-class InterceptProtocol(http.HTTPChannel):
-   requestFactory = InterceptHandler
-   
-class InterceptFactory(http.HTTPFactory):
-   protocol = InterceptProtocol
       
 def usage():
    print 'Usage : python nx_extract /path/to/conf/file'
-
-def build_file_list(path):
-   rootdir = path
-   for root, subFolders, files in os.walk(rootdir):
-      for file in files:
-         glob_fileList.append(os.path.join(root,file))
 
 
 if __name__  == '__main__':
@@ -363,9 +450,15 @@ if __name__  == '__main__':
       exit(-1)
    fd.close()
 
+   credshandler = InMemoryUsernamePasswordDatabaseDontUse()  # i know there is DontUse in the name
+   credshandler.addUser(glob_user, glob_pass)
+   portal = Portal(HTTPRealm(), [credshandler])
+   credentialFactory = DigestCredentialFactory("md5", "Naxsi-UI")
 
+   webroot = HTTPAuthSessionWrapper(portal, [credentialFactory])
+   
+   factory = Site(webroot)
+   reactor.listenTCP(port, factory)
 
-   build_file_list('.')
-
-   reactor.listenTCP(port, InterceptFactory())
+#   daemonize(stdout = '/tmp/nx_extract_output', stderr = '/tmp/nx_extract_error')
    reactor.run()
