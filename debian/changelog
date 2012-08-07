@@ -6,7 +6,20 @@ nginx (1.2.2-0) UNRELEASED; urgency=medium
   * debian/rules:
     + Added -DFORTIFY_SOURCE=2 -fstack-protector to build flags. (Closes: #680712)
 
- -- Michael Lustfield <michael@lustfield.net>  Sun, 22 Jul 2012 03:42:49 +0000
+ -- Michael Lustfield <michael@lustfield.net>  Sun, 05 Aug 2012 17:28:44 +0530
+
+nginx (1.2.1-2.2) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Fix "removes files that were installed by another package":
+    don't remove directories that are owned by (and removed from) nginx-common
+    from nginx-extras.postrm. This seems to have been the idea in commit e30a854
+    ("Moved configuration purging to nginx-common.") except that it was added
+    in nginx-common.postrm without being removed in nginx-extras.postrm.
+    Remove nginx-extras.postrm since it's empty after this change.
+    (Closes: #681758)
+
+ -- gregor herrmann <gregoa@debian.org>  Sat, 04 Aug 2012 18:13:10 +0200
 
 nginx (1.2.1-2.1) unstable; urgency=low
 
