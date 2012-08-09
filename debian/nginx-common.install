@@ -1,4 +1,4 @@
 debian/conf/* etc/nginx
 debian/ufw/nginx etc/ufw/applications.d
 debian/scripts/* usr/sbin
-html/* usr/share/nginx/www/
+html/* usr/share/nginx/html/

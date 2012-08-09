@@ -71,7 +71,7 @@ config.env.%:
 
 config.status.full: config.env.full config.sub config.guess
 	cd $(BUILDDIR_full) && CFLAGS="$(CFLAGS)" CORE_LINK="$(LDFLAGS)" ./configure  \
-	    --prefix=/etc/nginx \
+	    --prefix=/usr/share/nginx \
 	    --conf-path=/etc/nginx/nginx.conf \
 	    --error-log-path=/var/log/nginx/error.log \
 	    --http-client-body-temp-path=/var/lib/nginx/body \
@@ -112,7 +112,7 @@ config.status.full: config.env.full config.sub config.guess
 
 config.status.light: config.env.light config.sub config.guess
 	cd $(BUILDDIR_light) && CFLAGS="$(CFLAGS)" CORE_LINK="$(LDFLAGS)" ./configure  \
-	    --prefix=/etc/nginx \
+	    --prefix=/usr/share/nginx \
 	    --conf-path=/etc/nginx/nginx.conf \
 	    --error-log-path=/var/log/nginx/error.log \
 	    --http-client-body-temp-path=/var/lib/nginx/body \
@@ -144,7 +144,7 @@ config.status.light: config.env.light config.sub config.guess
 
 config.status.extras: config.env.extras config.sub config.guess
 	cd $(BUILDDIR_extras) && CFLAGS="$(CFLAGS)" CORE_LINK="$(LDFLAGS)" ./configure  \
-	    --prefix=/etc/nginx \
+	    --prefix=/usr/share/nginx \
 	    --conf-path=/etc/nginx/nginx.conf \
 	    --error-log-path=/var/log/nginx/error.log \
 	    --http-client-body-temp-path=/var/lib/nginx/body \
@@ -196,7 +196,7 @@ config.status.extras: config.env.extras config.sub config.guess
 
 config.status.naxsi: config.env.naxsi config.sub config.guess
 	cd $(BUILDDIR_naxsi) && CFLAGS="$(CFLAGS)" CORE_LINK="$(LDFLAGS)" ./configure  \
-	    --prefix=/etc/nginx \
+	    --prefix=/usr/share/nginx \
 	    --conf-path=/etc/nginx/nginx.conf \
 	    --error-log-path=/var/log/nginx/error.log \
 	    --http-client-body-temp-path=/var/lib/nginx/body \

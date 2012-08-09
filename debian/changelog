@@ -6,7 +6,7 @@ nginx (1.2.3-1~dotdeb.0) stable; urgency=medium
 
  -- Guillaume Plessis <gui@dotdeb.org>  Tue, 07 Aug 2012 14:59:42 +0200
 
-nginx (1.2.2-0) UNRELEASED; urgency=medium
+nginx (1.2.3-0) UNRELEASED; urgency=medium
 
   * debian/nginx-common.nginx.init
     + Added --retry to start-stop-daemon. (Closes: #682360)
@@ -14,8 +14,13 @@ nginx (1.2.2-0) UNRELEASED; urgency=medium
     + Added some other modifications after testing. (LP: #1033856)
   * debian/rules:
     + Added -DFORTIFY_SOURCE=2 -fstack-protector to build flags. (Closes: #680712)
+  * debian/nginx-common.install:
+    + Moved default docs to /usr/share/nginx/html. (Closes: #1031515)
+  * debian/rules:
+    + Set prefix to /usr/share/nginx.
+  * New upstream release. (Closes: #683704)
 
- -- Michael Lustfield <michael@lustfield.net>  Wed, 08 Aug 2012 22:58:45 +0000
+ -- Michael Lustfield <michael@lustfield.net>  Wed, 08 Aug 2012 23:13:54 +0000
 
 nginx (1.2.1-2.2) unstable; urgency=low
 
