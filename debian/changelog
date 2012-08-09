@@ -11,10 +11,11 @@ nginx (1.2.2-0) UNRELEASED; urgency=medium
   * debian/nginx-common.nginx.init
     + Added --retry to start-stop-daemon. (Closes: #682360)
     + Added $named to Required-Start/Stop. (Closes: #679879)
+    + Added some other modifications after testing. (LP: #1033856)
   * debian/rules:
     + Added -DFORTIFY_SOURCE=2 -fstack-protector to build flags. (Closes: #680712)
 
- -- Michael Lustfield <michael@lustfield.net>  Sun, 05 Aug 2012 17:28:44 +0530
+ -- Michael Lustfield <michael@lustfield.net>  Wed, 08 Aug 2012 22:58:45 +0000
 
 nginx (1.2.1-2.2) unstable; urgency=low
 
