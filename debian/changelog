@@ -20,9 +20,11 @@ nginx (1.2.3-0) UNRELEASED; urgency=medium
     + Set prefix to /usr/share/nginx.
   * debian/po/fr.po
     + Updated French translation file. (Closes: #679601)
+  * debian/logrotate:
+    + Removed semicolon after an fi statement. (Closes: #683870)
   * New upstream release. (Closes: #683704)
 
- -- Michael Lustfield <michael@lustfield.net>  Wed, 08 Aug 2012 23:26:21 +0000
+ -- Michael Lustfield <michael@lustfield.net>  Wed, 08 Aug 2012 23:43:38 +0000
 
 nginx (1.2.1-2.2) unstable; urgency=low
 
