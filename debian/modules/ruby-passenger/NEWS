@@ -1,3 +1,25 @@
+Release 3.0.17
+--------------
+
+ * Fixed a Ruby 1.9 encoding-related bug in the memory measurer.
+   (Phusion Passenger Enterprise)
+ * Fixed OOM adjustment bugs on Linux.
+ * Fixed compilation problems on Fedora 18 and 19.
+ * Fixed compilation problems on SunOS.
+ * Fixed compilation problems on AIX. Contribution by Perry Smith.
+ * Fixed various compilation warnings.
+ * Upgraded preferred Nginx version to 1.2.3.
+
+3.0.16 was an unofficial hotfix release, and so its announcement had been skipped.
+
+
+Release 3.0.15
+--------------
+
+ * Updated documentation.
+ * Updated website links.
+
+
 Release 3.0.14
 --------------
 
