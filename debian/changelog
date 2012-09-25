@@ -1,3 +1,10 @@
+nginx (1.2.4-1~dotdeb.0) stable; urgency=medium
+
+  * New upstream release
+  * Passenger 3.0.17
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Tue, 25 Sep 2012 16:10:42 +0200
+
 nginx (1.2.3-1~dotdeb.0) stable; urgency=medium
 
   * Naxsi 0.48
