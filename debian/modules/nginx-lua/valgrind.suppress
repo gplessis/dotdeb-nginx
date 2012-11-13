@@ -1,5 +1,11 @@
 {
 <insert_a_suppression_name_here>
+Memcheck:Leak
+fun:malloc
+fun:ngx_alloc
+}
+{
+<insert_a_suppression_name_here>
 Memcheck:Addr1
 fun:ngx_init_cycle
 fun:ngx_master_process_cycle
@@ -12,46 +18,7 @@ fun:ngx_init_cycle
 fun:ngx_master_process_cycle
 fun:main
 }
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Param
-   socketcall.sendmsg(msg.msg_iov[i])
-   fun:sendmsg
-   fun:ngx_write_channel
-   fun:ngx_signal_worker_processes
-   fun:ngx_master_process_cycle
-   fun:main
-}
-{
-<insert_a_suppression_name_here>
-Memcheck:Param
-socketcall.sendmsg(msg.msg_iov[i])
-fun:__sendmsg_nocancel
-fun:ngx_write_channel
-fun:ngx_signal_worker_processes
-fun:ngx_master_process_cycle
-fun:main
-}
-{
-<insert_a_suppression_name_here>
-Memcheck:Param
-socketcall.sendmsg(msg.msg_iov[i])
-fun:__sendmsg_nocancel
-fun:ngx_write_channel
-fun:ngx_master_process_cycle
-fun:main
-}
-{
-<insert_a_suppression_name_here>
-Memcheck:Param
-socketcall.sendmsg(msg.msg_iov[i])
-fun:__sendmsg_nocancel
-fun:ngx_write_channel
-fun:ngx_pass_open_channel
-fun:ngx_start_worker_processes
-fun:ngx_master_process_cycle
-fun:main
-}
+
 {
    <insert_a_suppression_name_here>
    Memcheck:Cond
@@ -400,16 +367,6 @@ fun:ngx_http_lua_ngx_echo
 }
 {
    <insert_a_suppression_name_here>
-   Memcheck:Param
-   socketcall.sendmsg(msg.msg_iov[i])
-   fun:__sendmsg_nocancel
-   fun:ngx_write_channel
-   fun:ngx_signal_worker_processes
-   fun:ngx_master_process_cycle
-   fun:main
-}
-{
-   <insert_a_suppression_name_here>
    Memcheck:Leak
    fun:malloc
    fun:ngx_alloc
@@ -589,4 +546,3 @@ fun:ngx_http_lua_ngx_echo
    fun:ngx_palloc_block
    fun:ngx_palloc
 }
-

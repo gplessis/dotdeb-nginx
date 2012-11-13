@@ -14,12 +14,13 @@ plan tests => repeat_each() * (blocks() * 2 + 20);
 our $HtmlDir = html_dir;
 #warn $html_dir;
 
-$ENV{LUA_CPATH} = "/home/lz/luax/?.so;;";
-
 #no_diff();
 #no_long_string();
 
 $ENV{TEST_NGINX_MEMCACHED_PORT} ||= 11211;
+
+#no_shuffle();
+no_long_string();
 
 run_tests();
 

@@ -3,7 +3,7 @@
 use lib 'lib';
 use Test::Nginx::Socket;
 
-repeat_each(2);
+#repeat_each(2);
 
 plan tests => repeat_each() * 87;
 
@@ -71,6 +71,7 @@ __DATA__
         content_by_lua 'ngx.say("foo")';
         more_clear_headers Date;
     }
+
 --- request
 GET /t
 --- response_body
@@ -243,6 +244,7 @@ attempt to send data on a closed socket:
             end
         ';
     }
+
 --- request
 GET /t
 --- response_body
@@ -282,8 +284,8 @@ connect: nil connection refused
 send: nil closed
 receive: nil closed
 close: nil closed
---- error_log
-connect() failed (111: Connection refused)
+--- error_log eval
+qr/connect\(\) failed \(\d+: Connection refused\)/
 
 
 
@@ -297,7 +299,7 @@ connect() failed (111: Connection refused)
     location /test {
         content_by_lua '
             local sock = ngx.socket.tcp()
-            local ok, err = sock:connect("taobao.com", 16787)
+            local ok, err = sock:connect("google.com", 16787)
             ngx.say("connect: ", ok, " ", err)
 
             local bytes
@@ -430,7 +432,7 @@ attempt to send data on a closed socket
 --- request
 GET /t
 --- response_body_like
-^failed to connect: blah-blah-not-found\.agentzh\.org could not be resolved(?: \(110: Operation timed out\))?
+^failed to connect: blah-blah-not-found\.agentzh\.org could not be resolved(?: \(\d+: Operation timed out\))?
 connected: nil
 failed to send request: closed$
 --- error_log
@@ -965,10 +967,17 @@ close: nil closed
     }
 --- request
     GET /test
+
+--- stap2
+M(http-lua-info) {
+    printf("tcp resume: %p\n", $coctx)
+    print_ubacktrace()
+}
+
 --- response_body
 failed to connect: connection refused
---- error_log
-connect() failed (111: Connection refused)
+--- error_log eval
+qr/connect\(\) failed \(\d+: Connection refused\)/
 
 
 
@@ -1165,6 +1174,12 @@ function go(port)
         ngx.say("failed to receive a line: ", err, " [", part, "]")
     end
 end
+
+--- stap2
+M(http-lua-info) {
+    printf("tcp resume\n")
+    print_ubacktrace()
+}
 --- request
 GET /t
 --- response_body_like eval

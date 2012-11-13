@@ -5,7 +5,7 @@ use Test::Nginx::Socket;
 #worker_connections(1014);
 #master_on();
 #workers(2);
-#log_level('warn');
+log_level('warn');
 
 repeat_each(2);
 #repeat_each(1);
@@ -16,6 +16,7 @@ no_root_location();
 
 $ENV{TEST_NGINX_CLIENT_PORT} ||= $ENV{TEST_NGINX} ||= server_port();
 
+#no_shuffle();
 #no_diff();
 no_long_string();
 run_tests();
@@ -114,7 +115,7 @@ b r = 4a 2
 
 === TEST 4: empty
 --- config
-    location /lua {
+    location /t {
         content_by_lua '
             local args = ngx.req.get_uri_args()
             local keys = {}
@@ -131,7 +132,7 @@ b r = 4a 2
         ';
     }
 --- request
-GET /lua
+GET /t
 --- response_body
 done
 
@@ -358,7 +359,7 @@ done
             ngx.req.set_uri_args("hello")
             ngx.req.set_uri("/bar", true);
         ';
-        proxy_pass http://www.taobao.com:5678;
+        proxy_pass http://google.com:5678;
     }
 --- request
     GET /foo?world
@@ -440,7 +441,7 @@ foo: /bar?hello
 --- request
     GET /foo?world
 --- response_body
-err: [string "ngx.req.set_uri"]:1: attempt to use zero-length uri
+err: attempt to use zero-length uri
 foo: /foo?world
 
 
@@ -497,7 +498,7 @@ HTTP/1.0 ca%20t=%25
             ngx.req.set_uri("/bar", true);
             ngx.exit(503)
         ';
-        proxy_pass http://www.taobao.com:5678;
+        proxy_pass http://google.com:5678;
     }
 --- request
     GET /foo?world
@@ -523,7 +524,7 @@ hello
 --- request
     GET /foo?world
 --- response_body
-err: [string "ngx.req.set_uri"]:1: API disabled in the context of access_by_lua*
+err: API disabled in the context of access_by_lua*
 
 
 
@@ -562,7 +563,7 @@ uri: /bar
 --- request
     GET /foo?world
 --- response_body
-err: [string "ngx.req.set_uri"]:1: API disabled in the context of content_by_lua*
+err: API disabled in the context of content_by_lua*
 
 
 
@@ -602,7 +603,7 @@ uri: /bar
 --- request
     GET /foo?world
 --- response_body
-err: [string "ngx.req.set_uri"]:1: API disabled in the context of set_by_lua*
+err: API disabled in the context of set_by_lua*
 
 
 
@@ -769,6 +770,7 @@ bar = 4
 foo = 3
 --- error_log
 lua hit query args limit 2
+--- log_level: debug
 
 
 
@@ -795,6 +797,7 @@ bar = true
 foo = 3
 --- error_log
 lua hit query args limit 2
+--- log_level: debug
 
 
 
@@ -823,6 +826,7 @@ foo = 3
 done
 --- error_log
 lua hit query args limit 2
+--- log_level: debug
 
 
 
@@ -870,6 +874,7 @@ CORE::join("", @k);
 --- timeout: 4
 --- error_log
 lua hit query args limit 100
+--- log_level: debug
 
 
 
@@ -917,6 +922,7 @@ CORE::join("", @k);
 --- timeout: 4
 --- error_log
 lua hit query args limit 102
+--- log_level: debug
 
 
 

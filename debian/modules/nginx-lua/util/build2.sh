@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # this file is mostly meant to be used by the author himself.
 
@@ -43,6 +43,7 @@ time ngx-build $force $version \
                 --add-module=$home/work/nginx/ngx_http_upstream_keepalive-0.7 \
                 --add-module=$root/../rds-json-nginx-module \
                 --add-module=$root/../coolkit-nginx-module \
+                --add-module=$root/../redis2-nginx-module \
           --with-select_module \
           --with-poll_module \
           --with-rtsig_module \

@@ -143,8 +143,6 @@ ngx_http_lua_header_filter_inline(ngx_http_request_t *r)
     ngx_http_lua_loc_conf_t     *llcf;
     char                        *err;
 
-    dd("HERE");
-
     llcf = ngx_http_get_module_loc_conf(r, ngx_http_lua_module);
     lmcf = ngx_http_get_module_main_conf(r, ngx_http_lua_module);
 
@@ -263,17 +261,10 @@ ngx_http_lua_header_filter(ngx_http_request_t *r)
     dd("ctx = %p", ctx);
 
     if (ctx == NULL) {
-        ctx = ngx_pcalloc(r->pool, sizeof(ngx_http_lua_ctx_t));
+        ctx = ngx_http_lua_create_ctx(r);
         if (ctx == NULL) {
-            return NGX_HTTP_INTERNAL_SERVER_ERROR;
+            return NGX_ERROR;
         }
-
-        dd("setting new ctx: ctx = %p", ctx);
-
-        ctx->cc_ref = LUA_NOREF;
-        ctx->ctx_ref = LUA_NOREF;
-
-        ngx_http_set_ctx(r, ctx, ngx_http_lua_module);
     }
 
     if (ctx->cleanup == NULL) {

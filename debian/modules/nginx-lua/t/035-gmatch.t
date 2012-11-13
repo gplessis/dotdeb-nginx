@@ -7,7 +7,7 @@ use Test::Nginx::Socket;
 #workers(2);
 #log_level('warn');
 
-repeat_each(2);
+repeat_each(5);
 
 plan tests => repeat_each() * (blocks() * 2 + 1);
 
@@ -311,6 +311,10 @@ baz
     }
 --- request
     GET /re
+--- stap2
+F(ngx_http_lua_ngx_re_gmatch_iterator) { println("iterator") }
+F(ngx_http_lua_ngx_re_gmatch_gc) { println("gc") }
+F(ngx_http_lua_ngx_re_gmatch_cleanup) { println("cleanup") }
 --- response_body
 hello
 okay
@@ -481,4 +485,29 @@ matched
 sr failed: 500
 --- error_log
 attempt to use ngx.re.gmatch iterator in a request that did not create it
+
+
+
+=== TEST 20: gmatch (empty matched string)
+--- config
+    location /re {
+        content_by_lua '
+            for m in ngx.re.gmatch("hello", "a|") do
+                if m then
+                    ngx.say("matched: [", m[0], "]")
+                else
+                    ngx.say("not matched: ", m)
+                end
+            end
+        ';
+    }
+--- request
+    GET /re
+--- response_body
+matched: []
+matched: []
+matched: []
+matched: []
+matched: []
+matched: []
 

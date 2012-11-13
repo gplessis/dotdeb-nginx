@@ -3,9 +3,9 @@
 use lib 'lib';
 use Test::Nginx::Socket;
 
-repeat_each(10);
+repeat_each(2);
 
-plan tests => repeat_each() * (3 * blocks() + 4);
+plan tests => repeat_each() * (3 * blocks() + 6);
 
 our $HtmlDir = html_dir;
 
@@ -188,8 +188,8 @@ GET /t
 --- response_body
 connected
 failed to receive data: connection refused
---- error_log
-recv() failed (111: Connection refused)
+--- error_log eval
+qr/recv\(\) failed \(\d+: Connection refused\)/
 
 
 
@@ -252,6 +252,13 @@ function get_udp()
 
     return udp
 end
+
+--- stap2
+M(http-lua-info) {
+    printf("tcp resume: %p\n", $coctx)
+    print_ubacktrace()
+}
+
 --- request
 GET /main
 --- response_body_like: \b500\b
@@ -491,4 +498,158 @@ GET /t
 --- log_level: debug
 --- error_log
 lua udp socket receive buffer size: 1400
+
+
+
+=== TEST 9: read timeout and resend
+--- config
+    location = /t {
+        content_by_lua '
+            local udp = ngx.socket.udp()
+            udp:settimeout(30)
+            local ok, err = udp:setpeername("127.0.0.1", 19232)
+            if not ok then
+                ngx.say("failed to setpeername: ", err)
+                return
+            end
+            local ok, err = udp:send("blah")
+            if not ok then
+                ngx.say("failed to send: ", err)
+                return
+            end
+            for i = 1, 2 do
+                local data, err = udp:receive()
+                if err == "timeout" then
+                    -- continue
+                else
+                    if not data then
+                        ngx.say("failed to receive: ", err)
+                        return
+                    end
+                    ngx.say("received: ", data)
+                    return
+                end
+            end
+
+            ngx.say("timed out")
+        ';
+    }
+--- udp_listen: 19232
+--- udp_reply: hello world
+--- udp_reply_delay: 45ms
+--- request
+GET /t
+--- response_body
+received: hello world
+--- error_log
+lua udp socket read timed out
+
+
+
+=== TEST 10: access the google DNS server (using IP addr)
+--- config
+    server_tokens off;
+    location /t {
+        content_by_lua '
+            local socket = ngx.socket
+            -- local socket = require "socket"
+
+            local udp = socket.udp()
+
+            udp:settimeout(2000) -- 2 sec
+
+            local ok, err = udp:setpeername("8.8.8.8", 53)
+            if not ok then
+                ngx.say("failed to connect: ", err)
+                return
+            end
+
+            local req = "\\0}\\1\\0\\0\\1\\0\\0\\0\\0\\0\\0\\3www\\6google\\3com\\0\\0\\1\\0\\1"
+
+            -- ngx.print(req)
+            -- do return end
+
+            local ok, err = udp:send(req)
+            if not ok then
+                ngx.say("failed to send: ", err)
+                return
+            end
+
+            local data, err = udp:receive()
+            if not data then
+                ngx.say("failed to receive data: ", err)
+                return
+            end
+
+            if string.match(data, "\\3www\\6google\\3com") then
+                ngx.say("received a good response.")
+            else
+                ngx.say("received a bad response: ", #data, " bytes: ", data)
+            end
+        ';
+    }
+--- request
+GET /t
+--- response_body
+received a good response.
+--- no_error_log
+[error]
+--- log_level: debug
+--- error_log
+lua udp socket receive buffer size: 8192
+
+
+
+=== TEST 11: access the google DNS server (using domain names)
+--- config
+    server_tokens off;
+    resolver $TEST_NGINX_RESOLVER;
+    location /t {
+        content_by_lua '
+            local socket = ngx.socket
+            -- local socket = require "socket"
+
+            local udp = socket.udp()
+
+            udp:settimeout(2000) -- 2 sec
+
+            local ok, err = udp:setpeername("google-public-dns-a.google.com", 53)
+            if not ok then
+                ngx.say("failed to connect: ", err)
+                return
+            end
+
+            local req = "\\0}\\1\\0\\0\\1\\0\\0\\0\\0\\0\\0\\3www\\6google\\3com\\0\\0\\1\\0\\1"
+
+            -- ngx.print(req)
+            -- do return end
+
+            local ok, err = udp:send(req)
+            if not ok then
+                ngx.say("failed to send: ", err)
+                return
+            end
+
+            local data, err = udp:receive()
+            if not data then
+                ngx.say("failed to receive data: ", err)
+                return
+            end
+
+            if string.match(data, "\\3www\\6google\\3com") then
+                ngx.say("received a good response.")
+            else
+                ngx.say("received a bad response: ", #data, " bytes: ", data)
+            end
+        ';
+    }
+--- request
+GET /t
+--- response_body
+received a good response.
+--- no_error_log
+[error]
+--- log_level: debug
+--- error_log
+lua udp socket receive buffer size: 8192
 

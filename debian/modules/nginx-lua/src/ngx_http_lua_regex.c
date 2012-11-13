@@ -773,11 +773,6 @@ compiled:
 
     ctx = lua_newuserdata(L, sizeof(ngx_http_lua_regex_ctx_t));
 
-    lua_createtable(L, 0 /* narr */, 1 /* nrec */); /* metatable */
-    lua_pushcfunction(L, ngx_http_lua_ngx_re_gmatch_gc);
-    lua_setfield(L, -2, "__gc");
-    lua_setmetatable(L, -2);
-
     ctx->request = r;
     ctx->regex = re_comp.regex;
     ctx->regex_sd = sd;
@@ -787,6 +782,11 @@ compiled:
     ctx->flags = (uint8_t) flags;
 
     if (!(flags & NGX_LUA_RE_COMPILE_ONCE)) {
+        lua_createtable(L, 0 /* narr */, 1 /* nrec */); /* metatable */
+        lua_pushcfunction(L, ngx_http_lua_ngx_re_gmatch_gc);
+        lua_setfield(L, -2, "__gc");
+        lua_setmetatable(L, -2);
+
         cln = ngx_http_cleanup_add(r, 0);
         if (cln == NULL) {
             return luaL_error(L, "out of memory");
@@ -795,6 +795,9 @@ compiled:
         cln->handler = ngx_http_lua_ngx_re_gmatch_cleanup;
         cln->data = ctx;
         ctx->cleanup = &cln->handler;
+
+    } else {
+        ctx->cleanup = NULL;
     }
 
     lua_pushinteger(L, 0);
@@ -941,7 +944,11 @@ ngx_http_lua_ngx_re_gmatch_iterator(lua_State *L)
     }
 
     offset = cap[1];
-    if (offset == (ssize_t) subj.len) {
+    if (offset == cap[0]) {
+        offset++;
+    }
+
+    if (offset > (ssize_t) subj.len) {
         offset = -1;
 
         if (!(ctx->flags & NGX_LUA_RE_COMPILE_ONCE)) {
@@ -1080,6 +1087,7 @@ ngx_http_lua_ngx_re_sub_helper(lua_State *L, unsigned global)
     int                          type;
     unsigned                     func;
     int                          offset;
+    int                          cp_offset;
     size_t                       count;
     luaL_Buffer                  luabuf;
     ngx_int_t                    flags;
@@ -1432,12 +1440,9 @@ ngx_http_lua_ngx_re_sub_helper(lua_State *L, unsigned global)
 exec:
     count = 0;
     offset = 0;
+    cp_offset = 0;
 
     for (;;) {
-        if (subj.len == 0) {
-            break;
-        }
-
         if (flags & NGX_LUA_RE_MODE_DFA) {
 
 #if LUA_HAVE_PCRE_DFA
@@ -1487,7 +1492,7 @@ exec:
         }
 
         if (func) {
-            lua_pushvalue(L, -1);
+            lua_pushvalue(L, 3);
 
             lua_createtable(L, rc - 1 /* narr */, 1 /* nrec */);
 
@@ -1524,14 +1529,23 @@ exec:
                     return luaL_argerror(L, 3, msg);
             }
 
-            luaL_addlstring(&luabuf, (char *) &subj.data[offset],
-                    cap[0] - offset);
+            lua_insert(L, 1);
+
+            luaL_addlstring(&luabuf, (char *) &subj.data[cp_offset],
+                    cap[0] - cp_offset);
 
             luaL_addlstring(&luabuf, (char *) tpl.data, tpl.len);
 
-            lua_pop(L, 1);
+            lua_remove(L, 1);
 
-            offset = cap[1];
+            cp_offset = cap[1];
+            offset = cp_offset;
+            if (offset == cap[0]) {
+                offset++;
+                if (offset > (ssize_t) subj.len) {
+                    break;
+                }
+            }
 
             if (global) {
                 continue;
@@ -1540,7 +1554,7 @@ exec:
             break;
         }
 
-        rc = ngx_http_lua_complex_value(r, &subj, offset, rc, cap, ctpl,
+        rc = ngx_http_lua_complex_value(r, &subj, cp_offset, rc, cap, ctpl,
                 &luabuf);
 
         if (rc != NGX_OK) {
@@ -1549,7 +1563,14 @@ exec:
             goto error;
         }
 
-        offset = cap[1];
+        cp_offset = cap[1];
+        offset = cp_offset;
+        if (offset == cap[0]) {
+            offset++;
+            if (offset > (ssize_t) subj.len) {
+                break;
+            }
+        }
 
         if (global) {
             continue;
@@ -1563,7 +1584,7 @@ exec:
         lua_settop(L, 1);
 
     } else {
-        if (offset != (int) subj.len) {
+        if (offset < (int) subj.len) {
             dd("adding trailer: %s (len %d)", &subj.data[offset],
                     (int) (subj.len - offset));
 
@@ -1720,7 +1741,6 @@ ngx_http_lua_ngx_re_gmatch_cleanup(void *data)
 
     if (ctx) {
         if (ctx->regex_sd) {
-            dd("free study data");
             ngx_http_lua_regex_free_study_data(ctx->request->pool,
                                                ctx->regex_sd);
             ctx->regex_sd = NULL;
