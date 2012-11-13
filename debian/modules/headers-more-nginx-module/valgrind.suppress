@@ -3,6 +3,19 @@
 Memcheck:Leak
 fun:malloc
 fun:ngx_alloc
+obj:*
+}
+{
+<insert_a_suppression_name_here>
+Memcheck:Leak
+fun:malloc
+fun:ngx_alloc
+}
+{
+<insert_a_suppression_name_here>
+Memcheck:Leak
+fun:malloc
+fun:ngx_alloc
 fun:ngx_palloc_large
 fun:ngx_palloc
 }
@@ -13,7 +26,6 @@ fun:ngx_palloc
    fun:ngx_alloc
    fun:ngx_calloc
    fun:ngx_event_process_init
-   fun:ngx_single_process_cycle
 }
 {
 <insert_a_suppression_name_here>
@@ -101,8 +113,6 @@ fun:ngx_http_lua_get_output_header
    fun:malloc
    fun:ngx_alloc
    fun:ngx_event_process_init
-   fun:ngx_single_process_cycle
-   fun:main
 }
 {
    nginx-core-crc32-init
@@ -123,8 +133,6 @@ fun:ngx_http_lua_get_output_header
    fun:ngx_http_init_request
    fun:ngx_epoll_process_events
    fun:ngx_process_events_and_timers
-   fun:ngx_single_process_cycle
-   fun:main
 }
 {
    palloc_large_for_create_temp_buf
@@ -137,8 +145,6 @@ fun:ngx_http_lua_get_output_header
    fun:ngx_http_init_request
    fun:ngx_epoll_process_events
    fun:ngx_process_events_and_timers
-   fun:ngx_single_process_cycle
-   fun:main
 }
 {
    accept_create_pool
@@ -150,8 +156,6 @@ fun:ngx_http_lua_get_output_header
    fun:ngx_event_accept
    fun:ngx_epoll_process_events
    fun:ngx_process_events_and_timers
-   fun:ngx_single_process_cycle
-   fun:main
 }
 {
    create_pool_for_init_req
@@ -163,8 +167,6 @@ fun:ngx_http_lua_get_output_header
    fun:ngx_http_init_request
    fun:ngx_epoll_process_events
    fun:ngx_process_events_and_timers
-   fun:ngx_single_process_cycle
-   fun:main
 }
 {
    <insert_a_suppression_name_here>
@@ -182,7 +184,5 @@ fun:ngx_http_lua_get_output_header
    fun:gcov_exit
    fun:exit
    fun:ngx_master_process_exit
-   fun:ngx_single_process_cycle
-   fun:main
 }
 
