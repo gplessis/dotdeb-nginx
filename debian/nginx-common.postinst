@@ -15,6 +15,11 @@ case "$1" in
     if [ -x /bin/systemctl ]; then
       systemctl enable nginx.service >/dev/null 2>&1 || true
     fi
+    # If a symlink doesn't exist and can be created, then create it.
+    if [ -z $2 ] && [ ! -e /etc/nginx/sites-enabled/default ] &&
+       [ -d /etc/nginx/sites-enabled ] && [ -d /etc/nginx/sites-available ]; then
+      ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+    fi
     ;;
 
   abort-upgrade|abort-remove|abort-deconfigure)

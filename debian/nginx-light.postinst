@@ -2,13 +2,7 @@
 set -e
 
 case "$1" in
-  configure)
-    if [ -z $2 ] && [ ! -e /etc/nginx/sites-enabled/default ]; then
-      ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
-    fi
-    ;;
-
-  abort-upgrade|abort-remove|abort-deconfigure)
+  abort-upgrade|abort-remove|abort-deconfigure|configure)
     ;;
 
   *)

@@ -2,12 +2,12 @@
 # Copyright (C) 2012 Cyril Lavier
 # This file is distributed under the same license as the nginx-naxsi-ui package.
 # Copyright (C) of this file 2012 Chris Leick.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: nginx 1.2.0-2\n"
 "Report-Msgid-Bugs-To: nginx@packages.debian.org\n"
-"POT-Creation-Date: 2012-07-12 12:34-0600\n"
+"POT-Creation-Date: 2012-11-04 09:03+0530\n"
 "PO-Revision-Date: 2012-06-13 23:11+0200\n"
 "Last-Translator: Chris Leick <c.leick@vollbio.de>\n"
 "Language-Team: German <debian-l10n-german@lists.debian.org>\n"

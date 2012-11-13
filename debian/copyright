@@ -70,7 +70,7 @@ Copyright: 2009-2011, FRiCKLE <info@frickle.com>,
 License:
  Same as upstream license.
 
-Files: modules/nginx-dav-ext-module/
+Files: modules/nginx-dav-ext-module
 Copyright: 2012, Arutyunyan Roman <arut@qip.ru>
 License:
  Same as upstream license.
