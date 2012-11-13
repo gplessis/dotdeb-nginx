@@ -72,3 +72,7 @@ README for Modules versions
     rm -rf debian/ rpm/ test/ .pc/
     cd ..
     rsync -av ruby-passenger-3.0.14/ /path/to/nginx/debian/modules/ruby-passenger
+
+nginx-pinba
+  Homepage: http://pinba.org/
+  Version: 201211132155
