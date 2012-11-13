@@ -4,6 +4,7 @@ nginx (1.2.5-1~dotdeb.0) UNRELEASED; urgency=medium
   * chunkin-nginx-module 0.23rc2-3-e57a7ab9
   * headers-more-nginx-module v0.18-179f39b1
   * nginx-development-kit v0.2.17-7-f92d6c6a
+  * nginx-echo v0.41-b1e519fe
 
  -- Guillaume Plessis <gui@dotdeb.org>  Tue, 13 Nov 2012 10:22:42 -0800
 

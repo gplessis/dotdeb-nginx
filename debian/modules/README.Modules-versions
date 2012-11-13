@@ -22,7 +22,7 @@ README for Modules versions
 
  nginx-echo
   https://github.com/agentzh/echo-nginx-module
-  Version: v0.38rc2-7-g080c0a1
+  Version: v0.41-b1e519fe
 
  nginx-lua
   Homepage: https://github.com/chaoslawful/lua-nginx-module
