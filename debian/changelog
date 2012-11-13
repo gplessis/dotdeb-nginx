@@ -1,5 +1,6 @@
-nginx (1.2.5-1~dotdeb.0) UNRELEASED; urgency=medium
+nginx (1.2.5-1~dotdeb.0) stable; urgency=medium
 
+  * New upstream release
   * Adds the Pinba module to nginx-full, nginx-passenger and nginx-extras
   * Adds nginx-http-substitution-filter v0.6.2-6aa992a2 to nginx-full, 
     nginx-passenger and nginx-extras
