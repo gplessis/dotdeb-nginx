@@ -33,7 +33,15 @@ module BaseTestCase
   end
 
   def nginx_executable
-    return ENV['NGINX_EXEC'].nil? ? "/usr/local/nginx/sbin/nginx" : ENV['NGINX_EXEC']
+    if is_to_use_memory_check
+      return "valgrind --show-reachable=yes --trace-children=yes --time-stamp=yes --leak-check=full --log-file=mld_#{method_name_for_test}.log #{ENV['NGINX_EXEC'].nil? ? "/usr/local/nginx/sbin/nginx" : ENV['NGINX_EXEC']}"
+    else
+      return ENV['NGINX_EXEC'].nil? ? "/usr/local/nginx/sbin/nginx" : ENV['NGINX_EXEC']
+    end
+  end
+
+  def is_to_use_memory_check
+    !ENV['CHECK_MEMORY'].nil? and !`which valgrind`.empty?
   end
 
   def nginx_address
@@ -216,10 +224,16 @@ module BaseTestCase
     TCPSocket.open(nginx_host, nginx_port)
   end
 
-  def read_response(socket)
-    response = socket.readpartial(1)
+  def read_response(socket, wait_for=nil)
+    response ||= socket.readpartial(1)
     while (tmp = socket.read_nonblock(256))
       response += tmp
+    end
+  rescue Errno::EAGAIN => e
+    headers, body = (response || "").split("\r\n\r\n", 2)
+    if !wait_for.nil? && (body.nil? || body.empty? || !body.include?(wait_for))
+      IO.select([socket])
+      retry
     end
   ensure
     fail("Any response") if response.nil?
@@ -299,6 +313,8 @@ http {
     # (publisher) may do it?
     <%= "push_stream_authorized_channels_only #{@authorized_channels_only};" unless @authorized_channels_only.nil? %>
     <%= "push_stream_broadcast_channel_max_qtd #{@broadcast_channel_max_qtd};" unless @broadcast_channel_max_qtd.nil? %>
+
+    <%= "push_stream_allowed_origins #{@allowed_origins};" unless @allowed_origins.nil? %>
 
     server {
         listen          <%=nginx_port%>;

@@ -22,6 +22,7 @@ class TestSubscriberPolling < Test::Unit::TestCase
         assert_equal(304, sub_1.response_header.status, "Wrong status")
         assert_equal("", sub_1.response_header['LAST_MODIFIED'].to_s, "Wrong header")
         assert_equal("", sub_1.response_header['ETAG'].to_s, "Wrong header")
+        assert_equal(0, sub_1.response_header.content_length, "Wrong response")
         EventMachine.stop
       }
 
@@ -41,6 +42,7 @@ class TestSubscriberPolling < Test::Unit::TestCase
         assert_equal(304, sub_1.response_header.status, "Wrong status")
         assert_equal(headers['If-Modified-Since'], sub_1.response_header['LAST_MODIFIED'].to_s, "Wrong header")
         assert_equal(headers['If-None-Match'], sub_1.response_header['ETAG'].to_s, "Wrong header")
+        assert_equal(0, sub_1.response_header.content_length, "Wrong response")
         EventMachine.stop
       }
 
@@ -88,10 +90,11 @@ class TestSubscriberPolling < Test::Unit::TestCase
         sub_2 = EventMachine::HttpRequest.new(nginx_address + '/sub/' + channel.to_s).get :head => headers, :timeout => 30
         sub_2.callback {
           assert_equal(304, sub_2.response_header.status, "Wrong status")
+          assert_equal(0, sub_2.response_header.content_length, "Wrong response")
           assert_equal(sub_1.response_header['LAST_MODIFIED'], sub_2.response_header['LAST_MODIFIED'].to_s, "Wrong header")
           assert_equal(sub_1.response_header['ETAG'], sub_2.response_header['ETAG'].to_s, "Wrong header")
 
-          sleep (1) # to publish the second message in a different second from the first
+          sleep(1) # to publish the second message in a different second from the first
           publish_message_inline(channel, {'accept' => 'text/html'}, body + "1")
 
           headers.merge!({'If-Modified-Since' => sub_2.response_header['LAST_MODIFIED'], 'If-None-Match' => sub_2.response_header['ETAG']})
@@ -132,10 +135,11 @@ class TestSubscriberPolling < Test::Unit::TestCase
         sub_2 = EventMachine::HttpRequest.new(nginx_address + '/sub/' + channel.to_s).get :head => headers, :timeout => 30
         sub_2.callback {
           assert_equal(304, sub_2.response_header.status, "Wrong status")
+          assert_equal(0, sub_2.response_header.content_length, "Wrong response")
           assert_equal(sub_1.response_header['LAST_MODIFIED'], sub_2.response_header['LAST_MODIFIED'].to_s, "Wrong header")
           assert_equal(sub_1.response_header['ETAG'], sub_2.response_header['ETAG'].to_s, "Wrong header")
 
-          sleep (1) # to publish the second message in a different second from the first
+          sleep(1) # to publish the second message in a different second from the first
           publish_message_inline(channel, {'accept' => 'text/html'}, body + "3")
 
           headers.merge!({'If-Modified-Since' => sub_2.response_header['LAST_MODIFIED'], 'If-None-Match' => sub_2.response_header['ETAG']})
@@ -177,10 +181,11 @@ class TestSubscriberPolling < Test::Unit::TestCase
         sub_2 = EventMachine::HttpRequest.new(nginx_address + '/sub/' + channel.to_s).get :head => headers, :timeout => 30
         sub_2.callback {
           assert_equal(304, sub_2.response_header.status, "Wrong status")
+          assert_equal(0, sub_2.response_header.content_length, "Wrong response")
           assert_equal(sub_1.response_header['LAST_MODIFIED'], sub_2.response_header['LAST_MODIFIED'].to_s, "Wrong header")
           assert_equal(sub_1.response_header['ETAG'], sub_2.response_header['ETAG'].to_s, "Wrong header")
 
-          sleep (1) # to publish the second message in a different second from the first
+          sleep(1) # to publish the second message in a different second from the first
           publish_message_inline(channel, {'accept' => 'text/html'}, body + "3")
 
           headers.merge!({'If-Modified-Since' => sub_2.response_header['LAST_MODIFIED'], 'If-None-Match' => sub_2.response_header['ETAG']})
@@ -221,10 +226,11 @@ class TestSubscriberPolling < Test::Unit::TestCase
         sub_2 = EventMachine::HttpRequest.new(nginx_address + '/sub/' + channel_2.to_s + '/' + channel_1.to_s).get :head => headers, :timeout => 30
         sub_2.callback {
           assert_equal(304, sub_2.response_header.status, "Wrong status")
+          assert_equal(0, sub_2.response_header.content_length, "Wrong response")
           assert_equal(sub_1.response_header['LAST_MODIFIED'], sub_2.response_header['LAST_MODIFIED'].to_s, "Wrong header")
           assert_equal(sub_1.response_header['ETAG'], sub_2.response_header['ETAG'].to_s, "Wrong header")
 
-          sleep (1) # to publish the second message in a different second from the first
+          sleep(1) # to publish the second message in a different second from the first
           publish_message_inline(channel_1, {'accept' => 'text/html'}, body + "1_1")
 
           headers.merge!({'If-Modified-Since' => sub_2.response_header['LAST_MODIFIED'], 'If-None-Match' => sub_2.response_header['ETAG']})
@@ -239,10 +245,11 @@ class TestSubscriberPolling < Test::Unit::TestCase
             sub_4 = EventMachine::HttpRequest.new(nginx_address + '/sub/' + channel_2.to_s + '/' + channel_1.to_s).get :head => headers, :timeout => 30
             sub_4.callback {
               assert_equal(304, sub_4.response_header.status, "Wrong status")
+              assert_equal(0, sub_4.response_header.content_length, "Wrong response")
               assert_equal(sub_3.response_header['LAST_MODIFIED'], sub_4.response_header['LAST_MODIFIED'].to_s, "Wrong header")
               assert_equal(sub_3.response_header['ETAG'], sub_4.response_header['ETAG'].to_s, "Wrong header")
 
-              sleep (1) # to publish the second message in a different second from the first
+              sleep(1) # to publish the second message in a different second from the first
               publish_message_inline(channel_2, {'accept' => 'text/html'}, body + "1_2")
 
               headers.merge!({'If-Modified-Since' => sub_4.response_header['LAST_MODIFIED'], 'If-None-Match' => sub_4.response_header['ETAG']})
@@ -279,6 +286,7 @@ class TestSubscriberPolling < Test::Unit::TestCase
         assert_equal(304, sub_1.response_header.status, "Wrong status")
         assert_equal("", sub_1.response_header['LAST_MODIFIED'].to_s, "Wrong header")
         assert_equal("", sub_1.response_header['ETAG'].to_s, "Wrong header")
+        assert_equal(0, sub_1.response_header.content_length, "Wrong response")
         EventMachine.stop
       }
 
@@ -302,6 +310,7 @@ class TestSubscriberPolling < Test::Unit::TestCase
         assert_equal(304, sub_1.response_header.status, "Wrong status")
         assert_equal(headers['If-Modified-Since'], sub_1.response_header['LAST_MODIFIED'].to_s, "Wrong header")
         assert_equal(headers['If-None-Match'], sub_1.response_header['ETAG'].to_s, "Wrong header")
+        assert_equal(0, sub_1.response_header.content_length, "Wrong response")
         EventMachine.stop
       }
 
@@ -357,10 +366,11 @@ class TestSubscriberPolling < Test::Unit::TestCase
         sub_2 = EventMachine::HttpRequest.new(nginx_address + '/sub/' + channel.to_s).get :head => headers, :timeout => 30
         sub_2.callback {
           assert_equal(304, sub_2.response_header.status, "Wrong status")
+          assert_equal(0, sub_2.response_header.content_length, "Wrong response")
           assert_equal(sub_1.response_header['LAST_MODIFIED'], sub_2.response_header['LAST_MODIFIED'].to_s, "Wrong header")
           assert_equal(sub_1.response_header['ETAG'], sub_2.response_header['ETAG'].to_s, "Wrong header")
 
-          sleep (1) # to publish the second message in a different second from the first
+          sleep(1) # to publish the second message in a different second from the first
           publish_message_inline(channel, {'accept' => 'text/html'}, body + "1")
 
           headers.merge!({'If-Modified-Since' => sub_2.response_header['LAST_MODIFIED'], 'If-None-Match' => sub_2.response_header['ETAG']})
@@ -405,10 +415,11 @@ class TestSubscriberPolling < Test::Unit::TestCase
         sub_2 = EventMachine::HttpRequest.new(nginx_address + '/sub/' + channel.to_s).get :head => headers, :timeout => 30
         sub_2.callback {
           assert_equal(304, sub_2.response_header.status, "Wrong status")
+          assert_equal(0, sub_2.response_header.content_length, "Wrong response")
           assert_equal(sub_1.response_header['LAST_MODIFIED'], sub_2.response_header['LAST_MODIFIED'].to_s, "Wrong header")
           assert_equal(sub_1.response_header['ETAG'], sub_2.response_header['ETAG'].to_s, "Wrong header")
 
-          sleep (1) # to publish the second message in a different second from the first
+          sleep(1) # to publish the second message in a different second from the first
           publish_message_inline(channel, {'accept' => 'text/html'}, body + "3")
 
           headers.merge!({'If-Modified-Since' => sub_2.response_header['LAST_MODIFIED'], 'If-None-Match' => sub_2.response_header['ETAG']})
@@ -454,10 +465,11 @@ class TestSubscriberPolling < Test::Unit::TestCase
         sub_2 = EventMachine::HttpRequest.new(nginx_address + '/sub/' + channel.to_s).get :head => headers, :timeout => 30
         sub_2.callback {
           assert_equal(304, sub_2.response_header.status, "Wrong status")
+          assert_equal(0, sub_2.response_header.content_length, "Wrong response")
           assert_equal(sub_1.response_header['LAST_MODIFIED'], sub_2.response_header['LAST_MODIFIED'].to_s, "Wrong header")
           assert_equal(sub_1.response_header['ETAG'], sub_2.response_header['ETAG'].to_s, "Wrong header")
 
-          sleep (1) # to publish the second message in a different second from the first
+          sleep(1) # to publish the second message in a different second from the first
           publish_message_inline(channel, {'accept' => 'text/html'}, body + "3")
 
           headers.merge!({'If-Modified-Since' => sub_2.response_header['LAST_MODIFIED'], 'If-None-Match' => sub_2.response_header['ETAG']})
@@ -502,10 +514,11 @@ class TestSubscriberPolling < Test::Unit::TestCase
         sub_2 = EventMachine::HttpRequest.new(nginx_address + '/sub/' + channel_2.to_s + '/' + channel_1.to_s).get :head => headers, :timeout => 30
         sub_2.callback {
           assert_equal(304, sub_2.response_header.status, "Wrong status")
+          assert_equal(0, sub_2.response_header.content_length, "Wrong response")
           assert_equal(sub_1.response_header['LAST_MODIFIED'], sub_2.response_header['LAST_MODIFIED'].to_s, "Wrong header")
           assert_equal(sub_1.response_header['ETAG'], sub_2.response_header['ETAG'].to_s, "Wrong header")
 
-          sleep (1) # to publish the second message in a different second from the first
+          sleep(1) # to publish the second message in a different second from the first
           publish_message_inline(channel_1, {'accept' => 'text/html'}, body + "1_1")
 
           headers.merge!({'If-Modified-Since' => sub_2.response_header['LAST_MODIFIED'], 'If-None-Match' => sub_2.response_header['ETAG']})
@@ -520,10 +533,11 @@ class TestSubscriberPolling < Test::Unit::TestCase
             sub_4 = EventMachine::HttpRequest.new(nginx_address + '/sub/' + channel_2.to_s + '/' + channel_1.to_s).get :head => headers, :timeout => 30
             sub_4.callback {
               assert_equal(304, sub_4.response_header.status, "Wrong status")
+              assert_equal(0, sub_4.response_header.content_length, "Wrong response")
               assert_equal(sub_3.response_header['LAST_MODIFIED'], sub_4.response_header['LAST_MODIFIED'].to_s, "Wrong header")
               assert_equal(sub_3.response_header['ETAG'], sub_4.response_header['ETAG'].to_s, "Wrong header")
 
-              sleep (1) # to publish the second message in a different second from the first
+              sleep(1) # to publish the second message in a different second from the first
               publish_message_inline(channel_2, {'accept' => 'text/html'}, body + "1_2")
 
               headers.merge!({'If-Modified-Since' => sub_4.response_header['LAST_MODIFIED'], 'If-None-Match' => sub_4.response_header['ETAG']})
@@ -593,7 +607,7 @@ class TestSubscriberPolling < Test::Unit::TestCase
 
       sub_1 = EventMachine::HttpRequest.new(nginx_address + '/sub/' + channel.to_s + '?callback=' + callback_function_name).get :head => headers, :timeout => 30
       sub_1.callback {
-        assert_equal("#{callback_function_name}\r\n(\r\n#{body}\r\n);\r\n", sub_1.response, "Wrong message")
+        assert_equal("#{callback_function_name}\r\n([#{body}\r\n,]);\r\n", sub_1.response, "Wrong message")
         EventMachine.stop
       }
 

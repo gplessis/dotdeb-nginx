@@ -52,6 +52,15 @@ ngx_http_push_stream_subscriber_handler(ngx_http_request_t *r)
     ngx_int_t                                       status_code;
     ngx_str_t                                      *explain_error_message;
 
+    // add headers to support cross domain requests
+    ngx_http_push_stream_add_response_header(r, &NGX_HTTP_PUSH_STREAM_HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, &cf->allowed_origins);
+    ngx_http_push_stream_add_response_header(r, &NGX_HTTP_PUSH_STREAM_HEADER_ACCESS_CONTROL_ALLOW_METHODS, &NGX_HTTP_PUSH_STREAM_ALLOW_GET);
+    ngx_http_push_stream_add_response_header(r, &NGX_HTTP_PUSH_STREAM_HEADER_ACCESS_CONTROL_ALLOW_HEADERS, &NGX_HTTP_PUSH_STREAM_ALLOWED_HEADERS);
+
+    if (r->method & NGX_HTTP_OPTIONS) {
+        return ngx_http_push_stream_send_only_header_response(r, NGX_HTTP_OK, NULL);
+    }
+
     // only accept GET method
     if (!(r->method & NGX_HTTP_GET)) {
         ngx_http_push_stream_add_response_header(r, &NGX_HTTP_PUSH_STREAM_HEADER_ALLOW, &NGX_HTTP_PUSH_STREAM_ALLOW_GET);
@@ -208,7 +217,6 @@ ngx_http_push_stream_subscriber_polling_handler(ngx_http_request_t *r, ngx_http_
             return NGX_HTTP_INTERNAL_SERVER_ERROR;
         }
         worker_subscriber->longpolling = 1;
-        ngx_http_push_stream_add_response_header(r, &NGX_HTTP_PUSH_STREAM_HEADER_TRANSFER_ENCODING, &NGX_HTTP_PUSH_STREAM_HEADER_CHUNCKED);
 
         if (ngx_http_push_stream_registry_subscriber_locked(r, worker_subscriber) == NGX_ERROR) {
             ngx_shmtx_unlock(&shpool->mutex);
@@ -262,6 +270,11 @@ ngx_http_push_stream_subscriber_polling_handler(ngx_http_request_t *r, ngx_http_
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
+    if (ctx->callback != NULL) {
+        ngx_http_push_stream_send_response_text(r, ctx->callback->data, ctx->callback->len, 0);
+        ngx_http_push_stream_send_response_text(r, NGX_HTTP_PUSH_STREAM_CALLBACK_INIT_CHUNK.data, NGX_HTTP_PUSH_STREAM_CALLBACK_INIT_CHUNK.len, 0);
+    }
+
     cur = channels_ids;
     while ((cur = (ngx_http_push_stream_requested_channel_t *) ngx_queue_next(&cur->queue)) != channels_ids) {
         channel = ngx_http_push_stream_find_channel_locked(cur->id, r->connection->log);
@@ -271,6 +284,10 @@ ngx_http_push_stream_subscriber_polling_handler(ngx_http_request_t *r, ngx_http_
             return NGX_HTTP_INTERNAL_SERVER_ERROR;
         }
         ngx_http_push_stream_send_old_messages(r, channel, cur->backtrack_messages, if_modified_since, tag, greater_message_time, greater_message_tag, last_event_id);
+    }
+
+    if (ctx->callback != NULL) {
+        ngx_http_push_stream_send_response_text(r, NGX_HTTP_PUSH_STREAM_CALLBACK_END_CHUNK.data, NGX_HTTP_PUSH_STREAM_CALLBACK_END_CHUNK.len, 0);
     }
 
     if (cf->footer_template.len > 0) {
@@ -309,21 +326,18 @@ ngx_http_push_stream_subscriber_assign_channel(ngx_slab_pool_t *shpool, ngx_http
     return result;
 }
 
+
 ngx_http_push_stream_requested_channel_t *
 ngx_http_push_stream_parse_channels_ids_from_path(ngx_http_request_t *r, ngx_pool_t *pool) {
+    ngx_http_push_stream_main_conf_t               *mcf = ngx_http_get_module_main_conf(r, ngx_http_push_stream_module);
     ngx_http_push_stream_loc_conf_t                *cf = ngx_http_get_module_loc_conf(r, ngx_http_push_stream_module);
     ngx_http_variable_value_t                      *vv_channels_path = ngx_http_get_indexed_variable(r, cf->index_channels_path);
     ngx_http_push_stream_requested_channel_t       *channels_ids, *cur;
-    u_char                                         *channel_pos, *slash_pos, *backtrack_pos;
-    ngx_uint_t                                      len, backtrack_messages;
-    ngx_str_t                                      *channels_path;
+    ngx_str_t                                       aux;
+    int                                             captures[15];
+    ngx_int_t                                       n;
 
     if (vv_channels_path == NULL || vv_channels_path->not_found || vv_channels_path->len == 0) {
-        return NULL;
-    }
-
-    if ((channels_path = ngx_http_push_stream_create_str(pool, vv_channels_path->len)) == NULL) {
-        ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "push stream module: unable to allocate memory for channels_path string");
         return NULL;
     }
 
@@ -332,67 +346,37 @@ ngx_http_push_stream_parse_channels_ids_from_path(ngx_http_request_t *r, ngx_poo
         return NULL;
     }
 
-    ngx_memcpy(channels_path->data, vv_channels_path->data, vv_channels_path->len);
-
     ngx_queue_init(&channels_ids->queue);
 
-    channel_pos = channels_path->data;
-
     // doing the parser of given channel path
-    while (channel_pos != NULL) {
-        backtrack_messages = 0;
-        len = 0;
-
-        backtrack_pos = (u_char *) ngx_strstr(channel_pos, NGX_HTTP_PUSH_STREAM_BACKTRACK_SEP.data);
-        slash_pos = (u_char *) ngx_strstr(channel_pos, NGX_HTTP_PUSH_STREAM_SLASH.data);
-
-        if ((backtrack_pos != NULL) && (slash_pos != NULL)) {
-            if (slash_pos > backtrack_pos) {
-                len = backtrack_pos - channel_pos;
-                backtrack_pos = backtrack_pos + NGX_HTTP_PUSH_STREAM_BACKTRACK_SEP.len;
-                if (slash_pos > backtrack_pos) {
-                    backtrack_messages = ngx_atoi(backtrack_pos, slash_pos - backtrack_pos);
-                }
-            } else {
-                len = slash_pos - channel_pos;
-            }
-        } else if (backtrack_pos != NULL) {
-            len = backtrack_pos - channel_pos;
-            backtrack_pos = backtrack_pos + NGX_HTTP_PUSH_STREAM_BACKTRACK_SEP.len;
-            if ((channels_path->data + channels_path->len) > backtrack_pos) {
-                backtrack_messages = ngx_atoi(backtrack_pos, (channels_path->data + channels_path->len) - backtrack_pos);
-            }
-        } else if (slash_pos != NULL) {
-            len = slash_pos - channel_pos;
-        } else {
-            len = channels_path->data + channels_path->len - channel_pos;
-        }
-
-        if (len > 0) {
-
+    aux.data = vv_channels_path->data;
+    do {
+        aux.len = vv_channels_path->len - (aux.data - vv_channels_path->data);
+        if ((n = ngx_regex_exec(mcf->backtrack_parser_regex, &aux, captures, 15)) >= 0) {
             if ((cur = ngx_pcalloc(pool, sizeof(ngx_http_push_stream_requested_channel_t))) == NULL) {
                 ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "push stream module: unable to allocate memory for channel_id item");
                 return NULL;
             }
 
-            if ((cur->id = ngx_http_push_stream_create_str(pool, len)) == NULL) {
+            if ((cur->id = ngx_http_push_stream_create_str(pool, captures[0])) == NULL) {
                 ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "push stream module: unable to allocate memory for channel_id string");
                 return NULL;
             }
-            ngx_memcpy(cur->id->data, channel_pos, len);
-            cur->backtrack_messages = (backtrack_messages > 0) ? backtrack_messages : 0;
+            ngx_memcpy(cur->id->data, aux.data, captures[0]);
+            cur->backtrack_messages = 0;
+            if (captures[7] > captures[6]) {
+                cur->backtrack_messages = ngx_atoi(aux.data + captures[6], captures[7] - captures[6]);
+            }
 
             ngx_queue_insert_tail(&channels_ids->queue, &cur->queue);
-        }
 
-        channel_pos = NULL;
-        if (slash_pos != NULL) {
-            channel_pos = slash_pos + NGX_HTTP_PUSH_STREAM_SLASH.len;
+            aux.data = aux.data + captures[1];
         }
-    }
+    } while ((n != NGX_REGEX_NO_MATCHED) && (aux.data < (vv_channels_path->data + vv_channels_path->len)));
 
     return channels_ids;
 }
+
 
 static ngx_int_t
 ngx_http_push_stream_validate_channels(ngx_http_request_t *r, ngx_http_push_stream_requested_channel_t *channels_ids, ngx_int_t *status_code, ngx_str_t **explain_error_message)
@@ -617,7 +601,7 @@ ngx_http_push_stream_send_old_messages(ngx_http_request_t *r, ngx_http_push_stre
             // positioning at first message, and send the others
             while ((qtd > 0) && (!message->deleted) && ((message = (ngx_http_push_stream_msg_t *) ngx_queue_next(&message->queue)) != message_sentinel)) {
                 if (start == 0) {
-                    ngx_http_push_stream_send_response_message(r, channel, message);
+                    ngx_http_push_stream_send_response_message(r, channel, message, 0, 1);
                     qtd--;
                 } else {
                     start--;
@@ -639,7 +623,7 @@ ngx_http_push_stream_send_old_messages(ngx_http_request_t *r, ngx_http_push_stre
                 }
 
                 if (found && (((greater_message_time == 0) && (greater_message_tag == -1)) || (greater_message_time > message->time) || ((greater_message_time == message->time) && (greater_message_tag >= message->tag)))) {
-                    ngx_http_push_stream_send_response_message(r, channel, message);
+                    ngx_http_push_stream_send_response_message(r, channel, message, 0, 1);
                 }
             }
         }
@@ -725,6 +709,7 @@ ngx_http_push_stream_assing_subscription_to_channel_locked(ngx_slab_pool_t *shpo
     subscription->channel_subscriber_element_ref = element_subscriber;
 
     channel->subscribers++; // do this only when we know everything went okay
+    channel->last_activity_time = ngx_time();
     ngx_queue_insert_tail(&subscriptions_sentinel->queue, &subscription->queue);
     ngx_queue_insert_tail(&worker_subscribers_sentinel->subscribers_sentinel.queue, &element_subscriber->queue);
     return NGX_OK;

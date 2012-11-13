@@ -59,19 +59,14 @@ ngx_http_push_stream_find_channel_on_tree(ngx_str_t *id, ngx_log_t *log, ngx_rbt
 
         /* hash == node->key */
 
-        do {
-            channel = (ngx_http_push_stream_channel_t *) node;
+        channel = (ngx_http_push_stream_channel_t *) node;
 
-            rc = ngx_memn2cmp(id->data, channel->id.data, id->len, channel->id.len);
-            if (rc == 0) {
-                return channel;
-            }
+        rc = ngx_memn2cmp(id->data, channel->id.data, id->len, channel->id.len);
+        if (rc == 0) {
+            return channel;
+        }
 
-            node = (rc < 0) ? node->left : node->right;
-
-        } while (node != sentinel && hash == node->key);
-
-        break;
+        node = (rc < 0) ? node->left : node->right;
     }
 
     return NULL;
@@ -89,11 +84,9 @@ ngx_http_push_stream_initialize_channel(ngx_http_push_stream_channel_t *channel)
     channel->subscribers = 0;
     channel->deleted = 0;
     channel->expires = 0;
+    channel->last_activity_time = ngx_time();
 
-    // initialize queues
     ngx_queue_init(&channel->message_queue.queue);
-    ngx_queue_init(&channel->workers_with_subscribers.queue);
-
     channel->message_queue.deleted = 0;
 
     channel->node.key = ngx_crc32_short(channel->id.data, channel->id.len);
@@ -179,7 +172,6 @@ ngx_http_push_stream_get_channel(ngx_str_t *id, ngx_log_t *log, ngx_http_push_st
     ngx_http_push_stream_channel_t        *channel;
     ngx_slab_pool_t                       *shpool = (ngx_slab_pool_t *) ngx_http_push_stream_shm_zone->shm.addr;
     ngx_flag_t                             is_broadcast_channel = 0;
-    u_char                                *last;
 
     channel = ngx_http_push_stream_find_channel(id, log);
     if (channel != NULL) { // we found our channel
@@ -217,12 +209,15 @@ ngx_http_push_stream_get_channel(ngx_str_t *id, ngx_log_t *log, ngx_http_push_st
     }
 
     channel->id.len = id->len;
-    last = ngx_copy(channel->id.data, id->data, channel->id.len);
-    *last = '\0';
+    ngx_memcpy(channel->id.data, id->data, channel->id.len);
+    channel->id.data[channel->id.len] = '\0';
 
     channel->broadcast = is_broadcast_channel;
 
     ngx_http_push_stream_initialize_channel(channel);
+
+    // initialize workers_with_subscribers queues only when a channel is created
+    ngx_queue_init(&channel->workers_with_subscribers.queue);
 
     ngx_shmtx_unlock(&shpool->mutex);
     return channel;

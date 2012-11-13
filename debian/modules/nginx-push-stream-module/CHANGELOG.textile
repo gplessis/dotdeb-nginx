@@ -1,13 +1,33 @@
 h1(#changelog). Changelog
 
+h2. Version 0.3.4
+
+* Improvement on javascript cleanup objects
+* Fixing initial temp pool size
+* Fixing memory leak when recovering channel from trash, the workers_with_subscribers queue was wrongly reinitialized without free the memory on it
+* Changed default value of push_stream_message_ttl to 30 minutes to avoid memory leak of a message which is never discarded
+* Changed javascript configurations to be more flexible
+* Changed JSONP to receive old messages as array
+* Changed channels ids parser for a smarter version, using regular expression
+
+h2. Version 0.3.3
+
+* Adding JSONP support to pushstream.js and dynamically callback parameter
 * Adding event type feature to Event Source support
-* Adding tag and time available at message template, and make possible pass these values whithout set headers
+* Adding tag and time available at message template, and make possible pass these values without set headers
 * Adding a reference count to the message to avoid discard it before be processed for all workers
+* Adding padding messages based on user agent to bypass some problems on android/safari browsers on long-polling
 * Improvement on memory usage to reuse chains and buffers
 * Improvement on javascript message parser regexp
 * Improvement on sending alert messages to workers only when necessary
+* Improvement on reset ping timer when a message is sent
+* Improvement on disconnect any subscriber which receives a non OK response when writing to its socket
+* Improvement on documentation organization
+* Improvement on preventing XSS when using pushstream.js
+* Fixing memory leak when saving channels on a rbtree with ids which collides, problem inherited from Nginx and reported by Lanshun Zhou
 * Fixing memory leak in javascript
 * Fixing read messages in high throughput using keepalive on
+* Fixing EventSourceWrapper class on pushstream.js to use native reconnection feature from EventSource
 
 h2. Version 0.3.2
 

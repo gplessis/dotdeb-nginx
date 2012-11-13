@@ -70,12 +70,12 @@ typedef struct {
     ngx_str_t                       broadcast_channel_prefix;
     ngx_uint_t                      max_number_of_channels;
     ngx_uint_t                      max_number_of_broadcast_channels;
-    ngx_msec_t                      buffer_cleanup_interval;
     time_t                          message_ttl;
     ngx_uint_t                      max_subscribers_per_channel;
     ngx_uint_t                      max_messages_stored_per_channel;
     ngx_uint_t                      max_channel_id_length;
     ngx_http_push_stream_template_queue_t  msg_templates;
+    ngx_regex_t                    *backtrack_parser_regex;
 } ngx_http_push_stream_main_conf_t;
 
 typedef struct {
@@ -101,6 +101,7 @@ typedef struct {
     ngx_http_complex_value_t       *user_agent;
     ngx_str_t                       padding_by_user_agent;
     ngx_http_push_stream_padding_t *paddings;
+    ngx_str_t                       allowed_origins;
 } ngx_http_push_stream_loc_conf_t;
 
 // shared memory segment name
@@ -113,7 +114,7 @@ typedef struct {
     time_t                          time;
     ngx_flag_t                      deleted;
     ngx_int_t                       id;
-    ngx_str_t                      *raw;
+    ngx_str_t                       raw;
     ngx_int_t                       tag;
     ngx_str_t                      *event_id;
     ngx_str_t                      *event_type;
@@ -143,6 +144,7 @@ typedef struct {
     ngx_uint_t                          subscribers;
     ngx_http_push_stream_pid_queue_t    workers_with_subscribers;
     ngx_http_push_stream_msg_t          message_queue;
+    time_t                              last_activity_time;
     time_t                              expires;
     ngx_flag_t                          deleted;
     ngx_flag_t                          broadcast;
@@ -251,8 +253,7 @@ static const ngx_str_t NGX_HTTP_PUSH_STREAM_CHANNEL_DELETED = ngx_string("Channe
 #define NGX_HTTP_PUSH_STREAM_NUMBER_OF_CHANNELS_EXCEEDED    (void *) -3
 
 static ngx_str_t        NGX_HTTP_PUSH_STREAM_EMPTY = ngx_string("");
-static const ngx_str_t  NGX_HTTP_PUSH_STREAM_BACKTRACK_SEP = ngx_string(".b");
-static const ngx_str_t  NGX_HTTP_PUSH_STREAM_SLASH = ngx_string("/");
+static const ngx_str_t  NGX_HTTP_PUSH_STREAM_BACKTRACK_PATTERN = ngx_string("((\\.b([0-9]+))?(/|$))");
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_CALLBACK = ngx_string("callback");
 
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_DATE_FORMAT_ISO_8601 = ngx_string("%4d-%02d-%02dT%02d:%02d:%02d");
@@ -276,6 +277,9 @@ static const ngx_str_t  NGX_HTTP_PUSH_STREAM_HEADER_CONNECTION = ngx_string("Con
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_HEADER_SEC_WEBSOCKET_KEY = ngx_string("Sec-WebSocket-Key");
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_HEADER_SEC_WEBSOCKET_VERSION = ngx_string("Sec-WebSocket-Version");
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_HEADER_SEC_WEBSOCKET_ACCEPT = ngx_string("Sec-WebSocket-Accept");
+static const ngx_str_t  NGX_HTTP_PUSH_STREAM_HEADER_ACCESS_CONTROL_ALLOW_ORIGIN = ngx_string("Access-Control-Allow-Origin");
+static const ngx_str_t  NGX_HTTP_PUSH_STREAM_HEADER_ACCESS_CONTROL_ALLOW_METHODS = ngx_string("Access-Control-Allow-Methods");
+static const ngx_str_t  NGX_HTTP_PUSH_STREAM_HEADER_ACCESS_CONTROL_ALLOW_HEADERS = ngx_string("Access-Control-Allow-Headers");
 
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_WEBSOCKET_UPGRADE = ngx_string("WebSocket");
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_WEBSOCKET_CONNECTION = ngx_string("Upgrade");
@@ -325,6 +329,8 @@ static const u_char NGX_HTTP_PUSH_STREAM_WEBSOCKET_PAYLOAD_LEN_64_BYTE   = 127;
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_ALLOW_GET_POST_DELETE_METHODS = ngx_string("GET, POST, DELETE");
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_ALLOW_GET_POST_METHODS = ngx_string("GET, POST");
 static const ngx_str_t  NGX_HTTP_PUSH_STREAM_ALLOW_GET = ngx_string("GET");
+
+static const ngx_str_t  NGX_HTTP_PUSH_STREAM_ALLOWED_HEADERS = ngx_string("If-Modified-Since,If-None-Match");
 
 #define NGX_HTTP_PUSH_STREAM_CHECK_AND_FINALIZE_REQUEST_ON_ERROR(val, fail, r, errormessage) \
     if (val == fail) {                                                       \

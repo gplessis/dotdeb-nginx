@@ -46,7 +46,7 @@ README for Modules versions
  nginx-push-stream-module
   Homepage: https://github.com/wandenberg/nginx-push-stream-module
   https://github.com/wandenberg/nginx-push-stream-module.git
-  Version: a690c2e0d3
+  Version: v0.3.4-68651290
 
  nginx-syslog
   Homepage: https://github.com/yaoweibin/nginx_syslog_patch

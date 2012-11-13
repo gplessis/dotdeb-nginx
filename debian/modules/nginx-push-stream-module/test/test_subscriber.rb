@@ -8,6 +8,13 @@ class TestSubscriber < Test::Unit::TestCase
   end
 
   def test_accepted_methods
+    # testing OPTIONS method, EventMachine::HttpRequest does not have support to it
+    socket = TCPSocket.open(nginx_host, nginx_port)
+    socket.print("OPTIONS /sub/ch_test_accepted_methods_0 HTTP/1.0\r\n\r\n")
+    headers, body = read_response(socket)
+    assert(headers.match(/HTTP\/1\.1 200 OK/), "Didn't receive right header")
+    assert(headers.match(/Content-Length: 0/), "Didn't receive right header")
+
     EventMachine.run {
       multi = EventMachine::MultiRequest.new
 
@@ -309,7 +316,7 @@ class TestSubscriber < Test::Unit::TestCase
 
     #create channel
     publish_message(channel, headers, body)
-    sleep(2) #to ensure message was gone
+    sleep(5) #to ensure message was gone
 
     EventMachine.run {
       sub_1 = EventMachine::HttpRequest.new(nginx_address + '/sub/' + channel.to_s).get :head => headers, :timeout => 30
@@ -319,6 +326,7 @@ class TestSubscriber < Test::Unit::TestCase
         assert_equal("Subscriber could not create channels.", sub_1.response_header['X_NGINX_PUSHSTREAM_EXPLAIN'], "Didn't receive the right error message")
         EventMachine.stop
       }
+      add_test_timeout
     }
   end
 
@@ -338,7 +346,7 @@ class TestSubscriber < Test::Unit::TestCase
 
     #create channel
     publish_message(channel, headers, body)
-    sleep(2) #to ensure message was gone
+    sleep(5) #to ensure message was gone
 
     EventMachine.run {
       sub_1 = EventMachine::HttpRequest.new(nginx_address + '/sub/' + channel.to_s + '/' + broadcast_channel.to_s).get :head => headers, :timeout => 30
@@ -348,6 +356,7 @@ class TestSubscriber < Test::Unit::TestCase
         assert_equal("Subscriber could not create channels.", sub_1.response_header['X_NGINX_PUSHSTREAM_EXPLAIN'], "Didn't receive the right error message")
         EventMachine.stop
       }
+      add_test_timeout
     }
   end
 
@@ -673,6 +682,7 @@ class TestSubscriber < Test::Unit::TestCase
           EventMachine.stop
         }
       }
+      add_test_timeout
     }
   end
 
@@ -916,6 +926,100 @@ class TestSubscriber < Test::Unit::TestCase
       sub_5 = EventMachine::HttpRequest.new(nginx_address + '/sub/' + other_channel.to_s).get :head => headers, :timeout => 30
       sub_5.callback {
         assert_equal(200, sub_5.response_header.status, "Channel was not created")
+        EventMachine.stop
+      }
+
+      add_test_timeout
+    }
+  end
+
+  def config_test_accept_channels_name_with_dot_b
+    @subscriber_connection_timeout = "1s"
+    @ping_message_interval = nil
+    @header_template = nil
+    @footer_template = nil
+    @message_template = nil
+  end
+
+  def test_accept_channels_name_with_dot_b
+    channel = 'room.b18.beautiful'
+    response = ''
+
+    EventMachine.run {
+      publish_message_inline(channel, {'accept' => 'text/html'}, 'msg 1')
+      publish_message_inline(channel, {'accept' => 'text/html'}, 'msg 2')
+      publish_message_inline(channel, {'accept' => 'text/html'}, 'msg 3')
+      publish_message_inline(channel, {'accept' => 'text/html'}, 'msg 4')
+
+      sub = EventMachine::HttpRequest.new(nginx_address + '/sub/' + channel.to_s + '.b3').get
+      sub.stream { | chunk |
+        response += chunk
+      }
+      sub.callback {
+        assert_equal("msg 2\r\nmsg 3\r\nmsg 4\r\n", response, "The published message was not received correctly")
+
+        response = ''
+        sub_1 = EventMachine::HttpRequest.new(nginx_address + '/sub/' + channel.to_s).get
+        sub_1.stream { | chunk |
+          response += chunk
+        }
+        sub_1.callback { |chunk|
+          assert_equal("msg 5\r\n", response, "The published message was not received correctly")
+
+          EventMachine.stop
+        }
+
+        publish_message_inline(channel, {'accept' => 'text/html'}, 'msg 5')
+      }
+
+      add_test_timeout
+    }
+  end
+
+  def test_access_control_allow_headers
+    headers = {'accept' => 'application/json'}
+    channel = 'test_access_control_allow_headers'
+
+    EventMachine.run {
+      sub_1 = EventMachine::HttpRequest.new(nginx_address + '/sub/' + channel.to_s).get :head => headers, :timeout => 30
+      sub_1.stream { |chunk|
+        assert_equal("*", sub_1.response_header['ACCESS_CONTROL_ALLOW_ORIGIN'], "Didn't receive the right header")
+        assert_equal("GET", sub_1.response_header['ACCESS_CONTROL_ALLOW_METHODS'], "Didn't receive the right header")
+        assert_equal("If-Modified-Since,If-None-Match", sub_1.response_header['ACCESS_CONTROL_ALLOW_HEADERS'], "Didn't receive the right header")
+        EventMachine.stop
+      }
+
+      add_test_timeout
+    }
+  end
+
+  def test_default_access_control_allow_origin_header
+    headers = {'accept' => 'application/json'}
+    channel = 'test_default_access_control_allow_origin_header'
+
+    EventMachine.run {
+      sub_1 = EventMachine::HttpRequest.new(nginx_address + '/sub/' + channel.to_s).get :head => headers, :timeout => 30
+      sub_1.stream { |chunk|
+        assert_equal("*", sub_1.response_header['ACCESS_CONTROL_ALLOW_ORIGIN'], "Didn't receive the right header")
+        EventMachine.stop
+      }
+
+      add_test_timeout
+    }
+  end
+
+  def config_test_custom_access_control_allow_origin_header
+    @allowed_origins = "custom.domain.com"
+  end
+
+  def test_custom_access_control_allow_origin_header
+    headers = {'accept' => 'application/json'}
+    channel = 'test_custom_access_control_allow_origin_header'
+
+    EventMachine.run {
+      sub_1 = EventMachine::HttpRequest.new(nginx_address + '/sub/' + channel.to_s).get :head => headers, :timeout => 30
+      sub_1.stream { |chunk|
+        assert_equal("custom.domain.com", sub_1.response_header['ACCESS_CONTROL_ALLOW_ORIGIN'], "Didn't receive the right header")
         EventMachine.stop
       }
 
