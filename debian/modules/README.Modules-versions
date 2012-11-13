@@ -50,8 +50,8 @@ README for Modules versions
 
  nginx-syslog
   Homepage: https://github.com/yaoweibin/nginx_syslog_patch
-  https://raw.github.com/yaoweibin/nginx_syslog_patch/master/syslog_0.8.54.patch
-  Version: afeea6d78d
+  https://raw.github.com/yaoweibin/nginx_syslog_patch/master/syslog_1.2.0.patch
+  Version: 19427673
 
  naxsi
   Homepage: http://code.google.com/p/naxsi/
