@@ -1,6 +1,7 @@
 nginx (1.2.5-1~dotdeb.0) UNRELEASED; urgency=medium
 
   * Adds the Pinba module to nginx-full, nginx-passenger and nginx-extras
+  * chunkin-nginx-module 0.23rc2-3-e57a7ab9
 
  -- Guillaume Plessis <gui@dotdeb.org>  Tue, 13 Nov 2012 10:22:42 -0800
 
