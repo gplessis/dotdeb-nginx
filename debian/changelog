@@ -1,6 +1,8 @@
 nginx (1.2.5-1~dotdeb.0) UNRELEASED; urgency=medium
 
   * Adds the Pinba module to nginx-full, nginx-passenger and nginx-extras
+  * Adds nginx-http-substitution-filter v0.6.2-6aa992a2 to nginx-full, 
+    nginx-passenger and nginx-extras
   * chunkin-nginx-module 0.23rc2-3-e57a7ab9
   * headers-more-nginx-module v0.18-179f39b1
   * nginx-development-kit v0.2.17-7-f92d6c6a
