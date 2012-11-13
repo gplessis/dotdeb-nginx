@@ -1360,13 +1360,31 @@ about setting up Ruby on Rails and Phusion Passenger on OpenSolaris and EC2.</p>
 </div>
 <div class="sect2">
 <a href="javascript:void(0)" class="comments empty" title="Add a comment"><span class="count"></span></a><h3 id="_upgrading_or_downgrading_phusion_passenger" data-comment-topic="upgrading-or-downgrading-phusion-passenger-1dl8km6">2.3. Upgrading or downgrading Phusion Passenger</h3>
-<div class="sect3">
-<a href="javascript:void(0)" class="comments empty" title="Add a comment"><span class="count"></span></a><h4 id="_via_a_gem_or_a_source_tarball" data-comment-topic="via-a-gem-or-a-source-tarball-1vgkwhs">2.3.1. Via a gem or a source tarball</h4>
-<div class="paragraph"><p>To upgrade or downgrade Phusion Passenger via the gem or the source tarball, install the newer
-or older version as you normally would; that is, install the gem or unpack the tarball, and
-run <span class="monospaced">passenger-install-apache2-module</span>. Eventually <span class="monospaced">passenger-install-apache2-module</span> will tell
-you to copy &amp; paste some settings into the Apache configuration file; something that looks along
-the lines of:</p></div>
+<div class="paragraph"><p>Upgrading or downgrading Phusion Passenger for Apache involves several steps.</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+First, you have to obtain and install the files associated with the version that you want to upgrade or downgrade to. You can do this in three ways: by using <a href="#upgrade_or_downgrade_with_rubygems">RubyGems</a>, by downloading a <a href="#upgrade_or_downgrade_with_tarball">tarball</a>, or by installing a <a href="#upgrade_or_downgrade_with_linux_packages">native Linux package</a>. If you installed a native Linux package, then skip to the last step. If not, read on.
+</p>
+</li>
+<li>
+<p>
+Then you have to recompile the Phusion Passenger Apache module by invoking
+</p>
+<div class="listingblock">
+<div class="content monospaced">
+<pre># If you used RubyGems
+sudo passenger-install-apache2-module
+
+# If you used the tarball
+sudo /path-to-passenger/bin/passenger-install-apache2-module</pre>
+</div>
+</div>
+</li>
+<li>
+<p>
+Finally, <span class="monospaced">passenger-install-apache2-module</span> will tell you to copy &amp; paste some settings in the configuration file. Something that looks along the lines of:
+</p>
 <div class="listingblock">
 <div class="content monospaced">
 <pre>LoadModule passenger_module ...
@@ -1377,14 +1395,42 @@ PassengerRuby ...</pre>
 <div class="paragraph"><p>Because you already had Phusion Passenger installed, you already had similar settings
 in your Apache configuration file, just with different values. <strong>Replace</strong> the old settings with
 the new ones that the installer outputs. It is important that the old settings are removed,
-otherwise Phusion Passenger may malfunction.</p></div>
-<div class="paragraph"><p>When you’re done, restart Apache.</p></div>
+otherwise Phusion Passenger may malfunction.
+4. Restart Apache. You’re now done.</p></div>
+</li>
+</ol></div>
+<a href="javascript:void(0)" class="comments empty" title="Add a comment"><span class="count"></span></a><h4 id="upgrade_or_downgrade_with_rubygems" class="float" data-comment-topic="obtaining-phusion-passenger-files-with-rubygems-8fz7a8">Obtaining Phusion Passenger files with RubyGems</h4>
+<div class="paragraph">
+<div class="title">Open source</div>
+<p>You can obtain the files associated with the latest <em>open source</em> Phusion Passenger release by invoking the following command:</p>
 </div>
-<div class="sect3">
-<a href="javascript:void(0)" class="comments empty" title="Add a comment"><span class="count"></span></a><h4 id="_via_a_native_linux_package" data-comment-topic="via-a-native-linux-package-8dvooa">2.3.2. Via a native Linux package</h4>
-<div class="paragraph"><p>There are no special instructions required to upgrade or downgrade Phusion Passenger
-via a native Linux package.</p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>sudo gem install passenger</pre>
 </div>
+</div>
+<div class="paragraph"><p>You can also obtain a specific version by specifying the <span class="monospaced">-v</span> argument, like this:</p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>sudo gem install passenger -v 3.0.0</pre>
+</div>
+</div>
+<div class="paragraph">
+<div class="title">Enterprise</div>
+<p>If you’re using <a href="https://www.phusionpassenger.com/enterprise">Phusion Passenger Enterprise</a> then you should obtain the gem from the <a href="https://www.phusionpassenger.com/orders">Customer Area</a> instead. Login with your order reference and password. The Customer Area will show you a list of files. Download the gem file for the version you want (<span class="monospaced">passenger-enterprise-server-x.x.x.gem</span>) and install it with:</p>
+</div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>sudo gem install passenger-enterprise-server-x.x.x.gem</pre>
+</div>
+</div>
+<a href="javascript:void(0)" class="comments empty" title="Add a comment"><span class="count"></span></a><h4 id="upgrade_or_downgrade_with_tarball" class="float" data-comment-topic="obtaining-phusion-passenger-files-through-a-tarball-evcm0j">Obtaining Phusion Passenger files through a tarball</h4>
+<div class="paragraph"><p>You can obtain the files associated with the latest <em>open source</em> Phusion Passenger release by downloading the tarball linked from <a href="https://www.phusionpassenger.com/download">the Phusion Passenger download page</a>. If you want a specific version, please refer to the release archive on <a href="http://rubyforge.org/frs/?group_id=5873&amp;release_id=46919">RubyForge</a>.</p></div>
+<div class="paragraph"><p>If you’re using <a href="https://www.phusionpassenger.com/enterprise">Phusion Passenger Enterprise</a> then you should obtain the tarball from the <a href="https://www.phusionpassenger.com/orders">Customer Area</a> instead. Login with your order reference and password. The Customer Area will show you a list of files. Download the tarball for the version you want (<span class="monospaced">passenger-enterprise-server-x.x.x.tar.gz</span>).</p></div>
+<div class="paragraph"><p>Once you’ve obtained the tarball, extract it somewhere:</p></div>
+<a href="javascript:void(0)" class="comments empty" title="Add a comment"><span class="count"></span></a><h4 id="upgrade_or_downgrade_with_linux_packages" class="float" data-comment-topic="upgrading-with-native-linux-packages-jievu8">Upgrading with native Linux packages</h4>
+<div class="paragraph"><p>When using native Linux packages, it is only possible to upgrade, not downgrade. Native Linux packages are only available for the open source Phusion Passenger, not for Phusion Passenger Enterprise.</p></div>
+<div class="paragraph"><p>Native Linux packages are contributed by third parties. Although they update pretty quickly, they lag behind gem and tarball releases, perhaps by a few days. Please learn more about native Linux packages <a href="https://www.phusionpassenger.com/native_packages">at the Phusion Passenger website</a>.</p></div>
 </div>
 <div class="sect2">
 <a href="javascript:void(0)" class="comments empty" title="Add a comment"><span class="count"></span></a><h3 id="_unloading_disabling_phusion_passenger_from_apache_without_uninstalling_it" data-comment-topic="unloading-disabling-phusion-passenger-from-apache-without-uninstalling-it-s1axnx">2.4. Unloading (disabling) Phusion Passenger from Apache without uninstalling it</h3>
@@ -5647,7 +5693,7 @@ has no effect.</p></div>
 <div id="footnotes"><hr></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-08-28 11:03:54 CEST
+Last updated 2012-10-30 14:24:33 CET
 </div>
 </div>
 <script>/*! jQuery v1.7.1 jquery.com | jquery.org/license */

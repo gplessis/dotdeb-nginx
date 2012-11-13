@@ -7,6 +7,7 @@ nginx (1.2.5-1~dotdeb.0) UNRELEASED; urgency=medium
   * nginx-echo v0.41-b1e519fe
   * nginx-lua v0.7.4-35d963f1
   * nginx-push-stream-module v0.3.4-68651290
+  * Passenger 3.0.18
 
  -- Guillaume Plessis <gui@dotdeb.org>  Tue, 13 Nov 2012 10:22:42 -0800
 

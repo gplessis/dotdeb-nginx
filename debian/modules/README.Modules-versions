@@ -67,11 +67,11 @@ README for Modules versions
 
  ruby-passenger
   Homepage: http://www.modrails.com/
-  Version: 3.0.14
-    cd ruby-passenger-3.0.14
+  Version: 3.0.18
+    cd ruby-passenger-3.0.18
     rm -rf debian/ rpm/ test/ .pc/
     cd ..
-    rsync -av ruby-passenger-3.0.14/ /path/to/nginx/debian/modules/ruby-passenger
+    rsync -av ruby-passenger-3.0.18/ /path/to/nginx/debian/modules/ruby-passenger
 
 nginx-pinba
   Homepage: http://pinba.org/

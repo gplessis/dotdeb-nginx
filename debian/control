@@ -314,7 +314,7 @@ Package: nginx-passenger
 Architecture: linux-any kfreebsd-any
 Priority: extra
 Depends: nginx-common (= ${source:Version}),
-         ruby-passenger (>> 3.0.17),
+         ruby-passenger (>> 3.0.18),
          ${misc:Depends},
          ${shlibs:Depends}
 Provides: httpd,
