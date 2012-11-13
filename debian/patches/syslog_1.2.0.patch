@@ -1,7 +1,7 @@
-diff --git a/src/core/ngx_cycle.c b/src/core/ngx_cycle.c
-index 2da0bf9..5d2c77a 100644
---- a/src/core/ngx_cycle.c
-+++ b/src/core/ngx_cycle.c
+Index: nginx-1.2.5/src/core/ngx_cycle.c
+===================================================================
+--- nginx-1.2.5.orig/src/core/ngx_cycle.c
++++ nginx-1.2.5/src/core/ngx_cycle.c
 @@ -85,6 +85,12 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
      cycle->pool = pool;
      cycle->log = log;
@@ -15,10 +15,10 @@ index 2da0bf9..5d2c77a 100644
      cycle->old_cycle = old_cycle;
  
      cycle->conf_prefix.len = old_cycle->conf_prefix.len;
-diff --git a/src/core/ngx_log.c b/src/core/ngx_log.c
-index d7830fb..b0a9733 100644
---- a/src/core/ngx_log.c
-+++ b/src/core/ngx_log.c
+Index: nginx-1.2.5/src/core/ngx_log.c
+===================================================================
+--- nginx-1.2.5.orig/src/core/ngx_log.c
++++ nginx-1.2.5/src/core/ngx_log.c
 @@ -10,6 +10,15 @@
  
  
@@ -35,7 +35,7 @@ index d7830fb..b0a9733 100644
  
  
  static ngx_command_t  ngx_errlog_commands[] = {
-@@ -21,6 +30,15 @@ static ngx_command_t  ngx_errlog_commands[] = {
+@@ -21,6 +30,15 @@ static ngx_command_t  ngx_errlog_command
       0,
       NULL},
  
@@ -113,7 +113,7 @@ index d7830fb..b0a9733 100644
  
  static ngx_str_t err_levels[] = {
      ngx_null_string,
-@@ -89,11 +153,16 @@ ngx_log_error_core(ngx_uint_t level, ngx_log_t *log, ngx_err_t err,
+@@ -89,11 +153,16 @@ ngx_log_error_core(ngx_uint_t level, ngx
      va_list  args;
  #endif
      u_char  *p, *last, *msg;
@@ -130,7 +130,7 @@ index d7830fb..b0a9733 100644
  
      last = errstr + NGX_MAX_ERROR_STR;
  
-@@ -102,6 +171,10 @@ ngx_log_error_core(ngx_uint_t level, ngx_log_t *log, ngx_err_t err,
+@@ -102,6 +171,10 @@ ngx_log_error_core(ngx_uint_t level, ngx
  
      p = errstr + ngx_cached_err_log_time.len;
  
@@ -141,7 +141,7 @@ index d7830fb..b0a9733 100644
      p = ngx_slprintf(p, last, " [%V] ", &err_levels[level]);
  
      /* pid#tid */
-@@ -140,11 +213,27 @@ ngx_log_error_core(ngx_uint_t level, ngx_log_t *log, ngx_err_t err,
+@@ -140,11 +213,27 @@ ngx_log_error_core(ngx_uint_t level, ngx
  
      ngx_linefeed(p);
  
@@ -169,7 +169,7 @@ index d7830fb..b0a9733 100644
      {
          return;
      }
-@@ -365,6 +454,50 @@ ngx_log_create(ngx_cycle_t *cycle, ngx_str_t *name)
+@@ -365,6 +454,50 @@ ngx_log_create(ngx_cycle_t *cycle, ngx_s
  
      return log;
  }
@@ -234,7 +234,7 @@ index d7830fb..b0a9733 100644
  
      if (cf->cycle->new_log.file) {
          return "is duplicate";
-@@ -436,7 +576,44 @@ ngx_error_log(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+@@ -436,7 +576,44 @@ ngx_error_log(ngx_conf_t *cf, ngx_comman
  
      value = cf->args->elts;
  
@@ -279,7 +279,7 @@ index d7830fb..b0a9733 100644
          ngx_str_null(&name);
  
      } else {
-@@ -457,3 +634,63 @@ ngx_error_log(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+@@ -457,3 +634,63 @@ ngx_error_log(ngx_conf_t *cf, ngx_comman
  
      return ngx_log_set_levels(cf, &cf->cycle->new_log);
  }
@@ -343,10 +343,10 @@ index d7830fb..b0a9733 100644
 +}
 +#endif
 +
-diff --git a/src/core/ngx_log.h b/src/core/ngx_log.h
-index 3233647..5e7fdbf 100644
---- a/src/core/ngx_log.h
-+++ b/src/core/ngx_log.h
+Index: nginx-1.2.5/src/core/ngx_log.h
+===================================================================
+--- nginx-1.2.5.orig/src/core/ngx_log.h
++++ nginx-1.2.5/src/core/ngx_log.h
 @@ -12,6 +12,13 @@
  #include <ngx_config.h>
  #include <ngx_core.h>
@@ -375,7 +375,7 @@ index 3233647..5e7fdbf 100644
  };
  
  
-@@ -221,6 +235,10 @@ void ngx_cdecl ngx_log_debug_core(ngx_log_t *log, ngx_err_t err,
+@@ -221,6 +235,10 @@ void ngx_cdecl ngx_log_debug_core(ngx_lo
  
  ngx_log_t *ngx_log_init(u_char *prefix);
  ngx_log_t *ngx_log_create(ngx_cycle_t *cycle, ngx_str_t *name);
@@ -386,10 +386,10 @@ index 3233647..5e7fdbf 100644
  char *ngx_log_set_levels(ngx_conf_t *cf, ngx_log_t *log);
  void ngx_cdecl ngx_log_abort(ngx_err_t err, const char *fmt, ...);
  void ngx_cdecl ngx_log_stderr(ngx_err_t err, const char *fmt, ...);
-diff --git a/src/http/modules/ngx_http_log_module.c b/src/http/modules/ngx_http_log_module.c
-index 2d41285..fd3ce30 100644
---- a/src/http/modules/ngx_http_log_module.c
-+++ b/src/http/modules/ngx_http_log_module.c
+Index: nginx-1.2.5/src/http/modules/ngx_http_log_module.c
+===================================================================
+--- nginx-1.2.5.orig/src/http/modules/ngx_http_log_module.c
++++ nginx-1.2.5/src/http/modules/ngx_http_log_module.c
 @@ -9,6 +9,11 @@
  #include <ngx_core.h>
  #include <ngx_http.h>
@@ -414,7 +414,7 @@ index 2d41285..fd3ce30 100644
  } ngx_http_log_t;
  
  
-@@ -323,11 +333,27 @@ ngx_http_log_write(ngx_http_request_t *r, ngx_http_log_t *log, u_char *buf,
+@@ -314,11 +324,27 @@ ngx_http_log_write(ngx_http_request_t *r
      time_t      now;
      ssize_t     n;
      ngx_err_t   err;
@@ -443,7 +443,7 @@ index 2d41285..fd3ce30 100644
      } else {
          name = NULL;
          n = ngx_http_log_script_write(r, log->script, &name, buf, len);
-@@ -859,6 +885,10 @@ ngx_http_log_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
+@@ -831,6 +857,10 @@ ngx_http_log_merge_loc_conf(ngx_conf_t *
      log->script = NULL;
      log->disk_full_time = 0;
      log->error_log_time = 0;
@@ -454,7 +454,7 @@ index 2d41285..fd3ce30 100644
  
      lmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_log_module);
      fmt = lmcf->formats.elts;
-@@ -884,6 +914,13 @@ ngx_http_log_set_log(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+@@ -856,6 +886,13 @@ ngx_http_log_set_log(ngx_conf_t *cf, ngx
      ngx_http_log_main_conf_t   *lmcf;
      ngx_http_script_compile_t   sc;
  
@@ -468,7 +468,7 @@ index 2d41285..fd3ce30 100644
      value = cf->args->elts;
  
      if (ngx_strcmp(value[1].data, "off") == 0) {
-@@ -896,6 +933,38 @@ ngx_http_log_set_log(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+@@ -868,6 +905,38 @@ ngx_http_log_set_log(ngx_conf_t *cf, ngx
                             "invalid parameter \"%V\"", &value[2]);
          return NGX_CONF_ERROR;
      }
@@ -507,7 +507,7 @@ index 2d41285..fd3ce30 100644
  
      if (llcf->logs == NULL) {
          llcf->logs = ngx_array_create(cf->pool, 2, sizeof(ngx_http_log_t));
-@@ -913,6 +982,52 @@ ngx_http_log_set_log(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+@@ -885,6 +954,52 @@ ngx_http_log_set_log(ngx_conf_t *cf, ngx
  
      ngx_memzero(log, sizeof(ngx_http_log_t));
  
@@ -560,7 +560,7 @@ index 2d41285..fd3ce30 100644
      n = ngx_http_script_variables_count(&value[1]);
  
      if (n == 0) {
-@@ -920,7 +1035,7 @@ ngx_http_log_set_log(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+@@ -892,7 +1007,7 @@ ngx_http_log_set_log(ngx_conf_t *cf, ngx
          if (log->file == NULL) {
              return NGX_CONF_ERROR;
          }
@@ -569,7 +569,7 @@ index 2d41285..fd3ce30 100644
      } else {
          if (ngx_conf_full_name(cf->cycle, &value[1], 0) != NGX_OK) {
              return NGX_CONF_ERROR;
-@@ -945,6 +1060,7 @@ ngx_http_log_set_log(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+@@ -917,6 +1032,7 @@ ngx_http_log_set_log(ngx_conf_t *cf, ngx
              return NGX_CONF_ERROR;
          }
      }
@@ -577,11 +577,11 @@ index 2d41285..fd3ce30 100644
  
      if (cf->args->nelts >= 3) {
          name = value[2];
-diff --git a/src/http/ngx_http_core_module.c b/src/http/ngx_http_core_module.c
-index 42dd664..a46c60d 100644
---- a/src/http/ngx_http_core_module.c
-+++ b/src/http/ngx_http_core_module.c
-@@ -1450,6 +1450,9 @@ ngx_http_update_location_config(ngx_http_request_t *r)
+Index: nginx-1.2.5/src/http/ngx_http_core_module.c
+===================================================================
+--- nginx-1.2.5.orig/src/http/ngx_http_core_module.c
++++ nginx-1.2.5/src/http/ngx_http_core_module.c
+@@ -1450,6 +1450,9 @@ ngx_http_update_location_config(ngx_http
  
      if (r == r->main) {
          r->connection->log->file = clcf->error_log->file;
@@ -591,7 +591,7 @@ index 42dd664..a46c60d 100644
  
          if (!(r->connection->log->log_level & NGX_LOG_DEBUG_CONNECTION)) {
              r->connection->log->log_level = clcf->error_log->log_level;
-@@ -4657,6 +4660,15 @@ ngx_http_core_error_log(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+@@ -4763,6 +4766,15 @@ ngx_http_core_error_log(ngx_conf_t *cf, 
  
      ngx_str_t  *value, name;
  
@@ -607,7 +607,7 @@ index 42dd664..a46c60d 100644
      if (clcf->error_log) {
          return "is duplicate";
      }
-@@ -4666,6 +4678,36 @@ ngx_http_core_error_log(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+@@ -4772,6 +4784,36 @@ ngx_http_core_error_log(ngx_conf_t *cf, 
      if (ngx_strcmp(value[1].data, "stderr") == 0) {
          ngx_str_null(&name);
  
@@ -644,7 +644,7 @@ index 42dd664..a46c60d 100644
      } else {
          name = value[1];
      }
-@@ -4675,6 +4717,17 @@ ngx_http_core_error_log(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+@@ -4781,6 +4823,17 @@ ngx_http_core_error_log(ngx_conf_t *cf, 
          return NGX_CONF_ERROR;
      }
  
@@ -662,10 +662,10 @@ index 42dd664..a46c60d 100644
      if (cf->args->nelts == 2) {
          clcf->error_log->log_level = NGX_LOG_ERR;
          return NGX_CONF_OK;
-diff --git a/src/http/ngx_http_request.c b/src/http/ngx_http_request.c
-index 052f379..1d799d5 100644
---- a/src/http/ngx_http_request.c
-+++ b/src/http/ngx_http_request.c
+Index: nginx-1.2.5/src/http/ngx_http_request.c
+===================================================================
+--- nginx-1.2.5.orig/src/http/ngx_http_request.c
++++ nginx-1.2.5/src/http/ngx_http_request.c
 @@ -433,6 +433,9 @@ ngx_http_init_request(ngx_event_t *rev)
  
      clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);
@@ -676,7 +676,7 @@ index 052f379..1d799d5 100644
      if (!(c->log->log_level & NGX_LOG_DEBUG_CONNECTION)) {
          c->log->log_level = clcf->error_log->log_level;
      }
-@@ -1819,6 +1822,9 @@ found:
+@@ -1834,6 +1837,9 @@ found:
  
      clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);
      r->connection->log->file = clcf->error_log->file;
