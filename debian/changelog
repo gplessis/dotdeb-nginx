@@ -1,3 +1,9 @@
+nginx (1.2.6-1~dotdeb.1) UNRELEASED; urgency=medium
+
+  * Passenger 3.0.19
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Tue, 15 Jan 2012 10:27:42 +0100
+
 nginx (1.2.6-1~dotdeb.0) stable; urgency=medium
 
   * New upstream release
