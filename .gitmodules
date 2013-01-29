@@ -16,3 +16,6 @@
 [submodule "debian/modules/nginx-lua"]
 	path = debian/modules/nginx-lua
 	url = git://github.com/chaoslawful/lua-nginx-module.git
+[submodule "debian/modules/nginx-upstream-fair"]
+	path = debian/modules/nginx-upstream-fair
+	url = git://github.com/gnosek/nginx-upstream-fair.git
