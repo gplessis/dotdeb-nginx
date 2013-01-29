@@ -57,10 +57,6 @@ README for Modules versions
   Homepage: http://code.google.com/p/naxsi/
   Version: 0.48
 
- nginx-cache-purge
-  Homepage: http://labs.frickle.com/nginx_ngx_cache_purge/
-  Version: 1.6
-
  nginx-dav-ext-module
   Homepage: https://github.com/arut/nginx-dav-ext-module
   Version: v0.0.2-2-g54cebc1.tar.gz
