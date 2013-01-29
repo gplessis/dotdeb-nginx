@@ -25,3 +25,6 @@
 [submodule "debian/modules/nginx-upload-progress"]
 	path = debian/modules/nginx-upload-progress
 	url = git://github.com/masterzen/nginx-upload-progress-module.git
+[submodule "debian/modules/nginx-push-stream-module"]
+	path = debian/modules/nginx-push-stream-module
+	url = git://github.com/wandenberg/nginx-push-stream-module.git
