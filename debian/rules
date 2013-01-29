@@ -107,7 +107,7 @@ config.status.full: config.env.full config.sub config.guess
 	    --add-module=$(MODULESDIR)/nginx-dav-ext-module \
 	    --add-module=$(MODULESDIR)/nginx-syslog \
 	    --add-module=$(MODULESDIR)/nginx-cache-purge \
-	    --add-module=$(MODULESDIR)/nginx-pinba \
+	    --add-module=$(MODULESDIR)/ngx_http_pinba_module \
 	    --add-module=$(MODULESDIR)/nginx-http-substitution-filter \
             $(CONFIGURE_OPTS) >$@
 	touch $@
@@ -193,7 +193,7 @@ config.status.extras: config.env.extras config.sub config.guess
 	    --add-module=$(MODULESDIR)/nginx-dav-ext-module \
 	    --add-module=$(MODULESDIR)/nginx-syslog \
 	    --add-module=$(MODULESDIR)/nginx-cache-purge \
-	    --add-module=$(MODULESDIR)/nginx-pinba \
+	    --add-module=$(MODULESDIR)/ngx_http_pinba_module \
 	    --add-module=$(MODULESDIR)/nginx-http-substitution-filter \
             $(CONFIGURE_OPTS) >$@
 	touch $@
@@ -269,7 +269,7 @@ config.status.passenger: config.env.passenger config.sub config.guess
 	    --add-module=$(MODULESDIR)/nginx-syslog \
 	    --add-module=$(MODULESDIR)/nginx-cache-purge \
 	    --add-module=$(MODULESDIR)/ruby-passenger/ext/nginx \
-	    --add-module=$(MODULESDIR)/nginx-pinba \
+	    --add-module=$(MODULESDIR)/ngx_http_pinba_module \
 	    --add-module=$(MODULESDIR)/nginx-http-substitution-filter \
 	    $(CONFIGURE_OPTS) >$@
 	touch $@

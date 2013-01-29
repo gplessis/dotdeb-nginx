@@ -17,10 +17,6 @@ README for Modules versions
   Homepage: http://code.google.com/p/naxsi/
   Version: 0.48
 
-nginx-pinba
-  Homepage: http://pinba.org/
-  Version: 201211132155
-
 nginx-http-substitution-filter
   Homepage: https://github.com/yaoweibin/ngx_http_substitutions_filter_module
   Version: v0.6.2-6aa992a2
