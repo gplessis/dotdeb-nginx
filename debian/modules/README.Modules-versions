@@ -8,11 +8,6 @@ README for Modules versions
   http://web.iti.upv.es/~sto/nginx/
   Version: 1.2
 
- nginx-lua
-  Homepage: https://github.com/chaoslawful/lua-nginx-module
-  https://github.com/chaoslawful/lua-nginx-module.git
-  Version: v0.7.4-35d963f1
-
  nginx-upstream-fair
   Homepage: https://github.com/gnosek/nginx-upstream-fair
   Version: a18b409

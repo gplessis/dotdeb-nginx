@@ -13,3 +13,6 @@
 [submodule "debian/modules/nginx-echo"]
 	path = debian/modules/nginx-echo
 	url = git://github.com/agentzh/echo-nginx-module.git
+[submodule "debian/modules/nginx-lua"]
+	path = debian/modules/nginx-lua
+	url = git://github.com/chaoslawful/lua-nginx-module.git
