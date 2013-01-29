@@ -2,11 +2,7 @@ README for Modules versions
 ---------------------------
 
  This file lists third party modules built with nginx in Debian, homepage and
- version.
-
- nginx-development-kit
-  https://github.com/simpl/ngx_devel_kit/
-  Version: v0.2.17-7-f92d6c6a
+ version and that are not git submodules.
 
  nginx-auth-pam
   http://web.iti.upv.es/~sto/nginx/

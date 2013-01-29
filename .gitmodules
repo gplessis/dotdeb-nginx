@@ -7,3 +7,6 @@
 [submodule "debian/modules/headers-more-nginx-module"]
 	path = debian/modules/headers-more-nginx-module
 	url = git://github.com/agentzh/headers-more-nginx-module.git
+[submodule "debian/modules/nginx-development-kit"]
+	path = debian/modules/nginx-development-kit
+	url = git://github.com/simpl/ngx_devel_kit.git
