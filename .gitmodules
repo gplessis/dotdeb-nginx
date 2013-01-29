@@ -10,3 +10,6 @@
 [submodule "debian/modules/nginx-development-kit"]
 	path = debian/modules/nginx-development-kit
 	url = git://github.com/simpl/ngx_devel_kit.git
+[submodule "debian/modules/nginx-echo"]
+	path = debian/modules/nginx-echo
+	url = git://github.com/agentzh/echo-nginx-module.git

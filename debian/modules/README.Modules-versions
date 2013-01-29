@@ -8,10 +8,6 @@ README for Modules versions
   http://web.iti.upv.es/~sto/nginx/
   Version: 1.2
 
- nginx-echo
-  https://github.com/agentzh/echo-nginx-module
-  Version: v0.41-b1e519fe
-
  nginx-lua
   Homepage: https://github.com/chaoslawful/lua-nginx-module
   https://github.com/chaoslawful/lua-nginx-module.git
