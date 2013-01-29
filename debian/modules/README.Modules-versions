@@ -8,12 +8,6 @@ README for Modules versions
   http://web.iti.upv.es/~sto/nginx/
   Version: 1.2
 
- nginx-upload-progress
-  Homepage: https://github.com/masterzen/nginx-upload-progress-module
-  https://nodeload.github.com/masterzen/nginx-upload-progress-module/tarball/master
-  rm -r debian/nginx-upload-progress/test
-  Version: v0.9.0-0-ga788dea
-
  nginx-push-stream-module
   Homepage: https://github.com/wandenberg/nginx-push-stream-module
   https://github.com/wandenberg/nginx-push-stream-module.git
