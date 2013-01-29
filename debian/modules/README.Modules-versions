@@ -4,10 +4,6 @@ README for Modules versions
  This file lists third party modules built with nginx in Debian, homepage and
  version.
 
- chunkin-nginx-module
-  https://github.com/agentzh/chunkin-nginx-module
-  Version: v0.23rc2-3-e57a7ab9
-
  headers-more-nginx-module
   https://github.com/agentzh/headers-more-nginx-module
   Version: v0.18-179f39b1
