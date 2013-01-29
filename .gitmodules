@@ -31,3 +31,6 @@
 [submodule "debian/modules/nginx-dav-ext-module"]
 	path = debian/modules/nginx-dav-ext-module
 	url = git://github.com/arut/nginx-dav-ext-module.git
+[submodule "debian/modules/ruby-passenger"]
+	path = debian/modules/ruby-passenger
+	url = git://github.com/FooBarWidget/passenger.git
