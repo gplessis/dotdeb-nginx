@@ -8,10 +8,6 @@ README for Modules versions
   http://web.iti.upv.es/~sto/nginx/
   Version: 1.2
 
- nginx-upload
-  Homepage: https://github.com/vkholodkov/nginx-upload-module
-  Version: 2.2.0
-
  nginx-upload-progress
   Homepage: https://github.com/masterzen/nginx-upload-progress-module
   https://nodeload.github.com/masterzen/nginx-upload-progress-module/tarball/master

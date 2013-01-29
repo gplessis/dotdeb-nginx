@@ -19,3 +19,6 @@
 [submodule "debian/modules/nginx-upstream-fair"]
 	path = debian/modules/nginx-upstream-fair
 	url = git://github.com/gnosek/nginx-upstream-fair.git
+[submodule "debian/modules/nginx-upload-module"]
+	path = debian/modules/nginx-upload-module
+	url = git://github.com/vkholodkov/nginx-upload-module.git
