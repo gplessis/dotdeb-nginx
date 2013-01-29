@@ -4,3 +4,6 @@
 [submodule "debian/modules/chunkin-nginx-module"]
 	path = debian/modules/chunkin-nginx-module
 	url = git://github.com/agentzh/chunkin-nginx-module.git
+[submodule "debian/modules/headers-more-nginx-module"]
+	path = debian/modules/headers-more-nginx-module
+	url = git://github.com/agentzh/headers-more-nginx-module.git

@@ -4,10 +4,6 @@ README for Modules versions
  This file lists third party modules built with nginx in Debian, homepage and
  version.
 
- headers-more-nginx-module
-  https://github.com/agentzh/headers-more-nginx-module
-  Version: v0.18-179f39b1
-
  nginx-development-kit
   https://github.com/simpl/ngx_devel_kit/
   Version: v0.2.17-7-f92d6c6a
