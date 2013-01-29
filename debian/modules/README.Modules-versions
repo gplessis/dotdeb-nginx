@@ -17,10 +17,6 @@ README for Modules versions
   Homepage: http://code.google.com/p/naxsi/
   Version: 0.48
 
- nginx-dav-ext-module
-  Homepage: https://github.com/arut/nginx-dav-ext-module
-  Version: v0.0.2-2-g54cebc1.tar.gz
-
  ruby-passenger
   Homepage: http://www.modrails.com/
   Version: 3.0.19

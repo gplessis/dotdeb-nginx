@@ -28,3 +28,6 @@
 [submodule "debian/modules/nginx-push-stream-module"]
 	path = debian/modules/nginx-push-stream-module
 	url = git://github.com/wandenberg/nginx-push-stream-module.git
+[submodule "debian/modules/nginx-dav-ext-module"]
+	path = debian/modules/nginx-dav-ext-module
+	url = git://github.com/arut/nginx-dav-ext-module.git
