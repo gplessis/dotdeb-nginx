@@ -1,5 +1,6 @@
 nginx (1.2.6-1~dotdeb.1) UNRELEASED; urgency=medium
 
+  * Sync with Debian
   * Passenger 3.0.19
   * chunkin-nginx-module 0.23
   * nginx-lua 414c6605

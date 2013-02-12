@@ -207,12 +207,11 @@ Description: nginx web/proxy server (extended version)
  .
  MAIL MODULES: Mail Core, IMAP, POP3, SMTP, SSL.
  .
- THIRD PARTY MODULES: Auth PAM, Chunkin, DAV Ext, Echo, Embedded Lua,
- HttpHeadersMore, http push, Nginx Development Kit, Upload module,
- Upload Progress, Upstream Fair Queue.
+ THIRD PARTY MODULES: Auth PAM, Chunkin, Cache purge, DAV Ext, Echo,
+ Embedded Lua, HttpHeadersMore, http push, Nginx Development Kit,
+ Upload module, Upload Progress, Upstream Fair Queue.
  .
- MODULES ADDED BY DOTDEB : File AIO, Syslog, Cache purge, Pinba, HTTP
- substitution filter
+ MODULES ADDED BY DOTDEB : File AIO, Syslog, Pinba, HTTP substitution filter
 
 Package: nginx-extras-dbg
 Architecture: any
@@ -258,11 +257,11 @@ Description: nginx web/proxy server (version with naxsi)
  Limit Requests, Limit Zone, Log, Map, Memcached, Proxy, Referer,
  Rewrite, Split Clients, SSI, Upstream, User ID.
  .
- OPTIONAL HTTP MODULES: IPv6, SSL, Stub Status.
+ OPTIONAL HTTP MODULES: IPv6, Real IP, SSL, Stub Status.
  .
  THIRD PARTY MODULES: Naxsi, Cache Purge, Upstream Fair.
  .
- MODULES ADDED BY DOTDEB : File AIO, Gzip static, Stub status, Echo, Syslog
+ MODULES ADDED BY DOTDEB : File AIO, Gzip static, Echo, Syslog
 
 Package: nginx-naxsi-dbg
 Architecture: any

@@ -1,5 +1,5 @@
 /var/log/nginx/*.log {
-	daily
+	weekly
 	missingok
 	rotate 52
 	compress
