@@ -1,8 +1,11 @@
 nginx (1.2.6-1~dotdeb.1) UNRELEASED; urgency=medium
 
   * Passenger 3.0.19
+  * chunkin-nginx-module 0.23
+  * nginx-lua 414c6605
+  * nginx-upload-module 2.2
 
- -- Guillaume Plessis <gui@dotdeb.org>  Tue, 15 Jan 2012 10:27:42 +0100
+ -- Guillaume Plessis <gui@dotdeb.org>  Tue, 12 Feb 2013 16:41:42 +0100
 
 nginx (1.2.6-1~dotdeb.0) stable; urgency=medium
 
