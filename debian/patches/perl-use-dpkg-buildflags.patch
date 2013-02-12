@@ -1,10 +1,10 @@
 Description: Use build flags from environment for perl (dpkg-buildflags).
  Necessary for hardening flags.
 Author: Simon Ruderich <simon@ruderich.org>
-Index: nginx-1.2.5/src/http/modules/perl/Makefile.PL
+Index: nginx-1.2.7/src/http/modules/perl/Makefile.PL
 ===================================================================
---- nginx-1.2.5.orig/src/http/modules/perl/Makefile.PL
-+++ nginx-1.2.5/src/http/modules/perl/Makefile.PL
+--- nginx-1.2.7.orig/src/http/modules/perl/Makefile.PL
++++ nginx-1.2.7/src/http/modules/perl/Makefile.PL
 @@ -3,6 +3,7 @@
  # Copyright (C) Nginx, Inc.
  
@@ -24,4 +24,4 @@ Index: nginx-1.2.5/src/http/modules/perl/Makefile.PL
 +    LDDLFLAGS         => "$Config{lddlflags} $ENV{LDFLAGS}",
      OPTIMIZE          => '-O',
  
-     INC               => "-I ../../../../../src/core " .
+     INC               => join(" ", map {
