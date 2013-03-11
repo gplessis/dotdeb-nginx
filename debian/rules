@@ -97,8 +97,6 @@ config.status.full: config.env.full config.sub config.guess
 	    --with-http_sub_module \
 	    --with-http_xslt_module \
 	    --with-ipv6 \
-	    --with-sha1=/usr/include/openssl \
-	    --with-md5=/usr/include/openssl \
 	    --with-mail \
 	    --with-mail_ssl_module \
 	    --add-module=$(MODULESDIR)/nginx-auth-pam \
@@ -176,8 +174,6 @@ config.status.extras: config.env.extras config.sub config.guess
 	    --with-http_sub_module \
 	    --with-http_xslt_module \
 	    --with-ipv6 \
-	    --with-sha1=/usr/include/openssl \
-	    --with-md5=/usr/include/openssl \
 	    --with-mail \
 	    --with-mail_ssl_module \
 	    --add-module=$(MODULESDIR)/chunkin-nginx-module \
@@ -259,8 +255,6 @@ config.status.passenger: config.env.passenger config.sub config.guess
 	    --with-http_sub_module \
 	    --with-http_xslt_module \
 	    --with-ipv6 \
-	    --with-sha1=/usr/include/openssl \
-	    --with-md5=/usr/include/openssl \
 	    --with-mail \
 	    --with-mail_ssl_module \
 	    --add-module=$(MODULESDIR)/nginx-auth-pam \
