@@ -64,6 +64,8 @@ class SQLWrapper(object):
     def StopInsert(self):
         if self.dbtype == 'sqlite':
             self.__conn.commit()
+        elif self.dbtype == 'mysql':
+            self.__conn.commit()
 
     def getResults(self):
         return self.__cursor.fetchall()
