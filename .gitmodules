@@ -40,3 +40,6 @@
 [submodule "debian/modules/ngx_http_substitutions_filter_module"]
 	path = debian/modules/ngx_http_substitutions_filter_module
 	url = git://github.com/yaoweibin/ngx_http_substitutions_filter_module.git
+[submodule "debian/modules/nginx-x-rid-header"]
+	path = debian/modules/nginx-x-rid-header
+	url = git://github.com/soundcloud/nginx-x-rid-header.git

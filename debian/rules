@@ -107,6 +107,8 @@ config.status.full: config.env.full config.sub config.guess
 	    --add-module=$(MODULESDIR)/nginx-cache-purge \
 	    --add-module=$(MODULESDIR)/ngx_http_pinba_module \
 	    --add-module=$(MODULESDIR)/ngx_http_substitutions_filter_module \
+	    --add-module=$(MODULESDIR)/nginx-x-rid-header \
+				--with-ld-opt=-lossp-uuid \
             $(CONFIGURE_OPTS) >$@
 	touch $@
 
@@ -139,6 +141,8 @@ config.status.light: config.env.light config.sub config.guess
 	    --without-http_userid_module \
 	    --without-http_uwsgi_module \
 	    --add-module=$(MODULESDIR)/nginx-echo \
+	    --add-module=$(MODULESDIR)/nginx-x-rid-header \
+				--with-ld-opt=-lossp-uuid \
             $(CONFIGURE_OPTS) >$@
 	touch $@
 
@@ -191,6 +195,8 @@ config.status.extras: config.env.extras config.sub config.guess
 	    --add-module=$(MODULESDIR)/nginx-syslog \
 	    --add-module=$(MODULESDIR)/ngx_http_pinba_module \
 	    --add-module=$(MODULESDIR)/ngx_http_substitutions_filter_module \
+	    --add-module=$(MODULESDIR)/nginx-x-rid-header \
+				--with-ld-opt=-lossp-uuid \
             $(CONFIGURE_OPTS) >$@
 	touch $@
 
@@ -224,6 +230,8 @@ config.status.naxsi: config.env.naxsi config.sub config.guess
 	    --add-module=$(MODULESDIR)/nginx-upstream-fair \
 	    --add-module=$(MODULESDIR)/nginx-echo \
 	    --add-module=$(MODULESDIR)/nginx-syslog \
+	    --add-module=$(MODULESDIR)/nginx-x-rid-header \
+				--with-ld-opt=-lossp-uuid \
 	    $(CONFIGURE_OPTS) >$@
 	touch $@
 
@@ -266,6 +274,8 @@ config.status.passenger: config.env.passenger config.sub config.guess
 	    --add-module=$(MODULESDIR)/ruby-passenger/ext/nginx \
 	    --add-module=$(MODULESDIR)/ngx_http_pinba_module \
 	    --add-module=$(MODULESDIR)/ngx_http_substitutions_filter_module \
+	    --add-module=$(MODULESDIR)/nginx-x-rid-header \
+				--with-ld-opt=-lossp-uuid \
 	    $(CONFIGURE_OPTS) >$@
 	touch $@
 

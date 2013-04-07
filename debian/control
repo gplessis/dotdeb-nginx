@@ -13,6 +13,7 @@ Build-Depends: autotools-dev,
                libgeoip-dev,
                liblua5.1-dev,
                libmhash-dev,
+               libossp-uuid-dev,
                libpam0g-dev,
                libpcre3-dev,
                libperl-dev,
@@ -107,7 +108,7 @@ Description: nginx web/proxy server (standard version)
  THIRD PARTY MODULES: Auth PAM, DAV Ext, Echo, Upstream Fair Queue.
  .
  MODULES ADDED BY DOTDEB : File AIO, Secure link, Syslog, Cache purge, Pinba,
- HTTP substitution filter
+ HTTP substitution filter, X-rid header
 
 Package: nginx-full-dbg
 Architecture: any
@@ -154,7 +155,7 @@ Description: nginx web/proxy server (basic version)
  .
  THIRD PARTY MODULES: Echo.
  .
- MODULES ADDED BY DOTDEB : File AIO
+ MODULES ADDED BY DOTDEB : File AIO, X-rid header
 
 Package: nginx-light-dbg
 Architecture: any
@@ -212,7 +213,8 @@ Description: nginx web/proxy server (extended version)
  Embedded Lua, HttpHeadersMore, http push, Nginx Development Kit,
  Upload module, Upload Progress, Upstream Fair Queue.
  .
- MODULES ADDED BY DOTDEB : File AIO, Syslog, Pinba, HTTP substitution filter
+ MODULES ADDED BY DOTDEB : File AIO, Syslog, Pinba, HTTP substitution filter,
+ X-rid header
 
 Package: nginx-extras-dbg
 Architecture: any
@@ -262,7 +264,7 @@ Description: nginx web/proxy server (version with naxsi)
  .
  THIRD PARTY MODULES: Naxsi, Cache Purge, Upstream Fair.
  .
- MODULES ADDED BY DOTDEB : File AIO, Gzip static, Echo, Syslog
+ MODULES ADDED BY DOTDEB : File AIO, Gzip static, Echo, Syslog, X-rid header
 
 Package: nginx-naxsi-dbg
 Architecture: any
@@ -347,7 +349,7 @@ Description: nginx web/proxy server (Passenger version)
  THIRD PARTY MODULES: Echo, Upstream Fair Queue, Passenger.
  .
  MODULES ADDED BY DOTDEB : File AIO, Secure link, Auth PAM, Headers more,
- Syslog, Cache purge, Pinba, HTTP substitution filter
+ Syslog, Cache purge, Pinba, HTTP substitution filter, X-rid header
 
 Package: nginx-passenger-dbg
 Architecture: linux-any kfreebsd-any
