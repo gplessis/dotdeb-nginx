@@ -39,9 +39,7 @@ if [ -n "$ULIMIT" ]; then
 fi
 
 test_nginx_config() {
-  $DAEMON -t $DAEMON_OPTS >/dev/null 2>&1
-  retvar=$?
-  if [ $retvar -ne 0 ]
+  if ! $DAEMON -t $DAEMON_OPTS >/dev/null 2>&1
   then
     $DAEMON -t $DAEMON_OPTS
     exit $?

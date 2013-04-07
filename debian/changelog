@@ -1,6 +1,7 @@
 nginx (1.2.8-1~dotdeb.2) stable; urgency=medium
 
   * Typo : ipv6only
+  * Now displays errors at startup
 
  -- Guillaume Plessis <gui@dotdeb.org>  Sun, 07 Apr 2013 10:00:42 -0700
 
