@@ -1,3 +1,9 @@
+nginx (1.2.8-1~dotdeb.2) stable; urgency=medium
+
+  * Typo : ipv6only
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Sun, 07 Apr 2013 10:00:42 -0700
+
 nginx (1.2.8-1~dotdeb.1) stable; urgency=medium
 
   * New upstream release
