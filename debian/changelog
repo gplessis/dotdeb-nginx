@@ -1,3 +1,11 @@
+nginx (1.2.8-1~dotdeb.1) stable; urgency=medium
+
+  * New upstream release
+  * Modules update
+  * Adds X-rid header module to all flavors. Closes #10
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Sat, 06 Apr 2013 16:30:42 -0700
+
 nginx (1.2.7-1~dotdeb.1) stable; urgency=medium
 
   * New upstream release. Closes #14
