@@ -38,14 +38,15 @@
 #include <sys/times.h>
 #include <ctype.h>
 
-    /* ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, "TOP READ CONF %V %V",  */
-    /* 		       &(value[0]), &(value[1]));   */
 /*
 ** Macro used to print incorrect configuration lines
 */
 #define ngx_http_dummy_line_conf_error(cf, value) do {	\
-    ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, "Naxsi-Config : Incorrect line %V %V (%s/%d)...", &(value[0]), &(value[1]), __FILE__, __LINE__); \
+    ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, \
+		       "Naxsi-Config : Incorrect line %V %V (%s/%d)...", \
+		       &(value[0]), &(value[1]), __FILE__, __LINE__);	\
   } while (0)
+
 
 /*
 ** Module's registred function/handlers.
@@ -58,6 +59,19 @@ static ngx_int_t	ngx_http_dummy_init(ngx_conf_t *cf);
 static char		*ngx_http_dummy_read_conf(ngx_conf_t *cf, 
 						  ngx_command_t *cmd,
 						  void *conf);
+
+static char		*ngx_http_naxsi_cr_loc_conf(ngx_conf_t *cf, 
+						    ngx_command_t *cmd,
+						    void *conf);
+
+static char		*ngx_http_naxsi_ud_loc_conf(ngx_conf_t *cf, 
+						    ngx_command_t *cmd,
+						    void *conf);
+
+static char		*ngx_http_naxsi_flags_loc_conf(ngx_conf_t *cf, 
+						       ngx_command_t *cmd,
+						       void *conf);
+
 static void		*ngx_http_dummy_create_loc_conf(ngx_conf_t *cf);
 static char		*ngx_http_dummy_merge_loc_conf(ngx_conf_t *cf, 
 						       void *parent,
@@ -75,6 +89,15 @@ static ngx_command_t  ngx_http_dummy_commands[] =  {
     NGX_HTTP_MAIN_CONF_OFFSET,
     0,
     NULL },
+  
+  /* BasicRule (in main) - nginx style */
+  { ngx_string(TOP_MAIN_BASIC_RULE_N),
+    NGX_HTTP_MAIN_CONF|NGX_CONF_1MORE,
+    ngx_http_dummy_read_main_conf,
+    NGX_HTTP_MAIN_CONF_OFFSET,
+    0,
+    NULL },
+  
   /* BasicRule (in loc) */
   { ngx_string(TOP_BASIC_RULE_T),
     NGX_HTTP_LOC_CONF|NGX_HTTP_LMT_CONF|NGX_CONF_1MORE,
@@ -82,47 +105,109 @@ static ngx_command_t  ngx_http_dummy_commands[] =  {
     NGX_HTTP_LOC_CONF_OFFSET,
     0,
     NULL },
-  /* DeniedUrl */
-  { ngx_string(TOP_DENIED_URL_T),
-    NGX_HTTP_LOC_CONF|NGX_HTTP_LMT_CONF
-    |NGX_CONF_1MORE,
+
+  /* BasicRule (in loc) - nginx style */
+  { ngx_string(TOP_BASIC_RULE_N),
+    NGX_HTTP_LOC_CONF|NGX_HTTP_LMT_CONF|NGX_CONF_1MORE,
     ngx_http_dummy_read_conf,
     NGX_HTTP_LOC_CONF_OFFSET,
     0,
     NULL },
 
-  /* FlagRule */
-  { ngx_string(TOP_LEARNING_FLAG_T),
+  /* DeniedUrl */
+  { ngx_string(TOP_DENIED_URL_T),
     NGX_HTTP_LOC_CONF|NGX_HTTP_LMT_CONF
-    |NGX_CONF_NOARGS,
-    ngx_http_dummy_read_conf,
+    |NGX_CONF_1MORE,
+    ngx_http_naxsi_ud_loc_conf,
     NGX_HTTP_LOC_CONF_OFFSET,
     0,
     NULL },
-  /* EnableFlag */
-  { ngx_string(TOP_ENABLED_FLAG_T),
+
+  /* DeniedUrl - nginx style */
+  { ngx_string(TOP_DENIED_URL_N),
     NGX_HTTP_LOC_CONF|NGX_HTTP_LMT_CONF
-    |NGX_CONF_NOARGS,
-    ngx_http_dummy_read_conf,
+    |NGX_CONF_1MORE,
+    ngx_http_naxsi_ud_loc_conf,
     NGX_HTTP_LOC_CONF_OFFSET,
     0,
     NULL },
-  /* DisableFlag */
-  { ngx_string(TOP_DISABLED_FLAG_T),
-    NGX_HTTP_LOC_CONF|NGX_HTTP_LMT_CONF
-    |NGX_CONF_NOARGS,
-    ngx_http_dummy_read_conf,
-    NGX_HTTP_LOC_CONF_OFFSET,
-    0,
-    NULL },
+
   /* CheckRule */
   { ngx_string(TOP_CHECK_RULE_T),
     NGX_HTTP_LOC_CONF|NGX_HTTP_LMT_CONF
     |NGX_CONF_1MORE,
-    ngx_http_dummy_read_conf,
+    ngx_http_naxsi_cr_loc_conf,
     NGX_HTTP_LOC_CONF_OFFSET,
     0,
     NULL },
+  
+  /* CheckRule  - nginx style*/
+  { ngx_string(TOP_CHECK_RULE_N),
+    NGX_HTTP_LOC_CONF|NGX_HTTP_LMT_CONF
+    |NGX_CONF_1MORE,
+    ngx_http_naxsi_cr_loc_conf,
+    NGX_HTTP_LOC_CONF_OFFSET,
+    0,
+    NULL },
+  /* 
+  ** flag rules
+  */
+  
+  /* Learning Flag */
+  { ngx_string(TOP_LEARNING_FLAG_T),
+    NGX_HTTP_LOC_CONF|NGX_HTTP_LMT_CONF
+    |NGX_CONF_NOARGS,
+    ngx_http_naxsi_flags_loc_conf,
+    NGX_HTTP_LOC_CONF_OFFSET,
+    0,
+    NULL },
+  
+  /* Learning Flag (nginx style) */
+  { ngx_string(TOP_LEARNING_FLAG_N),
+    NGX_HTTP_LOC_CONF|NGX_HTTP_LMT_CONF
+    |NGX_CONF_NOARGS,
+    ngx_http_naxsi_flags_loc_conf,
+    NGX_HTTP_LOC_CONF_OFFSET,
+    0,
+    NULL },
+
+  /* EnableFlag */
+  { ngx_string(TOP_ENABLED_FLAG_T),
+    NGX_HTTP_LOC_CONF|NGX_HTTP_LMT_CONF
+    |NGX_CONF_NOARGS,
+    ngx_http_naxsi_flags_loc_conf,
+    NGX_HTTP_LOC_CONF_OFFSET,
+    0,
+    NULL },
+
+  /* EnableFlag (nginx style) */
+  { ngx_string(TOP_ENABLED_FLAG_N),
+    NGX_HTTP_LOC_CONF|NGX_HTTP_LMT_CONF
+    |NGX_CONF_NOARGS,
+    ngx_http_naxsi_flags_loc_conf,
+    NGX_HTTP_LOC_CONF_OFFSET,
+    0,
+    NULL },
+  
+  /* DisableFlag */
+  { ngx_string(TOP_DISABLED_FLAG_T),
+    NGX_HTTP_LOC_CONF|NGX_HTTP_LMT_CONF
+    |NGX_CONF_NOARGS,
+    ngx_http_naxsi_flags_loc_conf,
+    NGX_HTTP_LOC_CONF_OFFSET,
+    0,
+    NULL },
+  
+  /* DisableFlag (nginx style) */
+  { ngx_string(TOP_DISABLED_FLAG_N),
+    NGX_HTTP_LOC_CONF|NGX_HTTP_LMT_CONF
+    |NGX_CONF_NOARGS,
+    ngx_http_naxsi_flags_loc_conf,
+    NGX_HTTP_LOC_CONF_OFFSET,
+    0,
+    NULL },
+
+
   ngx_null_command
 };
 
@@ -190,8 +275,8 @@ ngx_http_dummy_create_loc_conf(ngx_conf_t *cf)
 
 /* merge loc conf */
 /* NOTE/WARNING : This function wasn't tested correctly. 
- Actually, we shouldn't merge anything, as configuration is 
- specific 'per' location ? */
+   Actually, we shouldn't merge anything, as configuration is 
+   specific 'per' location ? */
 static char *
 ngx_http_dummy_merge_loc_conf(ngx_conf_t *cf, void *parent, 
 			      void *child)
@@ -232,21 +317,29 @@ ngx_http_dummy_init(ngx_conf_t *cf)
   if (cmcf == NULL || 
       main_cf == NULL)
     return (NGX_ERROR);
+  
   /* Register for access phase */
-  //h = ngx_array_push(&cmcf->phases[NGX_HTTP_ACCESS_PHASE].handlers);
   h = ngx_array_push(&cmcf->phases[NGX_HTTP_REWRITE_PHASE].handlers);
   if (h == NULL) 
     return (NGX_ERROR);
+  
   *h = ngx_http_dummy_access_handler;
   /* Go with each locations registred in the srv_conf. */
   loc_cf = main_cf->locations->elts;
+  
   for (i = 0; i < main_cf->locations->nelts; i++) {
+    loc_cf[i]->flag_enable_h = ngx_hash_key_lc((u_char *)RT_ENABLE, strlen(RT_ENABLE));
+    loc_cf[i]->flag_learning_h = ngx_hash_key_lc((u_char *)RT_LEARNING, strlen(RT_LEARNING));
+    loc_cf[i]->flag_post_action_h = ngx_hash_key_lc((u_char *)RT_POST_ACTION, strlen(RT_POST_ACTION));
+    loc_cf[i]->flag_extensive_log_h = ngx_hash_key_lc((u_char *)RT_EXTENSIVE_LOG, strlen(RT_EXTENSIVE_LOG));
+    
     if(ngx_http_dummy_create_hashtables_n(loc_cf[i], cf) != NGX_OK) {
       ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, 
 			 "WhiteList Hash building failed");
       return (NGX_ERROR);
     }
   }
+  
   return (NGX_OK);
 }
 
@@ -256,7 +349,6 @@ ngx_http_dummy_init(ngx_conf_t *cf)
 ** does : top level parsing config function, 
 **	  see foo_cfg_parse.c for stuff
 */
-//#define readconf_debug
 static char *
 ngx_http_dummy_read_conf(ngx_conf_t *cf, ngx_command_t *cmd, 
 			 void *conf)
@@ -266,10 +358,10 @@ ngx_http_dummy_read_conf(ngx_conf_t *cf, ngx_command_t *cmd,
   ngx_http_dummy_main_conf_t	*main_cf;
   ngx_str_t			*value;
   ngx_http_rule_t		rule, *rule_r;
-  ngx_http_check_rule_t		*rule_c;
   ngx_http_custom_rule_location_t	*location;
   unsigned int	i;
-  u_char			*var_end;
+  
+
   
 #ifdef readconf_debug
   if (cf) {
@@ -288,33 +380,6 @@ ngx_http_dummy_read_conf(ngx_conf_t *cf, ngx_command_t *cmd,
       return (NGX_CONF_ERROR);
     *bar = alcf;
     alcf->pushed = 1;
-  }
-  /* store denied URL for location */
-  if (!ngx_strcmp(value[0].data, TOP_DENIED_URL_T) && value[1].len) {
-    alcf->denied_url = ngx_pcalloc(cf->pool, sizeof(ngx_str_t));
-    if (!alcf->denied_url)
-      return (NGX_CONF_ERROR);
-    alcf->denied_url->data = ngx_pcalloc(cf->pool, value[1].len+1);
-    if (!alcf->denied_url->data)
-      return (NGX_CONF_ERROR);
-    memcpy(alcf->denied_url->data, value[1].data, value[1].len);
-    alcf->denied_url->len = value[1].len;
-    return (NGX_CONF_OK);
-  }
-  /* it's a flagrule, just a hack to enable/disable mod */
-  if (!ngx_strcmp(value[0].data, TOP_ENABLED_FLAG_T)) {
-    alcf->enabled = 1;
-    return (NGX_CONF_OK);
-  }
-  /* it's a flagrule, just a hack to enable/disable mod */
-  if (!ngx_strcmp(value[0].data, TOP_DISABLED_FLAG_T)) {
-    alcf->force_disabled = 1;
-    return (NGX_CONF_OK);
-  }
-  /* it's a flagrule, currently just a hack to enable/disable learning mode */
-  if (!ngx_strcmp(value[0].data, TOP_LEARNING_FLAG_T)) {
-    alcf->learning = 1;
-    return (NGX_CONF_OK);
   }
   if (!ngx_strcmp(value[0].data, TOP_BASIC_RULE_T)) {
 #ifdef readconf_debug
@@ -464,84 +529,203 @@ ngx_http_dummy_read_conf(ngx_conf_t *cf, ngx_command_t *cmd,
     }
     return (NGX_CONF_OK);
   }
-  /* this should be moved in a function, plus this code is not safe. */
-  else if (!ngx_strcmp(value[0].data, TOP_CHECK_RULE_T)) {
-#ifdef readconf_debug
-    ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, 
-		       "pushing rule %d in check rules", rule.rule_id);  
-#endif
-    i = 0;
-    if (!alcf->check_rules)
-      alcf->check_rules = ngx_array_create(cf->pool, 2, 
-					   sizeof(ngx_http_check_rule_t));
-    if (!alcf->check_rules)
-      return (NGX_CONF_ERROR);
-    rule_c = ngx_array_push(alcf->check_rules);
-    if (!rule_c) return (NGX_CONF_ERROR);
-    memset(rule_c, 0, sizeof(ngx_http_check_rule_t));
-    /* process the first word : score rule */
-    if (value[1].data[i] == '$') {
-#ifdef MDBG
-	ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, "XX-special score rule !");
-#endif
-	var_end = (u_char *) ngx_strchr((value[1].data)+i, ' ');
-	if (!var_end) {
-	  ngx_http_dummy_line_conf_error(cf, value);
-	  return (NGX_CONF_ERROR);
-	}
-	rule_c->sc_tag.data = ngx_pcalloc(cf->pool, var_end - value[1].data +1);
-	if (!rule_c->sc_tag.data)
-	  return (NGX_CONF_ERROR);
-	memcpy(rule_c->sc_tag.data, value[1].data, (var_end - value[1].data));
-	i += (var_end - value[1].data) + 1;
-	rule_c->sc_tag.len = (var_end - value[1].data);
-      }
-    else {
-      ngx_http_dummy_line_conf_error(cf, value);
-      return (NGX_CONF_ERROR);
-    }
-    // move to next word
-    while (value[1].data[i] && value[1].data[i] == ' ')
-      i++;
-    // get the comparison type
-    if (value[1].data[i] == '>' && value[1].data[i+1] == '=')
-      rule_c->cmp = SUP_OR_EQUAL;
-    else if (value[1].data[i] == '>' && value[1].data[i+1] != '=')
-      rule_c->cmp = SUP;
-    else if (value[1].data[i] == '<' && value[1].data[i+1] == '=')
-      rule_c->cmp = INF_OR_EQUAL;
-    else if (value[1].data[i] == '<' && value[1].data[i+1] != '=')
-      rule_c->cmp = INF;
-    else {
-      ngx_http_dummy_line_conf_error(cf, value);
-      return (NGX_CONF_ERROR);
-    }
-    // move to next word
-    while (value[1].data[i] && !(value[1].data[i] >= '0' && 
-				 value[1].data[i] <= '9') && (value[1].data[i] != '-'))
-      i++;
-#ifdef readconf_debug
-    ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, 
-		       "XX-special score in checkrule:%s from (%d)", 
-		       value[1].data, atoi((const char *)value[1].data+i));
-#endif
-    // get the score
-    rule_c->sc_score = atoi((const char *)(value[1].data+i));
-    /* process the second word : Action rule */
-    if (!ngx_strstr(value[2].data, "BLOCK"))
-      rule_c->block = 1;
-    else if (!ngx_strstr(value[2].data, "ALLOW"))
-      rule_c->block = 1;
-    else if (!ngx_strstr(value[2].data, "LOG"))
-      rule_c->block = 1;
-    else {
-      ngx_http_dummy_line_conf_error(cf, value);
-      return (NGX_CONF_ERROR);
-    }
-    return (NGX_CONF_OK);
-  }
   ngx_http_dummy_line_conf_error(cf, value);
   return (NGX_CONF_ERROR);
+}
+
+
+static char *
+ngx_http_naxsi_cr_loc_conf(ngx_conf_t *cf, ngx_command_t *cmd,
+			   void *conf)
+{
+
+  ngx_http_dummy_loc_conf_t	*alcf = conf, **bar;  
+  ngx_http_dummy_main_conf_t    *main_cf;
+  ngx_str_t			*value;
+  ngx_http_check_rule_t		*rule_c;
+  unsigned int	i;
+  u_char			*var_end;
+
+  
+
+  if (!alcf || !cf)
+    return (NGX_CONF_ERROR); 
+  value = cf->args->elts;
+  main_cf = ngx_http_conf_get_module_main_conf(cf, ngx_http_naxsi_module);
+  if (!alcf->pushed) { 
+    bar = ngx_array_push(main_cf->locations);
+    if (!bar)
+      return (NGX_CONF_ERROR);
+    *bar = alcf;
+    alcf->pushed = 1;
+  }
+  
+  if (ngx_strcmp(value[0].data, TOP_CHECK_RULE_T) &&
+      ngx_strcmp(value[0].data, TOP_CHECK_RULE_N))
+    return (NGX_CONF_ERROR);
+  
+#ifdef readconf_debug
+  ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, 
+		     "pushing rule %d in check rules", rule.rule_id);  
+#endif
+  i = 0;
+  if (!alcf->check_rules)
+    alcf->check_rules = ngx_array_create(cf->pool, 2, 
+					 sizeof(ngx_http_check_rule_t));
+  if (!alcf->check_rules)
+    return (NGX_CONF_ERROR);
+  rule_c = ngx_array_push(alcf->check_rules);
+  if (!rule_c) return (NGX_CONF_ERROR);
+  memset(rule_c, 0, sizeof(ngx_http_check_rule_t));
+  /* process the first word : score rule */
+  if (value[1].data[i] == '$') {
+#ifdef MDBG
+    ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, "XX-special score rule !");
+#endif
+    
+    
+    var_end = (u_char *) ngx_strchr((value[1].data)+i, ' ');
+    if (!var_end) {
+      ngx_http_dummy_line_conf_error(cf, value);
+      return (NGX_CONF_ERROR);
+    }
+    rule_c->sc_tag.data = ngx_pcalloc(cf->pool, var_end - value[1].data +1);
+    if (!rule_c->sc_tag.data)
+      return (NGX_CONF_ERROR);
+    memcpy(rule_c->sc_tag.data, value[1].data, (var_end - value[1].data));
+    i += (var_end - value[1].data) + 1;
+    rule_c->sc_tag.len = (var_end - value[1].data);
+  }
+  else {
+    ngx_http_dummy_line_conf_error(cf, value);
+    return (NGX_CONF_ERROR);
+  }
+  // move to next word
+  while (value[1].data[i] && value[1].data[i] == ' ')
+    i++;
+  // get the comparison type
+  if (value[1].data[i] == '>' && value[1].data[i+1] == '=')
+    rule_c->cmp = SUP_OR_EQUAL;
+  else if (value[1].data[i] == '>' && value[1].data[i+1] != '=')
+    rule_c->cmp = SUP;
+  else if (value[1].data[i] == '<' && value[1].data[i+1] == '=')
+    rule_c->cmp = INF_OR_EQUAL;
+  else if (value[1].data[i] == '<' && value[1].data[i+1] != '=')
+    rule_c->cmp = INF;
+  else {
+    ngx_http_dummy_line_conf_error(cf, value);
+    return (NGX_CONF_ERROR);
+  }
+  // move to next word
+  while (value[1].data[i] && !(value[1].data[i] >= '0' && 
+			       value[1].data[i] <= '9') && (value[1].data[i] != '-'))
+    i++;
+#ifdef readconf_debug
+  ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, 
+		     "XX-special score in checkrule:%s from (%d)", 
+		     value[1].data, atoi((const char *)value[1].data+i));
+#endif
+  // get the score
+  rule_c->sc_score = atoi((const char *)(value[1].data+i));
+  /* process the second word : Action rule */
+  if (ngx_strstr(value[2].data, "BLOCK"))
+    rule_c->block = 1;
+  else if (ngx_strstr(value[2].data,"ALLOW"))
+    rule_c->allow = 1;
+  else if (ngx_strstr(value[2].data, "LOG"))
+    rule_c->log = 1;
+  else {
+    ngx_http_dummy_line_conf_error(cf, value);
+    return (NGX_CONF_ERROR);
+  }
+  return (NGX_CONF_OK);
+}
+
+
+
+static char * 
+ngx_http_naxsi_ud_loc_conf(ngx_conf_t *cf, ngx_command_t *cmd,
+			   void *conf)
+{
+  ngx_http_dummy_loc_conf_t	*alcf = conf, **bar;  
+  ngx_http_dummy_main_conf_t    *main_cf;
+  ngx_str_t			*value;
+
+  if (!alcf || !cf)
+    return (NGX_CONF_ERROR); 
+  value = cf->args->elts;
+  main_cf = ngx_http_conf_get_module_main_conf(cf, ngx_http_naxsi_module);
+  if (!alcf->pushed) { 
+    bar = ngx_array_push(main_cf->locations);
+    if (!bar)
+      return (NGX_CONF_ERROR);
+    *bar = alcf;
+    alcf->pushed = 1;
+  }
+
+  /* store denied URL for location */
+  if ( (!ngx_strcmp(value[0].data, TOP_DENIED_URL_N) ||
+	!ngx_strcmp(value[0].data, TOP_DENIED_URL_T))
+       && value[1].len) {
+    alcf->denied_url = ngx_pcalloc(cf->pool, sizeof(ngx_str_t));
+    if (!alcf->denied_url)
+      return (NGX_CONF_ERROR);
+    alcf->denied_url->data = ngx_pcalloc(cf->pool, value[1].len+1);
+    if (!alcf->denied_url->data)
+      return (NGX_CONF_ERROR);
+    memcpy(alcf->denied_url->data, value[1].data, value[1].len);
+    alcf->denied_url->len = value[1].len;
+    return (NGX_CONF_OK);
+  }
+  else
+    return NGX_CONF_ERROR;
+  
+  
+}
+
+
+static char *
+ngx_http_naxsi_flags_loc_conf(ngx_conf_t *cf, ngx_command_t *cmd,
+			      void *conf)
+{
+  ngx_http_dummy_loc_conf_t	*alcf = conf, **bar;  
+  ngx_http_dummy_main_conf_t    *main_cf;
+  ngx_str_t			*value;
+
+  if (!alcf || !cf)
+    return (NGX_CONF_ERROR); 
+  value = cf->args->elts;
+  main_cf = ngx_http_conf_get_module_main_conf(cf, ngx_http_naxsi_module);
+  if (!alcf->pushed) { 
+    bar = ngx_array_push(main_cf->locations);
+    if (!bar)
+      return (NGX_CONF_ERROR);
+    *bar = alcf;
+    alcf->pushed = 1;
+  }
+
+  /* it's a flagrule, just a hack to enable/disable mod */
+  if (!ngx_strcmp(value[0].data, TOP_ENABLED_FLAG_T) ||
+      !ngx_strcmp(value[0].data, TOP_ENABLED_FLAG_N)) {
+    alcf->enabled = 1;
+    return (NGX_CONF_OK);
+  }
+  else
+    /* it's a flagrule, just a hack to enable/disable mod */
+    if (!ngx_strcmp(value[0].data, TOP_DISABLED_FLAG_T) ||
+	!ngx_strcmp(value[0].data, TOP_DISABLED_FLAG_N)) {
+      alcf->force_disabled = 1;
+      return (NGX_CONF_OK);
+    }
+    else
+      /* it's a flagrule, currently just a hack to enable/disable learning mode */
+      if (!ngx_strcmp(value[0].data, TOP_LEARNING_FLAG_T) ||
+	  !ngx_strcmp(value[0].data, TOP_LEARNING_FLAG_N)) {
+	alcf->learning = 1;
+	return (NGX_CONF_OK);
+      }
+      else
+	return (NGX_CONF_ERROR);
 }
 
 //#define main_conf_debug
@@ -554,136 +738,141 @@ ngx_http_dummy_read_main_conf(ngx_conf_t *cf, ngx_command_t *cmd,
   ngx_http_rule_t		rule, *rule_r;
   ngx_http_custom_rule_location_t	*location;
   unsigned int	i;
+  
   if (!alcf || !cf)
     return (NGX_CONF_ERROR);  /* alloc a new rule */
+  
   value = cf->args->elts;
   /* parse the line, fill rule struct  */
 #ifdef main_conf_debug
   ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, 
 		     "XX-TOP READ CONF %s", value[0].data);
 #endif
-  if (!ngx_strcmp(value[0].data, TOP_MAIN_BASIC_RULE_T)) {
-    memset(&rule, 0, sizeof(ngx_http_rule_t));
-    if (ngx_http_dummy_cfg_parse_one_rule(cf/*, alcf*/, value, &rule, 
-					  cf->args->nelts) != NGX_CONF_OK) {
-      ngx_http_dummy_line_conf_error(cf, value);
-      return (NGX_CONF_ERROR);
-    }
-
-    if (rule.br->headers) {
-#ifdef main_conf_debug
-      ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, 
-			 "pushing rule %d in header rules", rule.rule_id);  
-#endif
-      if (alcf->header_rules == NULL) {
-	alcf->header_rules = ngx_array_create(cf->pool, 2,
-					      sizeof(ngx_http_rule_t));
-	if (alcf->header_rules == NULL) 
-	  return NGX_CONF_ERROR;
-      }
-      rule_r = ngx_array_push(alcf->header_rules);
-      if (!rule_r) return (NGX_CONF_ERROR);
-      memcpy(rule_r, &rule, sizeof(ngx_http_rule_t));
-    }
-    /* push in body match rules (POST/PUT) */
-    if (rule.br->body || rule.br->body_var) {
-#ifdef main_conf_debug
-      ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, 
-			 "pushing rule %d in body rules", rule.rule_id);  
-#endif
-      if (alcf->body_rules == NULL) {
-	alcf->body_rules = ngx_array_create(cf->pool, 2,
-					    sizeof(ngx_http_rule_t));
-	if (alcf->body_rules == NULL) 
-	  return NGX_CONF_ERROR;
-      }
-      rule_r = ngx_array_push(alcf->body_rules);
-      if (!rule_r) return (NGX_CONF_ERROR);
-      memcpy(rule_r, &rule, sizeof(ngx_http_rule_t));
-    }
-    /* push in generic rules, as it's matching the URI */
-    if (rule.br->url)	{
-#ifdef main_conf_debug
-      ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-			 "pushing rule %d in generic rules", rule.rule_id);  
-#endif
-      if (alcf->generic_rules == NULL) {
-	alcf->generic_rules = ngx_array_create(cf->pool, 2,
-					       sizeof(ngx_http_rule_t));
-	if (alcf->generic_rules == NULL) 
-	  return NGX_CONF_ERROR;
-      }
-      rule_r = ngx_array_push(alcf->generic_rules);
-      if (!rule_r) return (NGX_CONF_ERROR);
-      memcpy(rule_r, &rule, sizeof(ngx_http_rule_t));
-    }
-    /* push in GET arg rules, but we should push in POST rules too  */
-    if (rule.br->args_var || rule.br->args) {
-#ifdef main_conf_debug
-      ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, 
-			 "pushing rule %d in GET rules", rule.rule_id);  
-#endif
-      if (alcf->get_rules == NULL) {
-	alcf->get_rules = ngx_array_create(cf->pool, 2,
-					   sizeof(ngx_http_rule_t));
-	if (alcf->get_rules == NULL) 
-	  return NGX_CONF_ERROR;
-      }
-      rule_r = ngx_array_push(alcf->get_rules);
-      if (!rule_r) return (NGX_CONF_ERROR);
-      memcpy(rule_r, &rule, sizeof(ngx_http_rule_t));
-    }
-    /* push in custom locations. It's a rule matching a VAR_NAME or an EXACT_URI :
-       - GET_VAR, POST_VAR, URI */
-    if (rule.br->custom_location) {
-#ifdef main_conf_debug
-      ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, 
-			 "pushing rule %d in custom_location rules", 
-			 rule.rule_id);  
-#endif
-      location = rule.br->custom_locations->elts;
-      for (i = 0; i < rule.br->custom_locations->nelts; i++) {
-	if (location[i].args_var)	{
-	  if (alcf->get_rules == NULL) {
-	    alcf->get_rules = ngx_array_create(cf->pool, 2,
-					       sizeof(ngx_http_rule_t));
-	    if (alcf->get_rules == NULL) 
-	      return NGX_CONF_ERROR;
-	  }
-	  rule_r = ngx_array_push(alcf->get_rules);
-	  if (!rule_r) return (NGX_CONF_ERROR);
-	  memcpy(rule_r, &rule, sizeof(ngx_http_rule_t));
-	}
-	if (location[i].body_var)	{
-	  if (alcf->body_rules == NULL) {
-	    alcf->body_rules = ngx_array_create(cf->pool, 2,
-						sizeof(ngx_http_rule_t));
-	    if (alcf->body_rules == NULL) 
-	      return NGX_CONF_ERROR;
-	  }
-	  rule_r = ngx_array_push(alcf->body_rules);
-	  if (!rule_r) return (NGX_CONF_ERROR);
-	  memcpy(rule_r, &rule, sizeof(ngx_http_rule_t));
-		      
-	}
-	if (location[i].headers_var) {
-	  if (alcf->header_rules == NULL) {
-	    alcf->header_rules = ngx_array_create(cf->pool, 2,
-						  sizeof(ngx_http_rule_t));
-	    if (alcf->header_rules == NULL) 
-	      return NGX_CONF_ERROR;
-	  }
-	  rule_r = ngx_array_push(alcf->header_rules);
-	  if (!rule_r) return (NGX_CONF_ERROR);
-	  memcpy(rule_r, &rule, sizeof(ngx_http_rule_t));
-	}
-      }
-    }
-    return (NGX_CONF_OK);
+  if (ngx_strcmp(value[0].data, TOP_MAIN_BASIC_RULE_T) &&
+      ngx_strcmp(value[0].data, TOP_MAIN_BASIC_RULE_N)) {
+    ngx_http_dummy_line_conf_error(cf, value);
+    return (NGX_CONF_ERROR);    
   }
-  ngx_http_dummy_line_conf_error(cf, value);
-  return (NGX_CONF_ERROR);
+  memset(&rule, 0, sizeof(ngx_http_rule_t));
+  
+  if (ngx_http_dummy_cfg_parse_one_rule(cf/*, alcf*/, value, &rule, 
+					cf->args->nelts) != NGX_CONF_OK) {
+    ngx_http_dummy_line_conf_error(cf, value);
+    return (NGX_CONF_ERROR);
+  }
+  
+  if (rule.br->headers) {
+#ifdef main_conf_debug
+    ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, 
+		       "pushing rule %d in header rules", rule.rule_id);  
+#endif
+    if (alcf->header_rules == NULL) {
+      alcf->header_rules = ngx_array_create(cf->pool, 2,
+					    sizeof(ngx_http_rule_t));
+      if (alcf->header_rules == NULL) 
+	return NGX_CONF_ERROR;
+    }
+    rule_r = ngx_array_push(alcf->header_rules);
+    if (!rule_r) return (NGX_CONF_ERROR);
+    memcpy(rule_r, &rule, sizeof(ngx_http_rule_t));
+  }
+  /* push in body match rules (POST/PUT) */
+  if (rule.br->body || rule.br->body_var) {
+#ifdef main_conf_debug
+    ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, 
+		       "pushing rule %d in body rules", rule.rule_id);  
+#endif
+    if (alcf->body_rules == NULL) {
+      alcf->body_rules = ngx_array_create(cf->pool, 2,
+					  sizeof(ngx_http_rule_t));
+      if (alcf->body_rules == NULL) 
+	return NGX_CONF_ERROR;
+    }
+    rule_r = ngx_array_push(alcf->body_rules);
+    if (!rule_r) return (NGX_CONF_ERROR);
+    memcpy(rule_r, &rule, sizeof(ngx_http_rule_t));
+  }
+  /* push in generic rules, as it's matching the URI */
+  if (rule.br->url)	{
+#ifdef main_conf_debug
+    ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
+		       "pushing rule %d in generic rules", rule.rule_id);  
+#endif
+    if (alcf->generic_rules == NULL) {
+      alcf->generic_rules = ngx_array_create(cf->pool, 2,
+					     sizeof(ngx_http_rule_t));
+      if (alcf->generic_rules == NULL) 
+	return NGX_CONF_ERROR;
+    }
+    rule_r = ngx_array_push(alcf->generic_rules);
+    if (!rule_r) return (NGX_CONF_ERROR);
+    memcpy(rule_r, &rule, sizeof(ngx_http_rule_t));
+  }
+  /* push in GET arg rules, but we should push in POST rules too  */
+  if (rule.br->args_var || rule.br->args) {
+#ifdef main_conf_debug
+    ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, 
+		       "pushing rule %d in GET rules", rule.rule_id);  
+#endif
+    if (alcf->get_rules == NULL) {
+      alcf->get_rules = ngx_array_create(cf->pool, 2,
+					 sizeof(ngx_http_rule_t));
+      if (alcf->get_rules == NULL) 
+	return NGX_CONF_ERROR;
+    }
+    rule_r = ngx_array_push(alcf->get_rules);
+    if (!rule_r) return (NGX_CONF_ERROR);
+    memcpy(rule_r, &rule, sizeof(ngx_http_rule_t));
+  }
+  /* push in custom locations. It's a rule matching a VAR_NAME or an EXACT_URI :
+     - GET_VAR, POST_VAR, URI */
+  if (rule.br->custom_location) {
+#ifdef main_conf_debug
+    ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, 
+		       "pushing rule %d in custom_location rules", 
+		       rule.rule_id);  
+#endif
+    location = rule.br->custom_locations->elts;
+    for (i = 0; i < rule.br->custom_locations->nelts; i++) {
+      if (location[i].args_var)	{
+	if (alcf->get_rules == NULL) {
+	  alcf->get_rules = ngx_array_create(cf->pool, 2,
+					     sizeof(ngx_http_rule_t));
+	  if (alcf->get_rules == NULL) 
+	    return NGX_CONF_ERROR;
+	}
+	rule_r = ngx_array_push(alcf->get_rules);
+	if (!rule_r) return (NGX_CONF_ERROR);
+	memcpy(rule_r, &rule, sizeof(ngx_http_rule_t));
+      }
+      if (location[i].body_var)	{
+	if (alcf->body_rules == NULL) {
+	  alcf->body_rules = ngx_array_create(cf->pool, 2,
+					      sizeof(ngx_http_rule_t));
+	  if (alcf->body_rules == NULL) 
+	    return NGX_CONF_ERROR;
+	}
+	rule_r = ngx_array_push(alcf->body_rules);
+	if (!rule_r) return (NGX_CONF_ERROR);
+	memcpy(rule_r, &rule, sizeof(ngx_http_rule_t));
+		      
+      }
+      if (location[i].headers_var) {
+	if (alcf->header_rules == NULL) {
+	  alcf->header_rules = ngx_array_create(cf->pool, 2,
+						sizeof(ngx_http_rule_t));
+	  if (alcf->header_rules == NULL) 
+	    return NGX_CONF_ERROR;
+	}
+	rule_r = ngx_array_push(alcf->header_rules);
+	if (!rule_r) return (NGX_CONF_ERROR);
+	memcpy(rule_r, &rule, sizeof(ngx_http_rule_t));
+      }
+    }
+  }
+  return (NGX_CONF_OK);
 }
+
 
 /*
 ** [ENTRY POINT] does : this is the function called by nginx : 
@@ -694,7 +883,8 @@ ngx_http_dummy_read_main_conf(ngx_conf_t *cf, ngx_command_t *cmd,
 ** - check our context struct (with scores & stuff) against custom check rules
 ** - check if the request should be denied
 */
-//#define mechanics_debug
+//#define mechanics_debug 1
+//#define naxsi_modifiers_debug 1
 static ngx_int_t ngx_http_dummy_access_handler(ngx_http_request_t *r)
 {
   ngx_http_request_ctx_t	*ctx;
@@ -703,6 +893,14 @@ static ngx_int_t ngx_http_dummy_access_handler(ngx_http_request_t *r)
   ngx_http_core_loc_conf_t  *clcf;
   struct tms		 tmsstart, tmsend;
   clock_t		 start, end;
+  ngx_http_variable_value_t *lookup;
+
+
+  static ngx_str_t learning_flag = ngx_string(RT_LEARNING);
+  static ngx_str_t enable_flag = ngx_string(RT_ENABLE);
+  static ngx_str_t post_action_flag = ngx_string(RT_POST_ACTION);
+  static ngx_str_t extensive_log_flag = ngx_string(RT_EXTENSIVE_LOG);
+  
   
   ctx = ngx_http_get_module_ctx(r, ngx_http_naxsi_module);
   cf = ngx_http_get_module_loc_conf(r, ngx_http_naxsi_module);
@@ -723,8 +921,26 @@ static ngx_int_t ngx_http_dummy_access_handler(ngx_http_request_t *r)
   if (!cf) 
     return (NGX_ERROR);
   /* the module is not enabled here */
-  if (!cf->enabled || cf->force_disabled)
+  /* if enable directive is not present at all in the location, 
+     don't try to do dynamic lookup for "live" enabled
+     naxsi, this would be very rude. */
+  if (!cf->enabled)
     return (NGX_DECLINED);
+  /* On the other hand, if naxsi has been explicitly disabled 
+     in this location (using naxsi directive), user is probably
+     trying to do something.  */
+  if (cf->force_disabled) {
+    /* Look if the user did not try to enable naxsi dynamically */
+    lookup = ngx_http_get_variable(r, &enable_flag, cf->flag_enable_h);
+    if (lookup && !lookup->not_found && lookup->len > 0) {
+      ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+		    "live enable is present %d", lookup->data[0] - '0');
+      if (lookup->data[0] - '0' != 1) {
+	return (NGX_DECLINED);}
+    }
+    else
+      return (NGX_DECLINED);
+  }
   /* don't process internal requests. */
   if (r->internal) {
 #ifdef mechanics_debug
@@ -744,7 +960,7 @@ static ngx_int_t ngx_http_dummy_access_handler(ngx_http_request_t *r)
   if (!ctx) {
     ctx = ngx_pcalloc(r->pool, sizeof(ngx_http_request_ctx_t));
     /* might have been set by a previous trigger */
-    if (cf->learning)	{
+    if (ctx->learning)	{
       clcf->post_action.data = 0; //cf->denied_url->data;
       clcf->post_action.len = 0; //cf->denied_url->len;
     }
@@ -752,6 +968,92 @@ static ngx_int_t ngx_http_dummy_access_handler(ngx_http_request_t *r)
     if (ctx == NULL)
       return NGX_ERROR;
     ngx_http_set_ctx(r, ctx, ngx_http_naxsi_module);
+    
+#ifdef naxsi_modifiers_debug
+    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+		  "XX-dummy : orig learning : %d", cf->learning ? 1 : 0);
+#endif
+    /* it seems that nginx will - in some cases - 
+     have a variable with empty content but with lookup->not_found set to 0,
+    so check len as well */
+    ctx->learning = cf->learning;
+    lookup = ngx_http_get_variable(r, &learning_flag, cf->flag_learning_h);
+    if (lookup && !lookup->not_found && lookup->len > 0) {
+      
+      ctx->learning = lookup->data[0] - '0';
+#ifdef naxsi_modifiers_debug
+      ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+		    "XX-dummy : override learning : %d (raw=%d)", 
+		    ctx->learning ? 1 : 0, lookup->len);
+#endif
+    }
+#ifdef naxsi_modifiers_debug
+    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+		  "XX-dummy : [final] learning : %d", ctx->learning ? 1 : 0);
+#endif
+
+    ctx->enabled = cf->enabled;
+#ifdef naxsi_modifiers_debug
+    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+		  "XX-dummy : orig enabled : %d", ctx->enabled ? 1 : 0);
+#endif
+    lookup = ngx_http_get_variable(r, &enable_flag, cf->flag_enable_h);
+    if (lookup && !lookup->not_found && lookup->len > 0) {
+      ctx->enabled = lookup->data[0] - '0';
+#ifdef naxsi_modifiers_debug
+      ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+		    "XX-dummy : override enable : %d", ctx->enabled ? 1 : 0);
+#endif
+
+    }
+#ifdef naxsi_modifiers_debug
+    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+		  "XX-dummy : [final] enabled : %d", ctx->enabled ? 1 : 0);
+#endif
+    
+    if (cf->learning)
+      ctx->post_action = 1;
+    else
+      ctx->post_action = 0;
+#ifdef naxsi_modifiers_debug    
+    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+		  "XX-dummy : orig post_action : %d", ctx->post_action ? 1 : 0);
+#endif
+    lookup = ngx_http_get_variable(r, &post_action_flag, cf->flag_post_action_h);
+    if (lookup && !lookup->not_found && lookup->len > 0) {
+      ctx->post_action = lookup->data[0] - '0';
+#ifdef naxsi_modifier_debug
+      ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+		    "XX-dummy : override post_action : %d", ctx->post_action ? 1 : 0);
+#endif
+    }
+#ifdef naxsi_modifiers_debug
+    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+		  "XX-dummy : [final] post_action : %d", ctx->post_action ? 1 : 0);
+#endif
+#ifdef naxsi_modifiers_debug    
+    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+		  "XX-dummy : orig extensive_log : %d", ctx->extensive_log ? 1 : 0);
+#endif
+    lookup = ngx_http_get_variable(r, &extensive_log_flag, cf->flag_extensive_log_h);
+    if (lookup && !lookup->not_found && lookup->len > 0) {
+      ctx->extensive_log = lookup->data[0] - '0';
+#ifdef naxsi_modifier_debug
+      ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+		    "XX-dummy : override extensive_log : %d", ctx->extensive_log ? 1 : 0);
+#endif
+    }
+#ifdef naxsi_modifiers_debug
+    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+		  "XX-dummy : [final] extensive_log : %d", ctx->extensive_log ? 1 : 0);
+#endif
+    //---
+
+    /* the module is not enabled here */
+    if (!ctx->enabled)
+      return (NGX_DECLINED);
+    
+
     if  ((r->method == NGX_HTTP_POST || r->method == NGX_HTTP_PUT) 
 	 && !ctx->ready) {
 #ifdef mechanics_debug
@@ -791,6 +1093,7 @@ static ngx_int_t ngx_http_dummy_access_handler(ngx_http_request_t *r)
       ctx->ready = 1;
   }
   if (ctx && ctx->ready && !ctx->over) {
+    
     if ((start = times(&tmsstart)) == (clock_t)-1)
       ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
 		    "XX-dummy : Failed to get time");
