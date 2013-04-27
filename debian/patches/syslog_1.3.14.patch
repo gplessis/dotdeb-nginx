@@ -1,7 +1,7 @@
-Index: nginx-1.2.8/src/core/ngx_cycle.c
+Index: nginx-1.4.0/src/core/ngx_cycle.c
 ===================================================================
---- nginx-1.2.8.orig/src/core/ngx_cycle.c
-+++ nginx-1.2.8/src/core/ngx_cycle.c
+--- nginx-1.4.0.orig/src/core/ngx_cycle.c
++++ nginx-1.4.0/src/core/ngx_cycle.c
 @@ -85,6 +85,12 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
      cycle->pool = pool;
      cycle->log = log;
@@ -15,10 +15,10 @@ Index: nginx-1.2.8/src/core/ngx_cycle.c
      cycle->old_cycle = old_cycle;
  
      cycle->conf_prefix.len = old_cycle->conf_prefix.len;
-Index: nginx-1.2.8/src/core/ngx_log.c
+Index: nginx-1.4.0/src/core/ngx_log.c
 ===================================================================
---- nginx-1.2.8.orig/src/core/ngx_log.c
-+++ nginx-1.2.8/src/core/ngx_log.c
+--- nginx-1.4.0.orig/src/core/ngx_log.c
++++ nginx-1.4.0/src/core/ngx_log.c
 @@ -10,6 +10,15 @@
  
  
@@ -343,10 +343,10 @@ Index: nginx-1.2.8/src/core/ngx_log.c
 +}
 +#endif
 +
-Index: nginx-1.2.8/src/core/ngx_log.h
+Index: nginx-1.4.0/src/core/ngx_log.h
 ===================================================================
---- nginx-1.2.8.orig/src/core/ngx_log.h
-+++ nginx-1.2.8/src/core/ngx_log.h
+--- nginx-1.4.0.orig/src/core/ngx_log.h
++++ nginx-1.4.0/src/core/ngx_log.h
 @@ -12,6 +12,13 @@
  #include <ngx_config.h>
  #include <ngx_core.h>
@@ -386,10 +386,10 @@ Index: nginx-1.2.8/src/core/ngx_log.h
  char *ngx_log_set_levels(ngx_conf_t *cf, ngx_log_t *log);
  void ngx_cdecl ngx_log_abort(ngx_err_t err, const char *fmt, ...);
  void ngx_cdecl ngx_log_stderr(ngx_err_t err, const char *fmt, ...);
-Index: nginx-1.2.8/src/http/modules/ngx_http_log_module.c
+Index: nginx-1.4.0/src/http/modules/ngx_http_log_module.c
 ===================================================================
---- nginx-1.2.8.orig/src/http/modules/ngx_http_log_module.c
-+++ nginx-1.2.8/src/http/modules/ngx_http_log_module.c
+--- nginx-1.4.0.orig/src/http/modules/ngx_http_log_module.c
++++ nginx-1.4.0/src/http/modules/ngx_http_log_module.c
 @@ -13,6 +13,11 @@
  #include <zlib.h>
  #endif
@@ -577,21 +577,21 @@ Index: nginx-1.2.8/src/http/modules/ngx_http_log_module.c
  
      if (cf->args->nelts >= 3) {
          name = value[2];
-Index: nginx-1.2.8/src/http/ngx_http_core_module.c
+Index: nginx-1.4.0/src/http/ngx_http_core_module.c
 ===================================================================
---- nginx-1.2.8.orig/src/http/ngx_http_core_module.c
-+++ nginx-1.2.8/src/http/ngx_http_core_module.c
-@@ -1451,6 +1451,9 @@ ngx_http_update_location_config(ngx_http
+--- nginx-1.4.0.orig/src/http/ngx_http_core_module.c
++++ nginx-1.4.0/src/http/ngx_http_core_module.c
+@@ -1462,6 +1462,9 @@ ngx_http_update_location_config(ngx_http
  
      if (r == r->main) {
-         r->connection->log->file = clcf->error_log->file;
+         ngx_http_set_connection_log(r->connection, clcf->error_log);
 +#if (NGX_ENABLE_SYSLOG)
 +        r->connection->log->priority = clcf->error_log->priority;
 +#endif
+     }
  
-         if (!(r->connection->log->log_level & NGX_LOG_DEBUG_CONNECTION)) {
-             r->connection->log->log_level = clcf->error_log->log_level;
-@@ -4764,6 +4767,15 @@ ngx_http_core_error_log(ngx_conf_t *cf, 
+     if ((ngx_io.flags & NGX_IO_SENDFILE) && clcf->sendfile) {
+@@ -4890,6 +4893,15 @@ ngx_http_core_error_log(ngx_conf_t *cf, 
  
      ngx_str_t  *value, name;
  
@@ -607,7 +607,7 @@ Index: nginx-1.2.8/src/http/ngx_http_core_module.c
      if (clcf->error_log) {
          return "is duplicate";
      }
-@@ -4773,6 +4785,36 @@ ngx_http_core_error_log(ngx_conf_t *cf, 
+@@ -4899,6 +4911,36 @@ ngx_http_core_error_log(ngx_conf_t *cf, 
      if (ngx_strcmp(value[1].data, "stderr") == 0) {
          ngx_str_null(&name);
  
@@ -644,7 +644,7 @@ Index: nginx-1.2.8/src/http/ngx_http_core_module.c
      } else {
          name = value[1];
      }
-@@ -4782,6 +4824,17 @@ ngx_http_core_error_log(ngx_conf_t *cf, 
+@@ -4908,6 +4950,17 @@ ngx_http_core_error_log(ngx_conf_t *cf, 
          return NGX_CONF_ERROR;
      }
  
@@ -662,27 +662,37 @@ Index: nginx-1.2.8/src/http/ngx_http_core_module.c
      if (cf->args->nelts == 2) {
          clcf->error_log->log_level = NGX_LOG_ERR;
          return NGX_CONF_OK;
-Index: nginx-1.2.8/src/http/ngx_http_request.c
+Index: nginx-1.4.0/src/http/ngx_http_request.c
 ===================================================================
---- nginx-1.2.8.orig/src/http/ngx_http_request.c
-+++ nginx-1.2.8/src/http/ngx_http_request.c
-@@ -433,6 +433,9 @@ ngx_http_init_request(ngx_event_t *rev)
- 
+--- nginx-1.4.0.orig/src/http/ngx_http_request.c
++++ nginx-1.4.0/src/http/ngx_http_request.c
+@@ -531,6 +531,9 @@ ngx_http_create_request(ngx_connection_t
      clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);
-     c->log->file = clcf->error_log->file;
+ 
+     ngx_http_set_connection_log(r->connection, clcf->error_log);
 +#if (NGX_ENABLE_SYSLOG)
 +    c->log->priority = clcf->error_log->priority;
 +#endif
-     if (!(c->log->log_level & NGX_LOG_DEBUG_CONNECTION)) {
-         c->log->log_level = clcf->error_log->log_level;
-     }
-@@ -1834,6 +1837,9 @@ found:
  
+     r->header_in = hc->nbusy ? hc->busy[0] : c->buffer;
+ 
+@@ -818,6 +821,9 @@ ngx_http_ssl_servername(ngx_ssl_conn_t *
+     clcf = ngx_http_get_module_loc_conf(hc->conf_ctx, ngx_http_core_module);
+ 
+     ngx_http_set_connection_log(c, clcf->error_log);
++#if (NGX_ENABLE_SYSLOG)
++    c->log->priority = clcf->error_log->priority;
++#endif
+ 
+     sscf = ngx_http_get_module_srv_conf(hc->conf_ctx, ngx_http_ssl_module);
+ 
+@@ -2019,6 +2025,9 @@ ngx_http_set_virtual_server(ngx_http_req
      clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);
-     r->connection->log->file = clcf->error_log->file;
+ 
+     ngx_http_set_connection_log(r->connection, clcf->error_log);
 +#if (NGX_ENABLE_SYSLOG)
 +    r->connection->log->priority = clcf->error_log->priority;
 +#endif
  
-     if (!(r->connection->log->log_level & NGX_LOG_DEBUG_CONNECTION)) {
-         r->connection->log->log_level = clcf->error_log->log_level;
+     return NGX_OK;
+ }
