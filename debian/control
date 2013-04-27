@@ -211,7 +211,7 @@ Description: nginx web/proxy server (extended version)
  .
  THIRD PARTY MODULES: Auth PAM, Cache purge, DAV Ext, Echo,
  Embedded Lua, HttpHeadersMore, http push, Nginx Development Kit,
- Upload module, Upload Progress, Upstream Fair Queue.
+ Upload Progress, Upstream Fair Queue.
  .
  MODULES ADDED BY DOTDEB : File AIO, Syslog, Pinba, HTTP substitution filter,
  SPDY, X-rid header
