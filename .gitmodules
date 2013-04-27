@@ -1,9 +1,6 @@
 [submodule "debian/modules/nginx-cache-purge"]
 	path = debian/modules/nginx-cache-purge
 	url = git://github.com/FRiCKLE/ngx_cache_purge.git
-[submodule "debian/modules/chunkin-nginx-module"]
-	path = debian/modules/chunkin-nginx-module
-	url = git://github.com/agentzh/chunkin-nginx-module.git
 [submodule "debian/modules/headers-more-nginx-module"]
 	path = debian/modules/headers-more-nginx-module
 	url = git://github.com/agentzh/headers-more-nginx-module.git

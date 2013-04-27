@@ -209,7 +209,7 @@ Description: nginx web/proxy server (extended version)
  .
  MAIL MODULES: Mail Core, IMAP, POP3, SMTP, SSL.
  .
- THIRD PARTY MODULES: Auth PAM, Chunkin, Cache purge, DAV Ext, Echo,
+ THIRD PARTY MODULES: Auth PAM, Cache purge, DAV Ext, Echo,
  Embedded Lua, HttpHeadersMore, http push, Nginx Development Kit,
  Upload module, Upload Progress, Upstream Fair Queue.
  .

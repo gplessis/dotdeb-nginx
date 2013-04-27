@@ -52,13 +52,6 @@ Copyright: 2007, Brice Figureau
 License:
  Same as upstream license.
 
-Files: modules/agentzh-chunkin-nginx-module-*/*
- modules/agentzh-headers-more-nginx-module-*/*
-Copyright: 2009, Taobao Inc., Alibaba Group <http://www.taobao.com>.
-           2009-2011, Zhang "agentzh" Yichun (章亦春) <agentzh@gmail.com>.
-License:
- Same as upstream license.
-
 Files: modules/nginx-auth-pam/*
 Copyright: 2008-2010, Sergio Talens Oliag <sto@iti.upv.es>
 License:
