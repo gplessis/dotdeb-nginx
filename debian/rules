@@ -168,6 +168,7 @@ config.status.extras: config.env.extras config.sub config.guess
 	    --with-http_flv_module \
 	    --with-http_geoip_module \
 	    --with-http_gzip_static_module \
+	    --with-http_gunzip_module \
 	    --with-http_image_filter_module \
 	    --with-http_mp4_module \
 	    --with-http_perl_module \
