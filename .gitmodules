@@ -37,3 +37,6 @@
 [submodule "debian/modules/nginx-x-rid-header"]
 	path = debian/modules/nginx-x-rid-header
 	url = git://github.com/soundcloud/nginx-x-rid-header.git
+[submodule "debian/modules/ngx_pagespeed"]
+	path = debian/modules/ngx_pagespeed
+	url = git://github.com/pagespeed/ngx_pagespeed.git
