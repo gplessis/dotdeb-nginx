@@ -1,3 +1,12 @@
+nginx (1.4.0-2~dotdeb.0) stable; urgency=low
+
+  * SPDY enabled in nginx-full, nginx-passenger and nginx-extras
+  * HTTP Gunzip enabled in nginx-extras
+  * Pagespeed enabled in nginx-extras. Close #30
+  * minor upgrades : headers-more, echo, Lua, Push stream, Pinba, Passenger
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Sat, 27 Apr 2013 14:21:42 -0700
+
 nginx (1.4.0-2) UNRELEASED; urgency=low
 
   [ Ondřej Surý ]
