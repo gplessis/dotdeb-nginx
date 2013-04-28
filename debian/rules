@@ -198,7 +198,6 @@ config.status.extras: config.env.extras config.sub config.guess
 	    --add-module=$(MODULESDIR)/ngx_http_substitutions_filter_module \
 	    --add-module=$(MODULESDIR)/nginx-x-rid-header \
 				--with-ld-opt=-lossp-uuid \
-	    --add-module=$(MODULESDIR)/ngx_pagespeed \
             $(CONFIGURE_OPTS) >$@
 	touch $@
 
