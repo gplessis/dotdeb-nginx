@@ -1,3 +1,9 @@
+nginx (1.4.0-2~dotdeb.2) testing; urgency=low
+
+  * nginx-passenger flavor has been removed (use unicorn or uwsgi instead)
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Sun, 28 Apr 2013 16:20:42 -0700
+
 nginx (1.4.0-2~dotdeb.0) stable; urgency=low
 
   * SPDY enabled in nginx-full, nginx-passenger and nginx-extras
