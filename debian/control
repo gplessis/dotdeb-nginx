@@ -4,7 +4,6 @@ Priority: optional
 Maintainer: Guillaume Plessis <gui@dotdeb.org>
 Build-Depends: autotools-dev,
                debhelper (>= 7),
-               hardening-wrapper,
                dpkg-dev (>= 1.15.5),
                libcurl4-openssl-dev,
                libexpat-dev,

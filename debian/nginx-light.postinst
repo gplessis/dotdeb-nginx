@@ -12,10 +12,10 @@ case "$1" in
 esac
 
 if [ -x /etc/init.d/nginx ]; then
-  if [ -f /var/run/nginx.pid ] && pidof /usr/sbin/nginx >/dev/null; then
-    NGX_PID=`cat /var/run/nginx.pid`
+  if [ -f /run/nginx.pid ] && pidof /usr/sbin/nginx >/dev/null; then
+    NGX_PID=`cat /run/nginx.pid`
     if kill -s USR2 $NGX_PID 2>/dev/null; then
-      while [ ! -f /var/run/nginx.pid.oldbin ]; do
+      while [ ! -f /run/nginx.pid.oldbin ]; do
         cnt=`expr $cnt + 1`
         if [ $cnt -gt 10 ]; then
           kill -s KILL $NGX_PID
@@ -24,7 +24,7 @@ if [ -x /etc/init.d/nginx ]; then
         fi
         sleep 1
       done
-      NGX_OLD_PID=`cat /var/run/nginx.pid.oldbin`
+      NGX_OLD_PID=`cat /run/nginx.pid.oldbin`
       kill -s QUIT $NGX_OLD_PID
     fi
   fi

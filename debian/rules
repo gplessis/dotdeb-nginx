@@ -1,11 +1,5 @@
 #!/usr/bin/make -f
 
-# enable the hardening wrapper
-DEB_BUILD_HARDENING = 1
-# but disable PIE
-DEB_BUILD_HARDENING_PIE = 0
-export DEB_BUILD_HARDENING DEB_BUILD_HARDENING_PIE
-
 CFLAGS = `dpkg-buildflags --get CFLAGS`
 CFLAGS += -Wall -DFORTIFY_SOURCE=2 -fstack-protector
 CFLAGS += `dpkg-buildflags --get CPPFLAGS`
@@ -72,7 +66,7 @@ config.status.full: config.env.full config.sub config.guess
 	    --http-scgi-temp-path=/var/lib/nginx/scgi \
 	    --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
 	    --lock-path=/var/lock/nginx.lock \
-	    --pid-path=/var/run/nginx.pid \
+	    --pid-path=/run/nginx.pid \
 	    --with-pcre-jit \
 	    --with-debug \
 	    --with-file-aio \
@@ -114,7 +108,7 @@ config.status.light: config.env.light config.sub config.guess
 	    --http-log-path=/var/log/nginx/access.log \
 	    --http-proxy-temp-path=/var/lib/nginx/proxy \
 	    --lock-path=/var/lock/nginx.lock \
-	    --pid-path=/var/run/nginx.pid \
+	    --pid-path=/run/nginx.pid \
 	    --with-pcre-jit \
 	    --with-file-aio \
 	    --with-http_gzip_static_module \
@@ -150,7 +144,7 @@ config.status.extras: config.env.extras config.sub config.guess
 	    --http-scgi-temp-path=/var/lib/nginx/scgi \
 	    --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
 	    --lock-path=/var/lock/nginx.lock \
-	    --pid-path=/var/run/nginx.pid \
+	    --pid-path=/run/nginx.pid \
 	    --with-pcre-jit \
 	    --with-debug \
 	    --with-file-aio \
@@ -204,7 +198,7 @@ config.status.naxsi: config.env.naxsi config.sub config.guess
 	    --http-scgi-temp-path=/var/lib/nginx/scgi \
 	    --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
 	    --lock-path=/var/lock/nginx.lock \
-	    --pid-path=/var/run/nginx.pid \
+	    --pid-path=/run/nginx.pid \
 	    --with-pcre-jit \
 	    --with-file-aio \
 	    --with-http_gzip_static_module \

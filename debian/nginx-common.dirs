@@ -7,4 +7,4 @@ etc/logrotate.d
 usr/share/nginx
 var/log/nginx
 var/lib/nginx
-var/run
+run

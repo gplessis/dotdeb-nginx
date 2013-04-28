@@ -2,5 +2,5 @@
 cd /usr/share/nginx-naxsi/naxsi-ui/
 python nx_extract.py /etc/nginx/naxsi-ui.conf &
 somepid=$!
-echo $somepid > /var/run/nginx-naxsi-ui_extract.pid
+echo $somepid > /run/nginx-naxsi-ui_extract.pid
 wait $somepid

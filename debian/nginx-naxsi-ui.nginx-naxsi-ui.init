@@ -39,39 +39,39 @@ case "$1" in
 			# Set the ulimits
 			ulimit $ULIMIT
 		fi
-		start-stop-daemon --start --quiet --pidfile /var/run/$NAME_intercept.pid \
+		start-stop-daemon --start --quiet --pidfile /run/$NAME_intercept.pid \
 		    --exec /usr/bin/daemon -- $DAEMON_intercept || true
 		echo "$NAME_intercept."
-		start-stop-daemon --start --quiet --pidfile /var/run/$NAME_extract.pid \
+		start-stop-daemon --start --quiet --pidfile /run/$NAME_extract.pid \
 		    --exec /usr/bin/daemon -- $DAEMON_extract || true
 		echo "$NAME_extract."
 		;;
 
 	stop)
 		echo -n "Stopping $DESC: "
-		start-stop-daemon --stop --quiet --pidfile /var/run/$NAME_extract.pid && rm /var/run/$NAME_extract.pid || true
+		start-stop-daemon --stop --quiet --pidfile /run/$NAME_extract.pid && rm /run/$NAME_extract.pid || true
 		echo "$NAME_extract."
-		start-stop-daemon --stop --quiet --pidfile /var/run/$NAME_intercept.pid && rm /var/run/$NAME_intercept.pid || true
+		start-stop-daemon --stop --quiet --pidfile /run/$NAME_intercept.pid && rm /run/$NAME_intercept.pid || true
 		echo "$NAME_intercept."
 		;;
 
 	restart|force-reload|reload)
 		echo -n "Restarting $DESC: "
-		start-stop-daemon --stop --quiet --pidfile /var/run/$NAME_extract.pid && rm /var/run/$NAME_extract.pid || true
+		start-stop-daemon --stop --quiet --pidfile /run/$NAME_extract.pid && rm /run/$NAME_extract.pid || true
 		echo "$NAME_extract."
-		start-stop-daemon --stop --quiet --pidfile /var/run/$NAME_intercept.pid && rm /var/run/$NAME_intercept.pid || true
+		start-stop-daemon --stop --quiet --pidfile /run/$NAME_intercept.pid && rm /run/$NAME_intercept.pid || true
 		echo "$NAME_intercept."
 		sleep 1
-		start-stop-daemon --start --quiet --pidfile /var/run/$NAME_intercept.pid \
+		start-stop-daemon --start --quiet --pidfile /run/$NAME_intercept.pid \
 		    --exec /usr/bin/daemon -- $DAEMON_intercept || true
 		echo "$NAME_intercept."
-		start-stop-daemon --start --quiet --pidfile /var/run/$NAME_extract.pid \
+		start-stop-daemon --start --quiet --pidfile /run/$NAME_extract.pid \
 		    --exec /usr/bin/daemon -- $DAEMON_extract || true
 		echo "$NAME_extract."
 		;;
 
 	status)
-		(status_of_proc -p /var/run/$NAME_extract.pid "$DAEMON_extract" nginx-naxsi-ui_extract && status_of_proc -p /var/run/$NAME_intercept.pid "$DAEMON_intercept" nginx-naxsi-ui_intercept) && exit 0 || exit $?
+		(status_of_proc -p /run/$NAME_extract.pid "$DAEMON_extract" nginx-naxsi-ui_extract && status_of_proc -p /run/$NAME_intercept.pid "$DAEMON_intercept" nginx-naxsi-ui_intercept) && exit 0 || exit $?
 		;;
 	*)
 		echo "Usage: $NAME {start|stop|restart|reload|force-reload|status}" >&2
