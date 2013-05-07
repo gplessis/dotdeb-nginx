@@ -1,3 +1,9 @@
+nginx (1.4.1-1~dotdeb.0) oldstable; urgency=high
+
+  * New upstream release
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Tue, 07 May 2013 06:37:42 -0700
+
 nginx (1.4.0-2~dotdeb.1) stable; urgency=low
 
   * SPDY disabled because of lack of NPN support in OpenSSL from Squeeze
