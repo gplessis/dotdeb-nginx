@@ -121,6 +121,7 @@ config.status.light: config.env.light config.sub config.guess
 	    --without-http_memcached_module \
 	    --without-http_referer_module \
 	    --without-http_scgi_module \
+	    --with-http_spdy_module \
 	    --without-http_split_clients_module \
 	    --with-http_stub_status_module \
 	    --without-http_ssi_module \
@@ -208,6 +209,7 @@ config.status.naxsi: config.env.naxsi config.sub config.guess
 	    --without-mail_imap_module \
 	    --without-http_uwsgi_module \
 	    --without-http_scgi_module \
+	    --with-http_spdy_module \
 	    --with-ipv6 \
 	    --with-http_stub_status_module \
 	    --with-http_realip_module \

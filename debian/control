@@ -147,7 +147,7 @@ Description: nginx web/proxy server (basic version)
  .
  THIRD PARTY MODULES: Echo.
  .
- MODULES ADDED BY DOTDEB : File AIO, X-rid header
+ MODULES ADDED BY DOTDEB : File AIO, SPDY, X-rid header
 
 Package: nginx-light-dbg
 Architecture: any
@@ -252,7 +252,7 @@ Description: nginx web/proxy server (version with naxsi)
  .
  THIRD PARTY MODULES: Naxsi, Cache Purge, Upstream Fair.
  .
- MODULES ADDED BY DOTDEB : File AIO, Gzip static, Echo, Syslog, X-rid header
+ MODULES ADDED BY DOTDEB : File AIO, Gzip static, Echo, SPDY, Syslog, X-rid header
 
 Package: nginx-naxsi-dbg
 Architecture: any
