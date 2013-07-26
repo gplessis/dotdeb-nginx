@@ -3,6 +3,7 @@ Section: httpd
 Priority: optional
 Maintainer: Guillaume Plessis <gui@dotdeb.org>
 Build-Depends: autotools-dev,
+               curl,
                debhelper (>= 7),
                dpkg-dev (>= 1.15.5),
                libcurl4-openssl-dev,
@@ -203,8 +204,8 @@ Description: nginx web/proxy server (extended version)
  Embedded Lua, HttpHeadersMore, http push, Nginx Development Kit,
  Upload Progress, Upstream Fair Queue.
  .
- MODULES ADDED BY DOTDEB : File AIO, Syslog, Pinba, HTTP Gunzip ,
- HTTP substitution filter, SPDY, X-rid header
+ MODULES ADDED BY DOTDEB : File AIO, Syslog, Pinba, HTTP Gunzip,
+ HTTP substitution filter, PageSpeed, SPDY, X-rid header
 
 Package: nginx-extras-dbg
 Architecture: any

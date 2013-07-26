@@ -134,6 +134,10 @@ config.status.light: config.env.light config.sub config.guess
 	touch $@
 
 config.status.extras: config.env.extras config.sub config.guess
+	cd $(MODULESDIR)/ngx_pagespeed && \
+	    curl https://dl.google.com/dl/page-speed/psol/1.6.29.5.tar.gz | tar xz && \
+	    perl -pi -e 'print "#ifdef LOG_INFO\n#undef LOG_INFO\n#endif\n\n#ifdef LOG_WARNING\n#undef LOG_WARNING\n#endif\n\n" if $$. == 1' \
+	    psol/include/third_party/chromium/src/base/logging.h
 	cd $(BUILDDIR_extras) && CFLAGS="$(CFLAGS)" CORE_LINK="$(LDFLAGS)" ./configure  \
 	    --prefix=/usr/share/nginx \
 	    --conf-path=/etc/nginx/nginx.conf \
@@ -182,6 +186,7 @@ config.status.extras: config.env.extras config.sub config.guess
 	    --add-module=$(MODULESDIR)/nginx-syslog \
 	    --add-module=$(MODULESDIR)/ngx_http_pinba_module \
 	    --add-module=$(MODULESDIR)/ngx_http_substitutions_filter_module \
+	    --add-module=$(MODULESDIR)/ngx_pagespeed \
 	    --add-module=$(MODULESDIR)/nginx-x-rid-header \
 				--with-ld-opt=-lossp-uuid \
             $(CONFIGURE_OPTS) >$@
@@ -256,6 +261,7 @@ clean:
 	rm -f config.sub config.guess
 	dh_clean
 	rm -rf $(CURDIR)/debian/build-*
+	rm -rf $(MODULESDIR)/ngx_pagespeed/psol
 mime-types:
 	
 

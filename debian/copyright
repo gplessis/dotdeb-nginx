@@ -118,3 +118,8 @@ Copyright: 2006-2010, Jose Parrella <joseparrella@cantv.net>,
                       Cyril Lavier <cyril.lavier@davromaniak.eu>.
 License:
  Same as upstream license.
+
+File: debian/modules/ngx_pagespeed
+Copyright: 2012, Google Inc.
+License:
+ Same as upstream license.
