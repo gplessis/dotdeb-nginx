@@ -8,7 +8,7 @@ Build-Depends: autotools-dev,
                dpkg-dev (>= 1.15.5),
                libcurl4-openssl-dev,
                libexpat-dev,
-               libgd2-noxpm-dev,
+               libgd2-dev | libgd2-noxpm-dev,
                libgeoip-dev,
                liblua5.1-dev,
                libmhash-dev,
@@ -20,7 +20,7 @@ Build-Depends: autotools-dev,
                libxslt1-dev,
                po-debconf,
                zlib1g-dev
-Standards-Version: 3.9.3
+Standards-Version: 3.9.4
 Homepage: http://nginx.net
 Vcs-Git: git://anonscm.debian.org/collab-maint/nginx.git
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=collab-maint/nginx.git;a=summary
@@ -61,7 +61,7 @@ Breaks: nginx (<< 0.8.54-4),
         nginx-extras (<< 0.8.54-4),
         nginx-full (<< 0.8.54-4),
         nginx-light (<< 0.8.54-4)
-Suggests: nginx-doc
+Suggests: nginx-doc, fcgiwrap
 Description: small, powerful, scalable web/proxy server - common files
  Nginx ("engine X") is a high-performance web and reverse proxy server
  created by Igor Sysoev. It can be used both as a standalone web server
@@ -80,6 +80,7 @@ Provides: httpd,
 Conflicts: nginx-extras,
            nginx-light,
            nginx-naxsi
+Suggests: nginx-doc (= ${source:Version})
 Description: nginx web/proxy server (standard version)
  Nginx ("engine X") is a high-performance web and reverse proxy server
  created by Igor Sysoev. It can be used both as a standalone web server
@@ -100,10 +101,11 @@ Description: nginx web/proxy server (standard version)
  .
  MAIL MODULES: Mail Core, IMAP, POP3, SMTP, SSL.
  .
- THIRD PARTY MODULES: Auth PAM, DAV Ext, Echo, Upstream Fair Queue.
+ THIRD PARTY MODULES: Auth PAM, DAV Ext, Echo, HTTP Substitution Filter,
+ Upstream Fair Queue.
  .
  MODULES ADDED BY DOTDEB : File AIO, Secure link, Syslog, Cache purge, Pinba,
- HTTP substitution filter, SPDY, X-rid header
+ SPDY, X-rid header
 
 Package: nginx-full-dbg
 Architecture: any
@@ -133,6 +135,7 @@ Provides: httpd,
 Conflicts: nginx-extras,
            nginx-full,
            nginx-naxsi
+Suggests: nginx-doc (= ${source:Version})
 Description: nginx web/proxy server (basic version)
  Nginx ("engine X") is a high-performance web and reverse proxy server
  created by Igor Sysoev. It can be used both as a standalone web server
@@ -180,6 +183,7 @@ Provides: httpd,
 Conflicts: nginx-full,
            nginx-light,
            nginx-naxsi
+Suggests: nginx-doc (= ${source:Version})
 Description: nginx web/proxy server (extended version)
  Nginx ("engine X") is a high-performance web and reverse proxy server
  created by Igor Sysoev. It can be used both as a standalone web server
@@ -200,12 +204,13 @@ Description: nginx web/proxy server (extended version)
  .
  MAIL MODULES: Mail Core, IMAP, POP3, SMTP, SSL.
  .
- THIRD PARTY MODULES: Auth PAM, Cache purge, DAV Ext, Echo,
- Embedded Lua, HttpHeadersMore, http push, Nginx Development Kit,
- Upload Progress, Upstream Fair Queue.
+ THIRD PARTY MODULES: Auth PAM, Cache purge, DAV Ext, Echo, Embedded Lua,
+ Fancy Index, HttpHeadersMore, HTTP Substitution Filter,
+ Nginx Development Kit, Upload Progress,
+ Upstream Fair Queue.
  .
  MODULES ADDED BY DOTDEB : File AIO, Syslog, Pinba, HTTP Gunzip,
- HTTP substitution filter, PageSpeed, SPDY, X-rid header
+ HTTP push stream, PageSpeed, SPDY, X-rid header
 
 Package: nginx-extras-dbg
 Architecture: any
@@ -279,10 +284,8 @@ Priority: extra
 Depends: daemon,
          dbconfig-common,
          nginx-naxsi (>= ${source:Version}),
-         python-mysqldb,
          python-twisted-web,
          ${misc:Depends}
-Recommends: mysql-server
 Provides: httpd,
           naxsi,
           nginx
