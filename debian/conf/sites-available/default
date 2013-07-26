@@ -35,14 +35,6 @@ server {
 		# include /etc/nginx/naxsi.rules
 	}
 
-	location /doc/ {
-		alias /usr/share/doc/;
-		autoindex on;
-		allow 127.0.0.1;
-		allow ::1;
-		deny all;
-	}
-
 	# Only for nginx-naxsi used with nginx-naxsi-ui : process denied requests
 	#location /RequestDenied {
 	#	proxy_pass http://127.0.0.1:8080;    

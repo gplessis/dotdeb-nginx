@@ -1,3 +1,17 @@
+nginx (1.4.1-2) unstable; urgency=medium
+
+  Started with nginx 1.4.1-2 upload, nginx-naxsi-ui switched backend from
+  MySQL to SQLite.
+
+  This was mostly caused by the future removal of MySQL support in naxsi-ui.
+  Thus, the nginx maintainers decided to switch from MySQL to SQLite.
+
+  All data contained in the MySQL database is not affected by this switch but
+  you need to start with a clean SQLite database to ensure nginx-naxsi-ui
+  reliability.
+
+ -- Cyril Lavier <cyril.lavier@davromaniak.eu>  Wed,  5 Jun 2013 09:45:03 +0200
+
 nginx (0.8.53-1) unstable; urgency=low
 
   As stated by upstream, the 0.7.x branch is consedered legacy and 0.8.x will
