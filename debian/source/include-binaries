@@ -1,5 +1,6 @@
 debian/modules/naxsi/contrib/naxsi-ui/bootstrap/img/glyphicons-halflings.png
 debian/modules/naxsi/contrib/naxsi-ui/bootstrap/img/glyphicons-halflings-white.png
+debian/modules/nginx-upload-progress/test/100
 debian/modules/ruby-passenger/doc/images/passenger_architecture.png
 debian/modules/ruby-passenger/doc/images/conservative_spawning.png
 debian/modules/ruby-passenger/doc/images/by_sa.png
