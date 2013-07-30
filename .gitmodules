@@ -40,3 +40,6 @@
 [submodule "debian/modules/ngx-fancyindex"]
 	path = debian/modules/ngx-fancyindex
 	url = git://github.com/aperezdc/ngx-fancyindex.git
+[submodule "debian/modules/ngx_pagespeed"]
+	path = debian/modules/ngx_pagespeed
+	url = git://github.com/pagespeed/ngx_pagespeed.git
