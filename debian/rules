@@ -223,6 +223,7 @@ config.status.naxsi: config.env.naxsi config.sub config.guess
 	    --pid-path=/var/run/nginx.pid \
 	    --with-pcre-jit \
 	    --with-file-aio \
+	    --with-http_geoip_module \
 	    --with-http_gzip_static_module \
 	    --with-http_ssl_module \
 	    --without-mail_pop3_module \
