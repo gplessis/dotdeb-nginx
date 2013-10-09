@@ -111,7 +111,7 @@ Description: nginx web/proxy server (standard version)
  Upstream Fair Queue.
  .
  MODULES ADDED BY DOTDEB : File AIO, Secure link, Syslog, Cache purge, Pinba,
- X-rid header
+ Proxy protocol, X-rid header
 
 Package: nginx-full-dbg
 Architecture: any
@@ -159,7 +159,7 @@ Description: nginx web/proxy server (basic version)
  .
  THIRD PARTY MODULES: Echo.
  .
- MODULES ADDED BY DOTDEB : File AIO, X-rid header
+ MODULES ADDED BY DOTDEB : File AIO, Proxy protocol, X-rid header
 
 Package: nginx-light-dbg
 Architecture: any
@@ -220,7 +220,7 @@ Description: nginx web/proxy server (extended version)
  Upstream Fair Queue.
  .
  MODULES ADDED BY DOTDEB : File AIO, Syslog, Pinba, HTTP Gunzip,
- HTTP push stream, PageSpeed, X-rid header
+ HTTP push stream, PageSpeed, Proxy protocol, X-rid header
 
 Package: nginx-extras-dbg
 Architecture: any
@@ -270,7 +270,8 @@ Description: nginx web/proxy server (version with naxsi)
  .
  THIRD PARTY MODULES: Naxsi, Cache Purge, Upstream Fair.
  .
- MODULES ADDED BY DOTDEB : File AIO, Gzip static, Echo, Syslog, X-rid header
+ MODULES ADDED BY DOTDEB : File AIO, Gzip static, Echo, Proxy protocol, 
+ Syslog, X-rid header
 
 Package: nginx-naxsi-dbg
 Architecture: any
@@ -353,7 +354,7 @@ Description: nginx web/proxy server (Passenger version)
  THIRD PARTY MODULES: Echo, Upstream Fair Queue, Passenger.
  .
  MODULES ADDED BY DOTDEB : File AIO, Secure link, Auth PAM, Headers more,
- Syslog, Cache purge, Pinba, HTTP substitution filter, X-rid header
+ Syslog, Cache purge, Pinba, Proxy protocol HTTP substitution filter, X-rid header
 
 Package: nginx-passenger-dbg
 Architecture: linux-any kfreebsd-any

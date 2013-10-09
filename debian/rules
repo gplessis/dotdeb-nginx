@@ -99,6 +99,7 @@ config.status.full: config.env.full config.sub config.guess
 	    --with-ipv6 \
 	    --with-mail \
 	    --with-mail_ssl_module \
+	    --with-proxy-protocol \
 	    --add-module=$(MODULESDIR)/nginx-auth-pam \
 	    --add-module=$(MODULESDIR)/nginx-dav-ext-module \
 	    --add-module=$(MODULESDIR)/nginx-echo \
@@ -140,6 +141,7 @@ config.status.light: config.env.light config.sub config.guess
 	    --without-http_ssi_module \
 	    --without-http_userid_module \
 	    --without-http_uwsgi_module \
+	    --with-proxy-protocol \
 	    --add-module=$(MODULESDIR)/nginx-echo \
 	    --add-module=$(MODULESDIR)/nginx-x-rid-header \
 				--with-ld-opt=-lossp-uuid \
@@ -185,6 +187,7 @@ config.status.extras: config.env.extras config.sub config.guess
 	    --with-ipv6 \
 	    --with-mail \
 	    --with-mail_ssl_module \
+	    --with-proxy-protocol \
 	    --add-module=$(MODULESDIR)/headers-more-nginx-module \
 	    --add-module=$(MODULESDIR)/nginx-auth-pam \
 	    --add-module=$(MODULESDIR)/nginx-cache-purge \
@@ -230,6 +233,7 @@ config.status.naxsi: config.env.naxsi config.sub config.guess
 	    --with-ipv6 \
 	    --with-http_stub_status_module \
 	    --with-http_realip_module \
+	    --with-proxy-protocol \
 	    --add-module=$(MODULESDIR)/naxsi/naxsi_src \
 	    --add-module=$(MODULESDIR)/nginx-cache-purge \
 	    --add-module=$(MODULESDIR)/nginx-upstream-fair \
@@ -270,6 +274,7 @@ config.status.passenger: config.env.passenger config.sub config.guess
 	    --with-ipv6 \
 	    --with-mail \
 	    --with-mail_ssl_module \
+	    --with-proxy-protocol \
 	    --add-module=$(MODULESDIR)/nginx-auth-pam \
 	    --add-module=$(MODULESDIR)/headers-more-nginx-module \
 	    --add-module=$(MODULESDIR)/nginx-echo \
