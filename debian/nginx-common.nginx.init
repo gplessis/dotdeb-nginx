@@ -26,7 +26,7 @@ set -e
 
 . /lib/lsb/init-functions
 
-PID=$(awk -F'[ ;]' '$1 !~ /^#/ && /pid/ {print $2}' /etc/nginx/nginx.conf)
+PID=$(awk -F'[ \t;]' '$1 !~ /^#/ && /pid/ {print $2}' /etc/nginx/nginx.conf)
 if [ -z "$PID" ]
 then
   PID=/run/nginx.pid
