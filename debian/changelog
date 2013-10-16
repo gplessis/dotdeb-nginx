@@ -1,10 +1,22 @@
-nginx (1.4.2-1~dotdeb.0) oldstable; urgency=low
+nginx (1.4.3-2~dotdeb.0) oldstable; urgency=low
 
-  * New upstream release
+  * Rebuilt for Dotdeb
+  * Sync with Debian
+  * geoip support in nginx-naxsi
+  * proxy protocol support in all flavors
 
- -- Guillaume Plessis <gui@dotdeb.org>  Fri, 26 Jul 2013 16:27:42 -0700
+ -- Guillaume Plessis <gui@dotdeb.org>  Tue, 15 Oct 2013 22:11:42 -0730
 
-nginx (1.4.1-4) UNRELEASED; urgency=low
+nginx (1.4.3-2) UNRELEASED; urgency=low
+
+  [ Kartik Mistry ]
+  * Renamed debian/nginx-common.service to debian/nginx-common.nginx.service so
+    it is installed properly for systemd. Thanks to Christos Trochalakis.
+  * Set debian/compat to 9 and updated debhelper dependency.
+
+ -- Kartik Mistry <kartik@debian.org>  Fri, 11 Oct 2013 20:46:27 +0530
+
+nginx (1.4.3-1) unstable; urgency=low
 
   [ Cyril Lavier ]
   * debian/nginx-naxsi-ui.postinst, debian/nginx-naxsi-ui.preinst:
@@ -17,7 +29,26 @@ nginx (1.4.1-4) UNRELEASED; urgency=low
   * conf/sites-available/default:
     + Removed /doc/ section per bug #715804.
 
- -- Michael Lustfield <michael@lustfield.net>  Wed, 17 Jul 2013 07:02:40 +0000
+  [ Christos Trochalakis ]
+  * New upstream release. (Closes: #722640)
+  * debian/nginx-common.nginx.init:
+    + Better pidfile extraction from nginx.conf. We now accept multiple
+      spaces and tabs as a field separator.
+  * debian/modules/nginx-auth-pam:
+    + Fixed upstream bug. (Closes: #721702)
+  * debian/watch:
+    + Only check for stable releases.
+  * debian/conf/sites-available/default:
+    + Correctly fallback to 404 when the requested file is missing.
+      (Closes: #724232)
+  * debian/logrotate:
+    + Gracefully handle empty pidfile in logrotate script.
+      (Closes: #696797)
+
+  [ Kartik Mistry ]
+  * Switch to dh-systemd (Closes: #713853)
+
+ -- Kartik Mistry <kartik@debian.org>  Thu, 10 Oct 2013 17:28:56 +0530
 
 nginx (1.4.1-3) unstable; urgency=low
 
