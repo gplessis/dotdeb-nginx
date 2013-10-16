@@ -342,11 +342,11 @@ binary-indep: build install
 	dh_installdocs -i
 	dh_installdebconf
 	dh_installexamples -i
-	dh_installinit -r --no-start -i --name=nginx
-	dh_installinit -r --no-start -i --name=nginx-naxsi-ui
+	dh_installinit -i --no-restart-on-upgrade --no-start --name=nginx
+	dh_installinit -i --no-restart-on-upgrade --no-start --name=nginx-naxsi-ui
 	cp debian/logrotate debian/nginx-common/etc/logrotate.d/nginx
 	mkdir -p debian/nginx-common/lib/systemd/system
-	cp debian/nginx-common.service debian/nginx-common/lib/systemd/system/nginx.service
+	cp debian/nginx-common.nginx.service debian/nginx-common/lib/systemd/system/nginx.service
 	dh_link -i
 	dh_compress -i
 	dh_fixperms -i
