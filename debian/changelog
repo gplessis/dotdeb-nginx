@@ -1,4 +1,4 @@
-nginx (1.4.3-2~dotdeb.1) stable; urgency=low
+nginx (1.4.3-3~dotdeb.1) stable; urgency=low
 
   * Rebuilt for Dotdeb
   * Sync with Debian
@@ -7,14 +7,44 @@ nginx (1.4.3-2~dotdeb.1) stable; urgency=low
 
  -- Guillaume Plessis <gui@dotdeb.org>  Tue, 15 Oct 2013 22:11:42 -0730
 
-nginx (1.4.3-2) UNRELEASED; urgency=low
+nginx (1.4.3-3) UNRELEASED; urgency=low
+
+  [ Christos Trochalakis ]
+  * debian/nginx-*.postinst:
+    + Wait for the new master to write its pid file before sending QUIT to the
+      old master. This solves an issue with systemd and the upgrade mechanism.
+
+      Systemd receives the SIGCHLD from the old master but it can't see the new
+      pid because the new master has not written it yet. As a result, it kills
+      everything inside the cgroup, including the new master.
+
+  [ Michael Lustfield ]
+  * debian/control:
+    + Added spdy to package description (Closes: #728038)
+
+ -- Michael Lustfield <michael@lustfield.net>  Sun, 27 Oct 2013 14:53:00 -0500
+
+nginx (1.4.3-2) unstable; urgency=low
 
   [ Kartik Mistry ]
   * Renamed debian/nginx-common.service to debian/nginx-common.nginx.service so
     it is installed properly for systemd. Thanks to Christos Trochalakis.
   * Set debian/compat to 9 and updated debhelper dependency.
 
- -- Kartik Mistry <kartik@debian.org>  Fri, 11 Oct 2013 20:46:27 +0530
+  [ Christos Trochalakis ]
+  * debian/rules, debian/nginx-common.dirs,
+    debian/debian-common.nginx.logrotate:
+    + Switch to dh_installlogrotate.
+  * debian/rules:
+    + *-stamp files are deleted by dh_clean.
+    + Remove unused mime-types target.
+    + Remove not needed config.sub and config.guess targets.
+  * debian/nginx-common.dirs:
+    + Don't ship an empty /run dir.
+  * debian/nginx-{light,full,extras}.lintian-overrides:
+    + Override false lintian spelling error warning.
+
+ -- Kartik Mistry <kartik@debian.org>  Wed, 16 Oct 2013 14:58:11 +0530
 
 nginx (1.4.3-1) unstable; urgency=low
 
