@@ -15,7 +15,7 @@ if [ -x /etc/init.d/nginx ]; then
   if [ -f /var/run/nginx.pid ] && pidof /usr/sbin/nginx >/dev/null; then
     NGX_PID=`cat /var/run/nginx.pid`
     if kill -s USR2 $NGX_PID 2>/dev/null; then
-      while [ ! -f /var/run/nginx.pid.oldbin ]; do
+      while [ ! -s /var/run/nginx.pid.oldbin ] || [ ! -s /var/run/nginx.pid ]; do
         cnt=`expr $cnt + 1`
         if [ $cnt -gt 10 ]; then
           kill -s KILL $NGX_PID

@@ -37,7 +37,6 @@ ifeq ($(DEB_BUILD_ARCH),sparc)
 	CONFIGURE_OPTS = --with-cc-opt="-m32 -mcpu=ultrasparc"
 endif
 
-
 ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
 	NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
 	ifeq (${NUMJOBS}, 0)
@@ -45,18 +44,6 @@ ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
 	endif
 else
 	NUMJOBS = 1
-endif
-
-config.sub:
-	dh_testdir
-ifneq "$(wildcard /usr/share/misc/config.sub)" ""
-		cp -f /usr/share/misc/config.sub config.sub
-endif
-
-config.guess:
-	dh_testdir
-ifneq "$(wildcard /usr/share/misc/config.guess)" ""
-		cp -f /usr/share/misc/config.guess config.guess
 endif
 
 config.env.%:
@@ -69,7 +56,7 @@ config.env.%:
 	cp -Pa $(CURDIR)/src $(BUILDDIR_$*)/
 	cp -Pa $(CURDIR)/man $(BUILDDIR_$*)/
 
-config.status.full: config.env.full config.sub config.guess
+config.status.full: config.env.full
 	cd $(BUILDDIR_full) && CFLAGS="$(CFLAGS)" CORE_LINK="$(LDFLAGS)" ./configure  \
 	    --prefix=/usr/share/nginx \
 	    --conf-path=/etc/nginx/nginx.conf \
@@ -113,7 +100,7 @@ config.status.full: config.env.full config.sub config.guess
             $(CONFIGURE_OPTS) >$@
 	touch $@
 
-config.status.light: config.env.light config.sub config.guess
+config.status.light: config.env.light
 	cd $(BUILDDIR_light) && CFLAGS="$(CFLAGS)" CORE_LINK="$(LDFLAGS)" ./configure  \
 	    --prefix=/usr/share/nginx \
 	    --conf-path=/etc/nginx/nginx.conf \
@@ -148,7 +135,7 @@ config.status.light: config.env.light config.sub config.guess
             $(CONFIGURE_OPTS) >$@
 	touch $@
 
-config.status.extras: config.env.extras config.sub config.guess
+config.status.extras: config.env.extras
 	cd $(MODULESDIR)/ngx_pagespeed && \
 	    curl https://dl.google.com/dl/page-speed/psol/1.6.29.5.tar.gz | tar xz && \
 	    perl -pi -e 'print "#ifdef LOG_INFO\n#undef LOG_INFO\n#endif\n\n#ifdef LOG_WARNING\n#undef LOG_WARNING\n#endif\n\n" if $$. == 1' \
@@ -208,7 +195,7 @@ config.status.extras: config.env.extras config.sub config.guess
             $(CONFIGURE_OPTS) >$@
 	touch $@
 
-config.status.naxsi: config.env.naxsi config.sub config.guess
+config.status.naxsi: config.env.naxsi
 	cd $(BUILDDIR_naxsi) && CFLAGS="$(CFLAGS)" CORE_LINK="$(LDFLAGS)" ./configure  \
 	    --prefix=/usr/share/nginx \
 	    --conf-path=/etc/nginx/nginx.conf \
@@ -319,15 +306,11 @@ build: build-indep build-arch
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp
-	rm -f config.sub config.guess
 	dh_clean
 	rm -rf $(CURDIR)/debian/build-*
 	rm -rf $(MODULESDIR)/ngx_pagespeed/psol
-mime-types:
-	
 
-install: mime-types
+install:
 	dh_testdir
 	dh_testroot
 	dh_prep
@@ -344,9 +327,7 @@ binary-indep: build install
 	dh_installexamples -i
 	dh_installinit -i --no-restart-on-upgrade --no-start --name=nginx
 	dh_installinit -i --no-restart-on-upgrade --no-start --name=nginx-naxsi-ui
-	cp debian/logrotate debian/nginx-common/etc/logrotate.d/nginx
-	mkdir -p debian/nginx-common/lib/systemd/system
-	cp debian/nginx-common.nginx.service debian/nginx-common/lib/systemd/system/nginx.service
+	dh_installlogrotate -i -pnginx-common --name=nginx
 	dh_link -i
 	dh_compress -i
 	dh_fixperms -i
@@ -360,6 +341,7 @@ binary-arch: install build-dbg
 	dh_testroot
 	dh_installchangelogs -a -k CHANGES
 	dh_installdocs -a
+	dh_lintian -a
 	dh_link -aA
 	dh_compress -a
 	dh_perl -a
