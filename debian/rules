@@ -228,7 +228,7 @@ config.status.naxsi: config.env.naxsi
 	    $(CONFIGURE_OPTS) >$@
 	touch $@
 
-config.status.passenger: config.env.passenger config.sub config.guess
+config.status.passenger: config.env.passenger
 	cd $(BUILDDIR_passenger) && CFLAGS="$(CFLAGS)" CORE_LINK="$(LDFLAGS)" ./configure  \
 	    --prefix=/etc/nginx \
 	    --conf-path=/etc/nginx/nginx.conf \
