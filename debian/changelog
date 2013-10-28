@@ -3,7 +3,6 @@ nginx (1.4.3-3~dotdeb.1) stable; urgency=low
   * Rebuilt for Dotdeb
   * Sync with Debian
   * geoip support in nginx-naxsi
-  * proxy protocol support in all flavors
 
  -- Guillaume Plessis <gui@dotdeb.org>  Tue, 15 Oct 2013 22:11:42 -0730
 

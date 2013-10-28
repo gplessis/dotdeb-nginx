@@ -1,3 +1,2 @@
 syslog_1.3.14.patch
 perl-use-dpkg-buildflags.patch
-nginx-1.4.x_proxy_protocol_patch_v2.patch

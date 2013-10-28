@@ -98,7 +98,7 @@ Description: nginx web/proxy server (standard version)
  Upstream Fair Queue.
  .
  MODULES ADDED BY DOTDEB : File AIO, Secure link, Syslog, Cache purge, Pinba,
- Proxy protocol, Spdy, X-rid header
+ Spdy, X-rid header
 
 Package: nginx-full-dbg
 Architecture: any
@@ -136,7 +136,7 @@ Description: nginx web/proxy server (basic version)
  .
  THIRD PARTY MODULES: Echo.
  .
- MODULES ADDED BY DOTDEB : File AIO, Proxy protocol, Spdy, X-rid header
+ MODULES ADDED BY DOTDEB : File AIO, Spdy, X-rid header
 
 Package: nginx-light-dbg
 Architecture: any
@@ -189,7 +189,7 @@ Description: nginx web/proxy server (extended version)
  Upstream Fair Queue.
  .
  MODULES ADDED BY DOTDEB : File AIO, Syslog, Pinba, HTTP Gunzip,
- HTTP push stream, PageSpeed, Proxy protocol, X-rid header
+ HTTP push stream, PageSpeed, X-rid header
 
 Package: nginx-extras-dbg
 Architecture: any
@@ -229,8 +229,7 @@ Description: nginx web/proxy server (version with naxsi)
  .
  THIRD PARTY MODULES: Naxsi, Cache Purge, Upstream Fair.
  .
- MODULES ADDED BY DOTDEB : File AIO, Gzip static, Echo, Proxy protocol, Spdy,
- Syslog, X-rid header
+ MODULES ADDED BY DOTDEB : File AIO, Gzip static, Echo, Spdy, Syslog, X-rid header
 
 Package: nginx-naxsi-dbg
 Architecture: any
