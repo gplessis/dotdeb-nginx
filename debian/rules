@@ -265,11 +265,11 @@ binary-indep: build install
 	dh_installdocs -i
 	dh_installdebconf
 	dh_installexamples -i
-	dh_systemd_enable --name=nginx
 	dh_installinit -i --no-restart-on-upgrade --no-start --name=nginx
 	dh_installinit -i --no-restart-on-upgrade --no-start --name=nginx-naxsi-ui
-	dh_systemd_start
 	dh_installlogrotate -i -pnginx-common --name=nginx
+	mkdir -p debian/nginx-common/lib/systemd/system
+	cp debian/nginx-common.service debian/nginx-common/lib/systemd/system/nginx.service
 	dh_link -i
 	dh_compress -i
 	dh_fixperms -i
