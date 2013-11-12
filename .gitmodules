@@ -40,3 +40,6 @@
 [submodule "debian/modules/ngx_pagespeed"]
 	path = debian/modules/ngx_pagespeed
 	url = git://github.com/pagespeed/ngx_pagespeed.git
+[submodule "debian/modules/ngx_set_misc"]
+	path = debian/modules/ngx_set_misc
+	url = https://github.com/agentzh/set-misc-nginx-module.git
