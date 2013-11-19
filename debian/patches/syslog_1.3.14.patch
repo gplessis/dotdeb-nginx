@@ -1,7 +1,7 @@
-Index: nginx-1.4.3/src/core/ngx_cycle.c
+Index: nginx-1.4.4/src/core/ngx_cycle.c
 ===================================================================
---- nginx-1.4.3.orig/src/core/ngx_cycle.c
-+++ nginx-1.4.3/src/core/ngx_cycle.c
+--- nginx-1.4.4.orig/src/core/ngx_cycle.c
++++ nginx-1.4.4/src/core/ngx_cycle.c
 @@ -85,6 +85,12 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
      cycle->pool = pool;
      cycle->log = log;
@@ -15,10 +15,10 @@ Index: nginx-1.4.3/src/core/ngx_cycle.c
      cycle->old_cycle = old_cycle;
  
      cycle->conf_prefix.len = old_cycle->conf_prefix.len;
-Index: nginx-1.4.3/src/core/ngx_log.c
+Index: nginx-1.4.4/src/core/ngx_log.c
 ===================================================================
---- nginx-1.4.3.orig/src/core/ngx_log.c
-+++ nginx-1.4.3/src/core/ngx_log.c
+--- nginx-1.4.4.orig/src/core/ngx_log.c
++++ nginx-1.4.4/src/core/ngx_log.c
 @@ -10,6 +10,15 @@
  
  
@@ -343,10 +343,10 @@ Index: nginx-1.4.3/src/core/ngx_log.c
 +}
 +#endif
 +
-Index: nginx-1.4.3/src/core/ngx_log.h
+Index: nginx-1.4.4/src/core/ngx_log.h
 ===================================================================
---- nginx-1.4.3.orig/src/core/ngx_log.h
-+++ nginx-1.4.3/src/core/ngx_log.h
+--- nginx-1.4.4.orig/src/core/ngx_log.h
++++ nginx-1.4.4/src/core/ngx_log.h
 @@ -12,6 +12,13 @@
  #include <ngx_config.h>
  #include <ngx_core.h>
@@ -386,10 +386,10 @@ Index: nginx-1.4.3/src/core/ngx_log.h
  char *ngx_log_set_levels(ngx_conf_t *cf, ngx_log_t *log);
  void ngx_cdecl ngx_log_abort(ngx_err_t err, const char *fmt, ...);
  void ngx_cdecl ngx_log_stderr(ngx_err_t err, const char *fmt, ...);
-Index: nginx-1.4.3/src/http/modules/ngx_http_log_module.c
+Index: nginx-1.4.4/src/http/modules/ngx_http_log_module.c
 ===================================================================
---- nginx-1.4.3.orig/src/http/modules/ngx_http_log_module.c
-+++ nginx-1.4.3/src/http/modules/ngx_http_log_module.c
+--- nginx-1.4.4.orig/src/http/modules/ngx_http_log_module.c
++++ nginx-1.4.4/src/http/modules/ngx_http_log_module.c
 @@ -13,6 +13,11 @@
  #include <zlib.h>
  #endif
@@ -577,10 +577,10 @@ Index: nginx-1.4.3/src/http/modules/ngx_http_log_module.c
  
      if (cf->args->nelts >= 3) {
          name = value[2];
-Index: nginx-1.4.3/src/http/ngx_http_core_module.c
+Index: nginx-1.4.4/src/http/ngx_http_core_module.c
 ===================================================================
---- nginx-1.4.3.orig/src/http/ngx_http_core_module.c
-+++ nginx-1.4.3/src/http/ngx_http_core_module.c
+--- nginx-1.4.4.orig/src/http/ngx_http_core_module.c
++++ nginx-1.4.4/src/http/ngx_http_core_module.c
 @@ -1462,6 +1462,9 @@ ngx_http_update_location_config(ngx_http
  
      if (r == r->main) {
@@ -662,10 +662,10 @@ Index: nginx-1.4.3/src/http/ngx_http_core_module.c
      if (cf->args->nelts == 2) {
          clcf->error_log->log_level = NGX_LOG_ERR;
          return NGX_CONF_OK;
-Index: nginx-1.4.3/src/http/ngx_http_request.c
+Index: nginx-1.4.4/src/http/ngx_http_request.c
 ===================================================================
---- nginx-1.4.3.orig/src/http/ngx_http_request.c
-+++ nginx-1.4.3/src/http/ngx_http_request.c
+--- nginx-1.4.4.orig/src/http/ngx_http_request.c
++++ nginx-1.4.4/src/http/ngx_http_request.c
 @@ -531,6 +531,9 @@ ngx_http_create_request(ngx_connection_t
      clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);
  
