@@ -1,3 +1,9 @@
+nginx (1.4.4-1~dotdeb.1) stable; urgency=high
+
+  * New upstream release : fixes CVE-2013-4547
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Tue, 19 Nov 2013 09:34:42 -0700
+
 nginx (1.4.3-3~dotdeb.2) stable; urgency=high
 
   * Security update : ngx_pagespeed 1.6.29.7
