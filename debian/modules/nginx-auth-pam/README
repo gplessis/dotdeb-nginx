@@ -1,8 +1,8 @@
 Nginx module to use PAM for simple http authentication
 ======================================================
 
-:Date: $Date: 2010-11-15 12:35:32 +0100 (dl 15 de nov de 2010) $
-:Revision: $Rev: 4488 $
+:Date: $Date: 2013-09-17 12:00:49 +0200 (dt 17 de set de 2013) $
+:Revision: $Rev: 7626 $
 
 Compilation
 -----------
@@ -11,32 +11,11 @@ When compiling from source build as usual adding the -add-module option::
 
   ./configure --add-module=$PATH_TO_MODULE
 
-If you are using a Debian GNU/Linux distribution is easy to build a modified
-package that includes this module::
-
-  # Get the source
-  apt-get source nginx
-  # Copy the module
-  NGINX_DEBIAN=$(ls -d nginx-*/debian)
-  mkdir $NGINX_DEBIAN/ngx_http_auth_pam_module
-  cp config  $NGINX_DEBIAN/ngx_http_auth_pam_module/
-  cp ngx_http_auth_pam_module.c $NGINX_DEBIAN/ngx_http_auth_pam_module/
-  cd $NGINX_DEBIAN; cd ..;
-  # Add the argument ``--add-module=./debian/ngx_http_auth_pam_module`` to the
-  # ./configure call on the debian/rules file
-  sed -i -e '/.\/configure .*\\$/,/[^\\]$/ {
-    /^.*[^\\]$/ { 
-      s%^\(.*\)$%\t    --add-module=./debian/ngx_http_auth_pam_module \\\n\1%;
-    }
-  }' debian/rules
-  # Add the libpam-dev build dependency
-  sed -i -e 's/^Build-Depends: /Build-Depends: libpam-dev, /;' debian/control
-  # Update the package version using the dch command from devscripts
-  dch -l'+authpam' 'Added ngx_http_auth_pam_module support'
-  # Build the package 
-  dpkg-buildpackage
-  # And install
-  sudo dpkg -i ../nginx*deb
+If you are using a Debian GNU/Linux distribution install the nginx-full package;
+the module has been included in the nginx debian package since version 1.1.6-1
+and there are newer packages on the stable distribution (wheezy) and the wheezy
+version is also available from the oldstable backports repository
+(squeeze-backports).
 
 Configuration
 -------------
@@ -57,8 +36,8 @@ To protect everything under ``/secure`` you will add the following to the
 ``nginx.conf`` file::
 
   location /secure {
-  	auth_pam              "Secure Zone";
-  	auth_pam_service_name "nginx";
+    auth_pam              "Secure Zone";
+    auth_pam_service_name "nginx";
   }
 
 Note that the module runs as the web server user, so the PAM modules used must
@@ -78,8 +57,8 @@ use the ``pam_listfile.so`` module; to limit who can access resources under
 ``/restricted`` add the following to the ``nginx.conf`` file::
 
   location /restricted {
-  	auth_pam              "Restricted Zone";
-  	auth_pam_service_name "nginx_restricted";
+    auth_pam              "Restricted Zone";
+    auth_pam_service_name "nginx_restricted";
   }
 
 Use the following ``/etc/pam.d/nginx_restricted`` file::
@@ -92,5 +71,32 @@ Use the following ``/etc/pam.d/nginx_restricted`` file::
 And add the users allowed to authenticate to the ``/etc/nginx/restricted_users``
 (remember that the web server user has to be able to read this file).
 
+
+PAM Environment
+---------------
+
+If you want use the ``pam_exec.so`` plugin for request based authentication the
+module can add to the PAM environment the ``HOST`` and ``REQUEST`` variables if
+you set the ``auth_pam_set_pam_env`` flag::
+
+  location /pam_exec_protected {
+    auth_pam              "Exec Zone";
+    auth_pam_service_name "nginx_exec";
+    auth_pam_set_pam_env  on;
+  }
+
+With this configuration if you access an URL like:
+
+  http://localhost:8000/pam_exec_protected/page?foo=yes&bar=too
+
+the PAM environment will include the following variables::
+
+    HOST=localhost:8000
+    REQUEST=GET /pam_exec_protected/page?foo=yes&bar=too HTTP/1.1
+
+You may use this information for request based authentication.
+You need a recent pam release (>= version 1.0.90) to expose environment
+variables to pam_exec.
+
 .. ......
-.. SVN Id: $Id: README 4488 2010-11-15 11:35:32Z sto $
+.. SVN Id: $Id: README 7626 2013-09-17 10:00:49Z sto $
