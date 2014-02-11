@@ -1,2 +1,3 @@
-syslog_1.3.14.patch
+syslog_1.4.0.patch
 perl-use-dpkg-buildflags.patch
+guard-use-of-deprecated-openssl-definition.patch
