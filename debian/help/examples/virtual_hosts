@@ -146,7 +146,7 @@ server {
 	ssl_session_timeout 5m;
 
 	ssl_protocols SSLv3 TLSv1;
-	ssl_ciphers ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv3:+EXP;
+	ssl_ciphers "HIGH:!aNULL:!MD5 or HIGH:!aNULL:!MD5:!3DES";
 	ssl_prefer_server_ciphers on;
 
 	location / {

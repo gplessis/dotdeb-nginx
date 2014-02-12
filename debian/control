@@ -20,14 +20,22 @@ Build-Depends: autotools-dev,
                libxslt1-dev,
                po-debconf,
                zlib1g-dev
-Standards-Version: 3.9.4
+Standards-Version: 3.9.5
 Homepage: http://nginx.net
 Vcs-Git: git://anonscm.debian.org/collab-maint/nginx.git
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=collab-maint/nginx.git;a=summary
 
 Package: nginx
 Architecture: all
-Depends: nginx-full | nginx-light, ${misc:Depends}
+Depends: nginx-full   (>= ${source:Version}) |
+         nginx-light  (>= ${source:Version}) |
+         nginx-extras (>= ${source:Version}) |
+         nginx-naxsi  (>= ${source:Version}) ,
+         nginx-full   (<< ${source:Version}.1~) |
+         nginx-light  (<< ${source:Version}.1~) |
+         nginx-extras (<< ${source:Version}.1~) |
+         nginx-naxsi  (<< ${source:Version}.1~) ,
+         ${misc:Depends}
 Description: small, powerful, scalable web/proxy server
  Nginx ("engine X") is a high-performance web and reverse proxy server
  created by Igor Sysoev. It can be used both as a standalone web server
@@ -70,7 +78,8 @@ Description: small, powerful, scalable web/proxy server - common files
 Package: nginx-full
 Architecture: any
 Depends: nginx-common (= ${source:Version}), ${misc:Depends}, ${shlibs:Depends}
-Provides: httpd, nginx
+Breaks: nginx (<< 1.4.4-5)
+Provides: httpd, httpd-cgi, nginx
 Conflicts: nginx-extras, nginx-light, nginx-naxsi
 Suggests: nginx-doc (= ${source:Version})
 Description: nginx web/proxy server (standard version)
@@ -117,7 +126,8 @@ Package: nginx-light
 Architecture: any
 Priority: extra
 Depends: nginx-common (= ${source:Version}), ${misc:Depends}, ${shlibs:Depends}
-Provides: httpd, nginx
+Breaks: nginx (<< 1.4.4-5)
+Provides: httpd, httpd-cgi, nginx
 Conflicts: nginx-extras, nginx-full, nginx-naxsi
 Suggests: nginx-doc (= ${source:Version})
 Description: nginx web/proxy server (basic version)
@@ -159,7 +169,8 @@ Depends: nginx-common (= ${source:Version}),
          ${misc:Depends},
          ${perl:Depends},
          ${shlibs:Depends}
-Provides: httpd, nginx
+Breaks: nginx (<< 1.4.4-5)
+Provides: httpd, httpd-cgi, nginx
 Conflicts: nginx-full, nginx-light, nginx-naxsi
 Suggests: nginx-doc (= ${source:Version})
 Description: nginx web/proxy server (extended version)
@@ -209,7 +220,9 @@ Package: nginx-naxsi
 Architecture: any
 Priority: extra
 Depends: nginx-common (= ${source:Version}), ${misc:Depends}, ${shlibs:Depends}
-Provides: httpd, nginx
+Breaks: nginx (<< 1.4.4-5),
+        nginx-naxsi-ui (<< 1.4.4-5)
+Provides: httpd, httpd-cgi, nginx
 Conflicts: nginx-extras, nginx-full, nginx-light
 Description: nginx web/proxy server (version with naxsi)
  Nginx ("engine X") is a high-performance web and reverse proxy server
@@ -251,10 +264,9 @@ Priority: extra
 Depends: daemon,
          dbconfig-common,
          nginx-naxsi (>= ${source:Version}),
+         nginx-naxsi (<< ${source:Version}.1~),
          python-twisted-web,
          ${misc:Depends}
-Provides: httpd, naxsi, nginx
-Conflicts: nginx-extras, nginx-full, nginx-light
 Description: nginx web/proxy server - naxsi configuration front-end
  Nginx ("engine X") is a high-performance web and reverse proxy server
  created by Igor Sysoev. It can be used both as a standalone web server

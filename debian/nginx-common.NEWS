@@ -1,3 +1,18 @@
+nginx-common (1.4.4-2) unstable; urgency=low
+
+  Per CVE-2013-0337 (bug #701112), we are changing /var/log/nginx permissions
+  to root:adm 750. If you have manipulated these permissions in any way, you
+  can add a dpkg-statoverride entry and the directory will not be touched.
+  You also have to manually set the permissions once, as dpkg doesn't do that
+  automatically for directories.
+
+  e.g.
+    chown root:adm /var/log/nginx
+    chmod 0755 /var/log/nginx
+    dpkg-statoverride --add root adm 0755 /var/log/nginx
+
+ -- Michael Lustfield <michael@lustfield.net>  Sun, 24 Nov 2013 15:59:52 -0600
+
 nginx (1.4.1-2) unstable; urgency=medium
 
   Started with nginx 1.4.1-2 upload, nginx-naxsi-ui switched backend from
