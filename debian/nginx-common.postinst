@@ -4,9 +4,15 @@ set -e
 case "$1" in
   configure)
     logdir="/var/log/nginx"
-    # Ensure existance and right state of log files and directory
-    if [ ! -d "$logdir" -a ! -L "$logdir" ]; then
-      mkdir "$logdir"
+    # Ensure secure permissions (CVE-2013-0337)
+    # http://bugs.debian.org/701112
+    #
+    # nginx uses 0755 for log files making them world readable,
+    # we fix that by using 0750 for the log directory.
+    #
+    # Allow local admin to override:
+    # e.g. dpkg-statoverride --add root adm 0755 /var/log/nginx
+    if ! dpkg-statoverride --list "$logdir" >/dev/null; then
       chown www-data:adm $logdir
       chmod 0750 $logdir
     fi

@@ -4,11 +4,7 @@ set -e
 case "$1" in
   remove|remove-in-favour|deconfigure|deconfigure-in-favour)
     if [ -x /etc/init.d/nginx ]; then
-      if [ -x /usr/sbin/invoke-rc.d ]; then
-        invoke-rc.d nginx stop
-      else   
-        /etc/init.d/nginx stop
-      fi
+      invoke-rc.d nginx stop || exit $?
     fi
     ;;
 

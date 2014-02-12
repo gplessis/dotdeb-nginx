@@ -63,21 +63,21 @@ stop() {
 
 case "$1" in
 	start)
-		test_nginx_config
 		log_daemon_msg "Starting $DESC" "$NAME"
+		test_nginx_config
 		start
 		log_end_msg $?
 		;;
 
 	stop)
-		log_daemon_msg "Stopping $DESC" "$NAME"
 		stop
+		log_daemon_msg "Stopping $DESC" "$NAME"
 		log_end_msg $?
 		;;
 
 	restart|force-reload)
-		test_nginx_config
 		log_daemon_msg "Restarting $DESC" "$NAME"
+		test_nginx_config
 		stop
 		sleep 1
 		start
@@ -85,8 +85,8 @@ case "$1" in
 		;;
 
 	reload)
-		test_nginx_config
 		log_daemon_msg "Reloading $DESC configuration" "$NAME"
+		test_nginx_config
 		start-stop-daemon --stop --signal HUP --quiet --pidfile $PID \
 			--oknodo --exec $DAEMON
 		log_end_msg $?
@@ -94,11 +94,7 @@ case "$1" in
 
 	configtest|testconfig)
 		log_daemon_msg "Testing $DESC configuration"
-		if test_nginx_config; then
-			log_daemon_msg "$NAME"
-		else
-			exit $?
-		fi
+		test_nginx_config
 		log_end_msg $?
 		;;
 

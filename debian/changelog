@@ -1,39 +1,105 @@
-nginx (1.4.4-1~dotdeb.0) oldstable; urgency=high
+nginx (1.4.5-1~dotdeb.0) oldstable; urgency=medium
 
-  * New upstream release : fixes CVE-2013-4547
+  * New upstream release.
 
- -- Guillaume Plessis <gui@dotdeb.org>  Tue, 19 Nov 2013 09:34:42 -0700
+ -- Guillaume Plessis <gui@dotdeb.org>  Tue, 11 Feb 2014 15:55:42 -0700
 
-nginx (1.4.3-3~dotdeb.1) oldstable; urgency=high
-
-  * Security update : ngx_pagespeed 1.6.29.7
-
- -- Guillaume Plessis <gui@dotdeb.org>  Thu, 31 Oct 2013 23:28:42 -0700
-
-nginx (1.4.3-3~dotdeb.0) oldstable; urgency=low
-
-  * Rebuilt for Dotdeb
-  * Sync with Debian
-  * geoip support in nginx-naxsi
-
- -- Guillaume Plessis <gui@dotdeb.org>  Tue, 15 Oct 2013 22:11:42 -0730
-
-nginx (1.4.3-3) UNRELEASED; urgency=low
+nginx (1.4.5-1) UNRELEASED; urgency=medium
 
   [ Christos Trochalakis ]
+  * New upstream release.
+  * debian/modules/nginx-lua:
+    + Update nginx-lua to v0.9.4
+  * debian/nginx-naxsi-ui.preinst:
+    + Fix exit status issue (Closes: #735152)
+  * debian/control:
+    + Fix arch:all to arch:any dependencies
+    + Make nginx depend on specific flavor version
+  * debian/nginx-*.postinst:
+    + Make nginx start by default (Closes: #735551)
+  * debian/nginx-*.prerm:
+    + No need to check for invoke-rc.d,
+      correctly set the exit code on error
+
+ -- Christos Trochalakis <yatiohi@ideopolis.gr>  Tue, 11 Feb 2014 18:34:51 +0200
+
+nginx (1.4.4-4) unstable; urgency=medium
+
+  [ Christos Trochalakis ]
+  * debian/nginx-common.postinst:
+    + Fix log re-opening issue due to wrong /var/log/nginx
+      permissions. (Closes: #734139)
+
+ -- Christos Trochalakis <yatiohi@ideopolis.gr>  Sat, 04 Jan 2014 09:41:40 +0200
+
+nginx (1.4.4-3) unstable; urgency=medium
+
+  [ Christos Trochalakis ]
+  * debian/nginx-naxsi-ui.postinst:
+    + Fix early exit issue (Closes: #715435)
+
+ -- Christos Trochalakis <yatiohi@ideopolis.gr>  Tue, 31 Dec 2013 11:47:07 +0200
+
+nginx (1.4.4-2) unstable; urgency=low
+
+  [ Michael Lustfield ]
+  * debian/control:
+    + Added Provides: httpd-cgi to packages. (Closes: #701508)
+    + Added other options to nginx depends. (Closes: #729860)
+    + Added Spdy to nginx-full package description.
+  * debian/nginx-common.nginx.init:
+    + Added missing line from patch. (Closes: #728103)
+  * debian/conf/sites-available/default:
+    + Changed ssl_protocols and ssl_ciphers. (Closes: 730142)
+  * debian/nginx-common.preinst:
+    + Modify permissions of /var/log/nginx. (Closes: #701112)
+  * debian/rules:
+    + Added spdy support to nginx-full. (Closes: #730432)
+
+  [ Christos Trochalakis ]
+  * debian/nginx-doc,docs, debian/nginx-common.NEWS:
+    + Ship NEWS with nginx-common instead of nginx-doc.
+  * debian/conf/proxy_params:
+    + Host header should be passed unmodified to the proxied server.
+    + Pass X-Forwarded-Proto header to the proxied server.
+  * debian/control:
+    + Fix nginx-naxsi-ui Depends and Conflicts lines.
+
+  [ Neutron Soutmun ]
+  * debian/patches/guard-use-of-deprecated-openssl-definition.patch:
+    + Fix FTBFS against the recent libssl-dev. (Closes: #733107)
+
+  [ Kartik Mistry ]
+  * debian/control:
+    + Updated to Standards-Version 3.9.5
+  * debian/watch, debian/upstream-signing-key.pgp:
+    + Use upstream PGP signature to verify by watch file.
+
+ -- Kartik Mistry <kartik@debian.org>  Fri, 27 Dec 2013 21:16:01 +0530
+
+nginx (1.4.4-1) unstable; urgency=low
+
+  [ Christos Trochalakis ]
+  * New upstream release. (Closes: #730012)
   * debian/nginx-*.postinst:
     + Wait for the new master to write its pid file before sending QUIT to the
       old master. This solves an issue with systemd and the upgrade mechanism.
-
       Systemd receives the SIGCHLD from the old master but it can't see the new
       pid because the new master has not written it yet. As a result, it kills
       everything inside the cgroup, including the new master.
+  * debian/modules/ngx-fancyindex:
+    + Upgrade Fancy Index module to v0.3.3 (Closes: #728721)
+  * debian/control:
+    + Remove Upload module from nginx-extras description (Closes: #729003)
 
   [ Michael Lustfield ]
   * debian/control:
     + Added spdy to package description (Closes: #728038)
+  * debian/nginx-common.nginx.init:
+    + Showing better start/stop messages. Thanks Pim van den Berg.
+      (Closes: #728103)
 
- -- Michael Lustfield <michael@lustfield.net>  Sun, 27 Oct 2013 14:53:00 -0500
+ -- Michael Lustfield <michael@lustfield.net>  Thu, 21 Nov 2013 19:25:50 +0530
 
 nginx (1.4.3-2) unstable; urgency=low
 
