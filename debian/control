@@ -12,6 +12,7 @@ Build-Depends: autotools-dev,
                libev-dev,
                libgd2-dev | libgd2-noxpm-dev,
                libgeoip-dev,
+               libldap2-dev,
                liblua5.1-dev,
                libmhash-dev,
                libossp-uuid-dev,
@@ -205,7 +206,7 @@ Description: nginx web/proxy server (extended version)
  Fancy Index, HttpHeadersMore, HTTP Substitution Filter,
  Nginx Development Kit, Upload Progress, Upstream Fair Queue.
  .
- MODULES ADDED BY DOTDEB : Cache purge, File AIO, Syslog, Pinba, HTTP Gunzip,
+ MODULES ADDED BY DOTDEB : Auth LDAP, Cache purge, File AIO, Syslog, Pinba, HTTP Gunzip,
  HTTP push stream, PageSpeed, X-rid header
 
 Package: nginx-extras-dbg

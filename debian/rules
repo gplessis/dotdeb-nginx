@@ -144,6 +144,7 @@ config.status.extras: config.env.extras
 	    --with-mail \
 	    --with-mail_ssl_module \
 	    --add-module=$(MODULESDIR)/headers-more-nginx-module \
+	    --add-module=$(MODULESDIR)/nginx-auth-ldap \
 	    --add-module=$(MODULESDIR)/nginx-auth-pam \
 	    --add-module=$(MODULESDIR)/nginx-cache-purge \
 	    --add-module=$(MODULESDIR)/nginx-dav-ext-module \
