@@ -1,10 +1,10 @@
-Description: Use build flags from environment for perl (dpkg-buildflags).
+Description: Use linker flags from environment for perl (dpkg-buildflags).
  Necessary for hardening flags.
-Author: Simon Ruderich <simon@ruderich.org>
-Index: nginx-1.4.5/src/http/modules/perl/Makefile.PL
+Author: Christos Trochalakis <yatiohi@ideopolis.gr>
+Index: nginx-1.4.6/src/http/modules/perl/Makefile.PL
 ===================================================================
---- nginx-1.4.5.orig/src/http/modules/perl/Makefile.PL
-+++ nginx-1.4.5/src/http/modules/perl/Makefile.PL
+--- nginx-1.4.6.orig/src/http/modules/perl/Makefile.PL
++++ nginx-1.4.6/src/http/modules/perl/Makefile.PL
 @@ -3,6 +3,7 @@
  # Copyright (C) Nginx, Inc.
  
@@ -13,15 +13,13 @@ Index: nginx-1.4.5/src/http/modules/perl/Makefile.PL
  use ExtUtils::MakeMaker;
  
  WriteMakefile(
-@@ -13,7 +14,10 @@ WriteMakefile(
-     ABSTRACT_FROM     => 'nginx.pm',     # retrieve abstract from module
+@@ -14,6 +15,9 @@ WriteMakefile(
      AUTHOR            => 'Igor Sysoev',
  
--    CCFLAGS           => "$ENV{NGX_PM_CFLAGS}",
-+    # $Config{ccflags}/$Config{lddlflags} doesn't contain hardening flags
-+    # (yet), add them manually.
-+    CCFLAGS           => "$Config{ccflags} $ENV{CFLAGS} $ENV{CPPFLAGS} $ENV{NGX_PM_CFLAGS}",
-+    LDDLFLAGS         => "$Config{lddlflags} $ENV{LDFLAGS}",
+     CCFLAGS           => "$ENV{NGX_PM_CFLAGS}",
++    # Pass link hardening flags
++    # $Config{lddlflags} is the default
++    LDDLFLAGS         => "$Config{lddlflags} $ENV{DEBIAN_NGINX_PERL_LDFLAGS}",
      OPTIMIZE          => '-O',
  
      INC               => join(" ", map {
