@@ -85,7 +85,7 @@ Description: small, powerful, scalable web/proxy server - common files
 Package: nginx-full
 Architecture: any
 Depends: nginx-common (= ${source:Version}), ${misc:Depends}, ${shlibs:Depends}
-Breaks: nginx (<< 1.4.4-5)
+Breaks: nginx (<< 1.4.5-1)
 Provides: httpd, httpd-cgi, nginx
 Conflicts: nginx-extras, nginx-light, nginx-naxsi, nginx-passenger
 Suggests: nginx-doc (= ${source:Version})
@@ -103,9 +103,9 @@ Description: nginx web/proxy server (standard version)
  Limit Zone, Log, Map, Memcached, Proxy, Referer, Rewrite, SCGI,
  Split Clients, SSI, Upstream, User ID, UWSGI.
  .
- OPTIONAL HTTP MODULES: Addition, Debug, GeoIP, Gzip Precompression,
- HTTP Sub, Image Filter, IPv6, Real IP, SSL, Stub Status, Substitution,
- WebDAV, XSLT.
+ OPTIONAL HTTP MODULES: Addition, Debug, GeoIP, Gzip Precompression, HTTP Sub,
+ Image Filter, IPv6, Real IP, SSL, Stub Status, Substitution, WebDAV,
+ XSLT.
  .
  MAIL MODULES: Mail Core, IMAP, POP3, SMTP, SSL.
  .
@@ -133,7 +133,7 @@ Package: nginx-light
 Architecture: any
 Priority: extra
 Depends: nginx-common (= ${source:Version}), ${misc:Depends}, ${shlibs:Depends}
-Breaks: nginx (<< 1.4.4-5)
+Breaks: nginx (<< 1.4.5-1)
 Provides: httpd, httpd-cgi, nginx
 Conflicts: nginx-extras, nginx-full, nginx-naxsi, nginx-passenger
 Suggests: nginx-doc (= ${source:Version})
@@ -148,7 +148,8 @@ Description: nginx web/proxy server (basic version)
  STANDARD HTTP MODULES: Core, Access, Auth Basic, Auto Index, Charset,
  Empty GIF, FastCGI, Gzip, Headers, Index, Log, Map, Proxy, Rewrite, Upstream.
  .
- OPTIONAL HTTP MODULES: Gzip Precompression, IPv6, SSL, Stub Status.
+ OPTIONAL HTTP MODULES: Debug, Gzip Precompression, IPv6, Real Ip, SSL,
+ Stub Status.
  .
  THIRD PARTY MODULES: Echo.
  .
@@ -176,7 +177,7 @@ Depends: nginx-common (= ${source:Version}),
          ${misc:Depends},
          ${perl:Depends},
          ${shlibs:Depends}
-Breaks: nginx (<< 1.4.4-5)
+Breaks: nginx (<< 1.4.5-1)
 Provides: httpd, httpd-cgi, nginx
 Conflicts: nginx-full, nginx-light, nginx-naxsi, nginx-passenger
 Suggests: nginx-doc (= ${source:Version})
@@ -200,12 +201,11 @@ Description: nginx web/proxy server (extended version)
  .
  MAIL MODULES: Mail Core, IMAP, POP3, SMTP, SSL.
  .
- THIRD PARTY MODULES: Auth PAM, Cache purge, DAV Ext, Echo, Embedded Lua,
+ THIRD PARTY MODULES: Auth PAM, DAV Ext, Echo, Embedded Lua,
  Fancy Index, HttpHeadersMore, HTTP Substitution Filter,
- Nginx Development Kit, Upload Progress,
- Upstream Fair Queue.
+ Nginx Development Kit, Upload Progress, Upstream Fair Queue.
  .
- MODULES ADDED BY DOTDEB : File AIO, Syslog, Pinba, HTTP Gunzip,
+ MODULES ADDED BY DOTDEB : Cache purge, File AIO, Syslog, Pinba, HTTP Gunzip,
  HTTP push stream, PageSpeed, X-rid header
 
 Package: nginx-extras-dbg
@@ -227,8 +227,8 @@ Package: nginx-naxsi
 Architecture: any
 Priority: extra
 Depends: nginx-common (= ${source:Version}), ${misc:Depends}, ${shlibs:Depends}
-Breaks: nginx (<< 1.4.4-5),
-        nginx-naxsi-ui (<< 1.4.4-5)
+Breaks: nginx (<< 1.4.5-1),
+        nginx-naxsi-ui (<< 1.4.5-1)
 Provides: httpd, httpd-cgi, nginx
 Conflicts: nginx-extras, nginx-full, nginx-light, nginx-passenger
 Description: nginx web/proxy server (version with naxsi)
@@ -244,11 +244,11 @@ Description: nginx web/proxy server (version with naxsi)
  Limit Requests, Limit Zone, Log, Map, Memcached, Proxy, Referer,
  Rewrite, Split Clients, SSI, Upstream, User ID.
  .
- OPTIONAL HTTP MODULES: GeoIP, IPv6, Real IP, SSL, Stub Status.
+ OPTIONAL HTTP MODULES: Debug, IPv6, Real IP, SSL, Stub Status.
  .
  THIRD PARTY MODULES: Naxsi, Cache Purge, Upstream Fair.
  .
- MODULES ADDED BY DOTDEB : File AIO, Gzip static, Echo, Syslog, X-rid header
+ MODULES ADDED BY DOTDEB : File AIO, Geoip, Gzip static, Echo, Syslog, X-rid header
 
 Package: nginx-naxsi-dbg
 Architecture: any
@@ -290,7 +290,7 @@ Package: nginx-passenger
 Architecture: linux-any kfreebsd-any
 Priority: extra
 Depends: nginx-common (= ${source:Version}), ruby-passenger (>> 3.0.19), ${misc:Depends}, ${shlibs:Depends}
-Breaks: nginx (<< 1.4.4-5)
+Breaks: nginx (<< 1.4.5-1)
 Provides: httpd, httpd-cgi, nginx
 Conflicts: nginx-extras, nginx-full, nginx-light, nginx-naxsi
 Suggests: nginx-doc (= ${source:Version})

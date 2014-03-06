@@ -1,10 +1,31 @@
-nginx (1.4.5-1~dotdeb.0) oldstable; urgency=medium
+nginx (1.4.6-1~dotdeb.0) oldstable; urgency=medium
 
+  * Rebuilt for Dotdeb
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Thu, 06 Mar 2014 16:11:42 +0100
+
+nginx (1.4.6-1) unstable; urgency=medium
+
+  [ Christos Trochalakis ]
   * New upstream release.
+  * debian/rules:
+    + Avoid double declaration of hardening flags.
+    + Expand buildflags so the build log is easier to follow.
+    + Switch to --with--cc-opt, --with-ld-opt configure flags.
+      Nginx is now compiled with --Werror, making all warnings
+      into errors.
+    + Split common configure options.
+    + Enable realip module for nginx-light.
+    + Enable debug module for nginx-light and nginx-extras.
+  * debian/patches/perl-use-dpkg-buildflags.patch:
+    + Rewrite patch to just just override LDDLFLAGS and not
+      CCFLAGS since this is handled by --with-cc-opt.
+  * debian/watch, debian/upstream/signing-key.asc:
+    + Fix upstream signature verification.
 
- -- Guillaume Plessis <gui@dotdeb.org>  Tue, 11 Feb 2014 15:55:42 -0700
+ -- Christos Trochalakis <yatiohi@ideopolis.gr>  Tue, 04 Mar 2014 18:06:55 +0200
 
-nginx (1.4.5-1) UNRELEASED; urgency=medium
+nginx (1.4.5-1) unstable; urgency=medium
 
   [ Christos Trochalakis ]
   * New upstream release.
@@ -20,8 +41,12 @@ nginx (1.4.5-1) UNRELEASED; urgency=medium
   * debian/nginx-*.prerm:
     + No need to check for invoke-rc.d,
       correctly set the exit code on error
+  * debian/nginx-common.nginx.init:
+    + Rewrite some parts of the initscript
+    + Introduce rotate command
+    + Introduce upgrade command
 
- -- Christos Trochalakis <yatiohi@ideopolis.gr>  Tue, 11 Feb 2014 18:34:51 +0200
+ -- Christos Trochalakis <yatiohi@ideopolis.gr>  Thu, 13 Feb 2014 11:41:49 +0200
 
 nginx (1.4.4-4) unstable; urgency=medium
 
