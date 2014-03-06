@@ -40,3 +40,6 @@
 [submodule "debian/modules/ngx_pagespeed"]
 	path = debian/modules/ngx_pagespeed
 	url = git://github.com/pagespeed/ngx_pagespeed.git
+[submodule "debian/modules/nginx-auth-ldap"]
+	path = debian/modules/nginx-auth-ldap
+	url = git://github.com/kvspb/nginx-auth-ldap.git
