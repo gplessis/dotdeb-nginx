@@ -3,8 +3,7 @@ set -e
 
 case "$1" in
   configure)
-    dpkg --compare-versions "$2" lt 1.4.1
-    if [ $? -eq 0 ]; then
+    if dpkg --compare-versions "$2" lt 1.4.1; then
       cp /etc/nginx/naxsi-ui.conf.1.4.1 /etc/nginx/naxsi-ui.conf
     fi
     ;;
