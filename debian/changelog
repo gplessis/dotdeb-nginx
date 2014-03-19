@@ -1,3 +1,9 @@
+nginx (1.4.7-1~dotdeb.1) stable; urgency=medium
+
+  * New upstream release
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Tue, 18 Mar 2014 21:51:42 -0700
+
 nginx (1.4.6-1~dotdeb.1) stable; urgency=medium
 
   * Rebuilt for Dotdeb

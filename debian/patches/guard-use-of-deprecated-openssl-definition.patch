@@ -4,10 +4,10 @@ Description: guard use of SSL_OP_MSIE_SSLV2_RSA_PADDING
 Author: Piotr Sikora <piotr@cloudflare.com>
 Origin: http://trac.nginx.org/nginx/changeset/a73678f5f96ffead0b616b2c03dfcfd5445d443b/nginx
 
-Index: nginx-1.4.6/src/event/ngx_event_openssl.c
+Index: nginx-1.4.7/src/event/ngx_event_openssl.c
 ===================================================================
---- nginx-1.4.6.orig/src/event/ngx_event_openssl.c
-+++ nginx-1.4.6/src/event/ngx_event_openssl.c
+--- nginx-1.4.7.orig/src/event/ngx_event_openssl.c
++++ nginx-1.4.7/src/event/ngx_event_openssl.c
 @@ -185,8 +185,10 @@ ngx_ssl_create(ngx_ssl_t *ssl, ngx_uint_
      SSL_CTX_set_options(ssl->ctx, SSL_OP_SSLREF2_REUSE_CERT_TYPE_BUG);
      SSL_CTX_set_options(ssl->ctx, SSL_OP_MICROSOFT_BIG_SSLV3_BUFFER);
