@@ -130,7 +130,6 @@ config.status.extras: config.env.extras
 	    --with-http_perl_module \
 	    --with-http_random_index_module \
 	    --with-http_secure_link_module \
-	    --with-http_spdy_module \
 	    --with-http_sub_module \
 	    --with-http_xslt_module \
 	    --with-mail \
