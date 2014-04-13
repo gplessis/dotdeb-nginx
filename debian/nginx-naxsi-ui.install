@@ -1,3 +1,0 @@
-debian/modules/naxsi/contrib/naxsi-ui/* usr/share/nginx-naxsi/naxsi-ui
-debian/naxsi-ui-extract usr/sbin
-debian/naxsi-ui-intercept usr/sbin

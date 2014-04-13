@@ -46,3 +46,6 @@
 [submodule "debian/modules/nginx-auth-ldap"]
 	path = debian/modules/nginx-auth-ldap
 	url = git://github.com/kvspb/nginx-auth-ldap.git
+[submodule "debian/modules/naxsi"]
+	path = debian/modules/naxsi
+	url = git://github.com/nbs-system/naxsi.git

@@ -12,7 +12,3 @@ README for Modules versions
   Homepage: https://github.com/yaoweibin/nginx_syslog_patch
   https://raw.github.com/yaoweibin/nginx_syslog_patch/master/syslog_1.3.11.patch
   Version: e946602a
-
- naxsi
-  Homepage: http://code.google.com/p/naxsi/
-  Version: 0.48

@@ -1,5 +1,3 @@
-debian/modules/naxsi/contrib/naxsi-ui/bootstrap/img/glyphicons-halflings.png
-debian/modules/naxsi/contrib/naxsi-ui/bootstrap/img/glyphicons-halflings-white.png
 debian/modules/nginx-upload-progress/test/100
 debian/modules/ruby-passenger/doc/images/passenger_architecture.png
 debian/modules/ruby-passenger/doc/images/conservative_spawning.png
@@ -35,3 +33,4 @@ debian/modules/ruby-passenger/doc/images/icons/callouts/3.png
 debian/modules/ruby-passenger/doc/images/icons/callouts/11.png
 debian/modules/ruby-passenger/doc/images/icons/callouts/8.png
 debian/modules/ruby-passenger/doc/images/icons/callouts/1.png
+debian/modules/naxsi/nx_util/nx_util.1.gz

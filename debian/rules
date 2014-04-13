@@ -143,6 +143,7 @@ config.status.extras: config.env.extras
 	    --with-mail \
 	    --with-mail_ssl_module \
 	    --add-module=$(MODULESDIR)/headers-more-nginx-module \
+	    --add-module=$(MODULESDIR)/naxsi/naxsi_src \
 	    --add-module=$(MODULESDIR)/nginx-auth-ldap \
 	    --add-module=$(MODULESDIR)/nginx-auth-pam \
 	    --add-module=$(MODULESDIR)/nginx-cache-purge \
@@ -259,7 +260,6 @@ binary-indep: build install
 	dh_installdebconf
 	dh_installexamples -i
 	dh_installinit -i --no-restart-on-upgrade --no-start --name=nginx
-	dh_installinit -i --no-restart-on-upgrade --no-start --name=nginx-naxsi-ui
 	dh_installlogrotate -i -pnginx-common --name=nginx
 	dh_link -i
 	dh_compress -i

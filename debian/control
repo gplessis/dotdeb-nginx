@@ -204,7 +204,7 @@ Description: nginx web/proxy server (extended version)
  .
  THIRD PARTY MODULES: Auth PAM, DAV Ext, Echo, Embedded Lua,
  Fancy Index, HttpHeadersMore, HTTP Substitution Filter,
- Nginx Development Kit, Upload Progress, Upstream Fair Queue.
+ Naxsi, Nginx Development Kit, Upload Progress, Upstream Fair Queue.
  .
  MODULES ADDED BY DOTDEB : Auth LDAP, Cache purge, File AIO, Syslog, Pinba, HTTP Gunzip,
  HTTP push stream, PageSpeed, X-rid header
@@ -265,27 +265,6 @@ Description: nginx web/proxy server (version with naxsi) - debugging symbols
  This package provides debugging symbols for nginx-naxsi, to assist in
  debugging issues that you may find. It should not be required for normal
  operation.
-
-Package: nginx-naxsi-ui
-Architecture: all
-Priority: extra
-Depends: daemon,
-         dbconfig-common,
-         nginx-naxsi (>= ${source:Version}),
-         nginx-naxsi (<< ${source:Version}.1~),
-         python-twisted-web,
-         ${misc:Depends}
-Description: nginx web/proxy server - naxsi configuration front-end
- Nginx ("engine X") is a high-performance web and reverse proxy server
- created by Igor Sysoev. It can be used both as a standalone web server
- and as a proxy to reduce the load on back-end HTTP or mail servers.
- .
- This package provides the autolearning daemon and web user interface for
- nginx's naxsi module.
- .
- It includes an interceptor (listening on TCP port 8080), which monitors
- HTTP requests from naxsi, and an extractor (running on TCP port 8081),
- which reads the database and prints reports about blocked requests.
 
 Package: nginx-passenger
 Architecture: linux-any kfreebsd-any
