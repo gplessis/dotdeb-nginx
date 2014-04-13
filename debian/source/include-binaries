@@ -1,3 +1,2 @@
-debian/modules/naxsi/contrib/naxsi-ui/bootstrap/img/glyphicons-halflings.png
-debian/modules/naxsi/contrib/naxsi-ui/bootstrap/img/glyphicons-halflings-white.png
 debian/modules/nginx-upload-progress/test/100
+debian/modules/naxsi/nx_util/nx_util.1.gz
