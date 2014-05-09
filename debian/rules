@@ -114,7 +114,7 @@ config.status.light: config.env.light
 
 config.status.extras: config.env.extras
 	cd $(MODULESDIR)/ngx_pagespeed && \
-	    curl https://dl.google.com/dl/page-speed/psol/1.7.30.3.tar.gz | tar xz && \
+	    curl https://dl.google.com/dl/page-speed/psol/1.8.31.2.tar.gz | tar xz && \
 	    perl -pi -e 'print "#ifdef LOG_INFO\n#undef LOG_INFO\n#endif\n\n#ifdef LOG_WARNING\n#undef LOG_WARNING\n#endif\n\n" if $$. == 1' \
 	    psol/include/third_party/chromium/src/base/logging.h
 	cd $(BUILDDIR_extras) && ./configure  \
