@@ -1,0 +1,66 @@
+Debian Packaging
+================
+
+We use git-buildpackage for packaging. Our repository can be found at
+git.debian.org:/git/collab-maint/nginx.git.
+
+Workflow for Unstable
+=====================
+
+We use the standard git-buildpackage workflow.
+
+Workflow for Experimental (not-active)
+======================================
+
+Now that nginx 1.6.0 is released there is no plan to package mainline 1.7
+releases to experimental. The following guide is been kept as a reference.
+
+--------
+
+Nginx mainline releases (1.5.x series) are been packaged for experimental,
+as they lack security support.
+
+The workflow we use is based on the assumption that packaging work happens on
+origin/master and experimental builds are a trivial patch away from that.
+
+The direct consequense of treating experimental as a patchset for origin/master
+is that the relevant branches are forced-pushed whenever we release a new
+1.5.x version. In other words, **it is not safe to base your work on the
+experimental branch**.
+
+This is a brief description of our experimental branches and how we are using
+them.
+
+* experimental-base
+  Force-pushed when origin/master changes.
+
+  experimental-base tracks the changes needed for building the 1.5.x branch,
+  such as new configure parameters, etc. On new 1.5.x releases, it is rebased
+  on origin/master so it is always up-to-date with our latest packaging work.
+
+* experimental
+  Force-pushed on every 1.5.x release.
+
+  This branch points to the latest 1.5.x release.
+  Before release this branch is reset to experimental-base, and then merged
+  with the new upstream-1.5 branch. Finally all the release specific changes
+  are commited (changelog entry etc) and the build is made.
+
+* upstream-1.5
+  Force-pushed on every 1.5.x release.
+
+  Before a new 1.5.x release the branch is reset to origin/upstream.
+  This is a technicallity so we can avoid resolving conflicts when a new 1.4.x
+  release happens between two experimental releases.
+
+Older 1.5.x releases are not referenced by any branch, but they can be found by
+the relevant debian/* tag.
+
+3rd party experimental workflow
+===============================
+
+As we described, it is better not base you work on our forced-pushed
+experimental branch. A better approach would be to maintain a custom-build
+branch that is rebased to our latest experimental branch (basically git rebase
+--onto the relevant commits should work).
+

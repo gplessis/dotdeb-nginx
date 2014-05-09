@@ -1,21 +1,51 @@
-nginx (1.4.7-1~dotdeb.2) stable; urgency=medium
-
-  * Naxsi updated to 0.53
-  * Naxsi added to nginx-extras
-
- -- Guillaume Plessis <gui@dotdeb.org>  Sun, 13 Apr 2014 16:12:42 -0700
-
-nginx (1.4.7-1~dotdeb.1) stable; urgency=medium
-
-  * New upstream release
-
- -- Guillaume Plessis <gui@dotdeb.org>  Tue, 18 Mar 2014 21:51:42 -0700
-
-nginx (1.4.6-1~dotdeb.1) stable; urgency=medium
+nginx (1.6.0-1~dotdeb.1) stable; urgency=medium
 
   * Rebuilt for Dotdeb
 
- -- Guillaume Plessis <gui@dotdeb.org>  Thu, 06 Mar 2014 16:11:42 +0100
+ -- Guillaume Plessis <gui@dotdeb.org>  Fri, 09 May 2014 15:23:42 -0700
+
+nginx (1.6.0-1) unstable; urgency=medium
+
+  [ Christos Trochalakis ]
+  * New upstream release.
+  * debian/rules:
+    + Enable auth request http module. (Closes: #725732)
+  * debian/patches/series:
+    + Remove backported openssl guard patch.
+
+ -- Christos Trochalakis <yatiohi@ideopolis.gr>  Thu, 24 Apr 2014 19:23:22 +0300
+
+nginx (1.4.7-2) unstable; urgency=medium
+
+  [ Christos Trochalakis ]
+  * debian/rules:
+    + Convert to dh $@
+      As a side effect, fixes make dependency issues (Closes: #744050)
+
+ -- Christos Trochalakis <yatiohi@ideopolis.gr>  Thu, 17 Apr 2014 14:30:27 +0300
+
+nginx (1.4.7-1) unstable; urgency=medium
+
+  [ Christos Trochalakis ]
+  * New upstream release. (Closes: #742059)
+    + Fixes pottential arbitrary code execution (CVE-2014-0133)
+      Debian build was not vulnerable since it was compiled
+      with the --with-debug configure option.
+  * debian/modules/nginx-http-push:
+    + Update to v0.711 (Closes: #732251)
+  * debian/modules/headers-more-nginx-module:
+    + Update to v0.25, containing several bugfixes.
+  * debian/modules/nginx-echo:
+    + Update to v0.51, containing several bugfixes.
+  * debian/modules/nginx-dav-ext-module:
+    + Update to v0.0.3, containing some uri encoding fixes.
+  * debian/modules/ngx_http_substitutions_filter_module:
+    + Update to v0.6.4, containing some enhancements.
+  * debian/modules/nginx-auth-pam:
+    + Update to v1.3.
+      This version contains our downstream patch (See: #721702)
+
+ -- Christos Trochalakis <yatiohi@ideopolis.gr>  Tue, 18 Mar 2014 22:03:47 +0200
 
 nginx (1.4.6-1) unstable; urgency=medium
 

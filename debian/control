@@ -97,9 +97,9 @@ Description: nginx web/proxy server (standard version)
  Limit Zone, Log, Map, Memcached, Proxy, Referer, Rewrite, SCGI,
  Split Clients, SSI, Upstream, User ID, UWSGI.
  .
- OPTIONAL HTTP MODULES: Addition, Debug, GeoIP, Gzip Precompression, HTTP Sub,
- Image Filter, IPv6, Real IP, Spdy, SSL, Stub Status, Substitution, WebDAV,
- XSLT.
+ OPTIONAL HTTP MODULES: Addition, Auth Request, Debug, GeoIP, Gzip
+ Precompression, HTTP Sub, Image Filter, IPv6, Real IP, Spdy, SSL, Stub Status,
+ Substitution, WebDAV, XSLT.
  .
  MAIL MODULES: Mail Core, IMAP, POP3, SMTP, SSL.
  .
@@ -142,8 +142,8 @@ Description: nginx web/proxy server (basic version)
  STANDARD HTTP MODULES: Core, Access, Auth Basic, Auto Index, Charset,
  Empty GIF, FastCGI, Gzip, Headers, Index, Log, Map, Proxy, Rewrite, Upstream.
  .
- OPTIONAL HTTP MODULES: Debug, Gzip Precompression, IPv6, Real Ip, SSL,
- Stub Status.
+ OPTIONAL HTTP MODULES: Auth Request, Debug, Gzip Precompression, IPv6, Real
+ Ip, SSL, Stub Status.
  .
  THIRD PARTY MODULES: Echo.
  .
@@ -189,8 +189,8 @@ Description: nginx web/proxy server (extended version)
  Limit Zone, Log, Map, Memcached, Proxy, Referer, Rewrite, SCGI,
  Split Clients, SSI, Upstream, User ID, UWSGI.
  .
- OPTIONAL HTTP MODULES: Addition, Debug, Embedded Perl, FLV, GeoIP,
- Gzip Precompression, Image Filter, IPv6, MP4, Random Index, Real IP,
+ OPTIONAL HTTP MODULES: Addition, Auth Request, Debug, Embedded Perl, FLV,
+ GeoIP, Gzip Precompression, Image Filter, IPv6, MP4, Random Index, Real IP,
  Secure Link, Spdy, SSL, Stub Status, Substitution, WebDAV, XSLT.
  .
  MAIL MODULES: Mail Core, IMAP, POP3, SMTP, SSL.
@@ -238,7 +238,7 @@ Description: nginx web/proxy server (version with naxsi)
  Limit Requests, Limit Zone, Log, Map, Memcached, Proxy, Referer,
  Rewrite, Split Clients, SSI, Upstream, User ID.
  .
- OPTIONAL HTTP MODULES: Debug, IPv6, Real IP, SSL, Stub Status.
+ OPTIONAL HTTP MODULES: Auth Request, Debug, IPv6, Real IP, SSL, Stub Status.
  .
  THIRD PARTY MODULES: Naxsi, Cache Purge, Upstream Fair.
  .
