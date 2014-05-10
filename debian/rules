@@ -1,30 +1,28 @@
 #!/usr/bin/make -f
+export DH_VERBOSE=1
 
 debian_cflags:=$(shell dpkg-buildflags --get CFLAGS) $(shell dpkg-buildflags --get CPPFLAGS)
 debian_ldflags:=$(shell dpkg-buildflags --get LDFLAGS)
 
-# export necessary for (hardening) flags for perl
-# (src/http/modules/perl/Makefile.PL).
+# export necessary perl hardenging flags
+# see: src/http/modules/perl/Makefile.PL
 DEBIAN_NGINX_PERL_LDFLAGS:= $(debian_ldflags)
 export DEBIAN_NGINX_PERL_LDFLAGS
+
+FLAVOURS := full light extras naxsi
+
+MODULESDIR = $(CURDIR)/debian/modules
+BASEDIR = $(CURDIR)
+$(foreach flavour,$(FLAVOURS),$(eval BUILDDIR_$(flavour) = $(CURDIR)/debian/build-$(flavour)))
 
 # export to avoid building embedded libev for
 # passenger flavour
 export USE_VENDORED_LIBEV = false
 
-FLAVOURS:=full light extras naxsi
-
 ifneq ($(DEB_BUILD_ARCH_OS),hurd)
   FLAVOURS+=passenger
   BUILDDIR_passenger = $(CURDIR)/debian/build-passenger
 endif
-
-BUILDDIR_full = $(CURDIR)/debian/build-full
-BUILDDIR_light = $(CURDIR)/debian/build-light
-BUILDDIR_extras = $(CURDIR)/debian/build-extras
-BUILDDIR_naxsi = $(CURDIR)/debian/build-naxsi
-MODULESDIR = $(CURDIR)/debian/modules
-BASEDIR = $(CURDIR)
 
 DEB_BUILD_ARCH ?=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 ifeq ($(DEB_BUILD_ARCH),sparc)
@@ -33,11 +31,7 @@ endif
 
 ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
 	NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
-	ifeq (${NUMJOBS}, 0)
-		NUMJOBS = 1
-	endif
-else
-	NUMJOBS = 1
+	MAKEFLAGS += -j$(NUMJOBS)
 endif
 
 # configure flags
@@ -61,6 +55,7 @@ common_configure_flags := \
 			--with-http_ssl_module \
 			--with-http_stub_status_module \
 			--with-http_realip_module \
+			--with-http_auth_request_module \
 			--with-file-aio \
 
 config.env.%:
