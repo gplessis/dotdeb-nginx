@@ -22,7 +22,11 @@ endif
 
 ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
 	NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
-	MAKEFLAGS += -j$(NUMJOBS)
+	ifeq (${NUMJOBS}, 0)
+		NUMJOBS = 1
+	endif
+else
+	NUMJOBS = 1
 endif
 
 # configure flags
