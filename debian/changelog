@@ -1,3 +1,9 @@
+nginx (1.6.0-1~dotdeb.2) stable; urgency=medium
+
+  * ngx_pagespeed security upgrade
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Fri, 27 Jun 2014 07:32:42 -0700
+
 nginx (1.6.0-1~dotdeb.1) stable; urgency=medium
 
   * Rebuilt for Dotdeb
