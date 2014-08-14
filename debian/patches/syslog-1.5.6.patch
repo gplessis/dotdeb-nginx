@@ -1,7 +1,7 @@
-Index: nginx-1.6.0/src/core/ngx_log.c
+Index: nginx-1.6.1/src/core/ngx_log.c
 ===================================================================
---- nginx-1.6.0.orig/src/core/ngx_log.c
-+++ nginx-1.6.0/src/core/ngx_log.c
+--- nginx-1.6.1.orig/src/core/ngx_log.c
++++ nginx-1.6.1/src/core/ngx_log.c
 @@ -10,6 +10,15 @@
  
  
@@ -191,10 +191,10 @@ Index: nginx-1.6.0/src/core/ngx_log.c
 -}
 +}
 \ No newline at end of file
-Index: nginx-1.6.0/src/http/modules/ngx_http_log_module.c
+Index: nginx-1.6.1/src/http/modules/ngx_http_log_module.c
 ===================================================================
---- nginx-1.6.0.orig/src/http/modules/ngx_http_log_module.c
-+++ nginx-1.6.0/src/http/modules/ngx_http_log_module.c
+--- nginx-1.6.1.orig/src/http/modules/ngx_http_log_module.c
++++ nginx-1.6.1/src/http/modules/ngx_http_log_module.c
 @@ -13,6 +13,11 @@
  #include <zlib.h>
  #endif
@@ -384,10 +384,10 @@ Index: nginx-1.6.0/src/http/modules/ngx_http_log_module.c
  
      if (cf->args->nelts >= 3) {
          name = value[2];
-Index: nginx-1.6.0/src/core/ngx_log.h
+Index: nginx-1.6.1/src/core/ngx_log.h
 ===================================================================
---- nginx-1.6.0.orig/src/core/ngx_log.h
-+++ nginx-1.6.0/src/core/ngx_log.h
+--- nginx-1.6.1.orig/src/core/ngx_log.h
++++ nginx-1.6.1/src/core/ngx_log.h
 @@ -12,6 +12,13 @@
  #include <ngx_config.h>
  #include <ngx_core.h>
