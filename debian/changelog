@@ -1,3 +1,10 @@
+nginx (1.6.1-1~dotdeb.2) stable; urgency=medium
+
+  * debian/rules, debian/modules/nginx-rtmp-module:
+    + Added rtmp support to nginx-extras.
+
+ -- Antoine Millet <antoine.millet@rentabiliweb.com>  Wed, 03 Sep 2014 14:48:32 +0200
+
 nginx (1.6.1-1~dotdeb.1) stable; urgency=medium
 
   * New upstream release
