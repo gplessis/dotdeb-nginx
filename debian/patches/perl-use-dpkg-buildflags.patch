@@ -1,10 +1,10 @@
 Description: Use linker flags from environment for perl (dpkg-buildflags).
  Necessary for hardening flags.
 Author: Christos Trochalakis <yatiohi@ideopolis.gr>
-Index: nginx-1.6.1/src/http/modules/perl/Makefile.PL
+Index: dotdeb-nginx/src/http/modules/perl/Makefile.PL
 ===================================================================
---- nginx-1.6.1.orig/src/http/modules/perl/Makefile.PL
-+++ nginx-1.6.1/src/http/modules/perl/Makefile.PL
+--- dotdeb-nginx.orig/src/http/modules/perl/Makefile.PL
++++ dotdeb-nginx/src/http/modules/perl/Makefile.PL
 @@ -3,6 +3,7 @@
  # Copyright (C) Nginx, Inc.
  
