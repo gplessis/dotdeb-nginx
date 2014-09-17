@@ -1,3 +1,12 @@
+nginx (1.6.2-1~dotdeb.1) stable; urgency=medium
+
+  * Imported Upstream version 1.6.2
+  * Patches refresh for 1.6.2
+  * ngx_pagespeed 1.9.32.1
+  * Modules update
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Tue, 16 Sep 2014 23:11:44 -0700
+
 nginx (1.6.1-1~dotdeb.1) stable; urgency=medium
 
   * New upstream release
