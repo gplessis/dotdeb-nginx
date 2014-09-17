@@ -4,6 +4,7 @@ nginx (1.6.2-1~dotdeb.0) oldstable; urgency=medium
   * Patches refresh for 1.6.2
   * ngx_pagespeed 1.9.32.1
   * Modules update
+  * nginx-rtmp-module added to nginx-extras
 
  -- Guillaume Plessis <gui@dotdeb.org>  Tue, 16 Sep 2014 23:15:28 -0700
 

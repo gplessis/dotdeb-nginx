@@ -207,7 +207,7 @@ Description: nginx web/proxy server (extended version)
  Nginx Development Kit, Upload Progress, Upstream Fair Queue.
  .
  MODULES ADDED BY DOTDEB : Auth LDAP, Cache purge, File AIO, Syslog, Naxsi, Pinba,
- HTTP Gunzip, HTTP push stream, PageSpeed, X-rid header
+ HTTP Gunzip, HTTP push stream, PageSpeed, RTMP, X-rid header
 
 Package: nginx-extras-dbg
 Architecture: any
