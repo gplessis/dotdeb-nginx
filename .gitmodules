@@ -46,3 +46,6 @@
 [submodule "debian/modules/naxsi"]
 	path = debian/modules/naxsi
 	url = git://github.com/nbs-system/naxsi.git
+[submodule "debian/modules/nginx-rtmp-module"]
+	path = debian/modules/nginx-rtmp-module
+	url = git://github.com/arut/nginx-rtmp-module.git
