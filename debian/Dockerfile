@@ -33,6 +33,12 @@ RUN mk-build-deps --install --tool 'apt-get -y' --remove /root/control && rm -f 
 ADD . /usr/src/builddir
 WORKDIR /usr/src/builddir
 
+RUN find debian/ -name '\.git*' -exec rm -rf {} \; &>/dev/null
+RUN rm -r debian/modules/nginx-upload-progress/test/
+RUN rm -r debian/modules/ruby-passenger/debian/
+RUN rm -r debian/modules/ruby-passenger/rpm/
+RUN rm -r debian/modules/ruby-passenger/test/
+RUN rm -r debian/modules/nginx-rtmp-module/test/
 RUN rm -f debian/Dockerfile
 RUN uscan --download-current-version
 RUN dpkg-buildpackage
