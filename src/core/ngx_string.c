@@ -429,8 +429,12 @@ ngx_vslprintf(u_char *buf, u_char *last, const char *fmt, va_list args)
             case 'N':
 #if (NGX_WIN32)
                 *buf++ = CR;
-#endif
+                if (buf < last) {
+                    *buf++ = LF;
+                }
+#else
                 *buf++ = LF;
+#endif
                 fmt++;
 
                 continue;
@@ -1422,7 +1426,7 @@ ngx_escape_uri(u_char *dst, u_char *src, size_t size, ngx_uint_t type)
 {
     ngx_uint_t      n;
     uint32_t       *escape;
-    static u_char   hex[] = "0123456789abcdef";
+    static u_char   hex[] = "0123456789ABCDEF";
 
                     /* " ", "#", "%", "?", %00-%1F, %7F-%FF */
 
@@ -1781,6 +1785,58 @@ ngx_escape_html(u_char *dst, u_char *src, size_t size)
             *dst++ = ch;
             break;
         }
+        size--;
+    }
+
+    return (uintptr_t) dst;
+}
+
+
+uintptr_t
+ngx_escape_json(u_char *dst, u_char *src, size_t size)
+{
+    u_char      ch;
+    ngx_uint_t  len;
+
+    if (dst == NULL) {
+        len = 0;
+
+        while (size) {
+            ch = *src++;
+
+            if (ch == '\\' || ch == '"') {
+                len++;
+
+            } else if (ch <= 0x1f) {
+                len += sizeof("\\u001F") - 2;
+            }
+
+            size--;
+        }
+
+        return (uintptr_t) len;
+    }
+
+    while (size) {
+        ch = *src++;
+
+        if (ch > 0x1f) {
+
+            if (ch == '\\' || ch == '"') {
+                *dst++ = '\\';
+            }
+
+            *dst++ = ch;
+
+        } else {
+            *dst++ = '\\'; *dst++ = 'u'; *dst++ = '0'; *dst++ = '0';
+            *dst++ = '0' + (ch >> 4);
+
+            ch &= 0xf;
+
+            *dst++ = (ch < 10) ? ('0' + ch) : ('A' + ch - 10);
+        }
+
         size--;
     }
 
