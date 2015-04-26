@@ -1,6 +1,12 @@
 #!/bin/sh
 set -e
 
+# Handle naxsi removal
+dpkg-maintscript-helper rm_conffile \
+	  /etc/nginx/naxsi-ui.conf.1.4.1 1.6.2-2~ -- "$@"
+dpkg-maintscript-helper rm_conffile \
+	  /etc/nginx/naxsi-ui.conf       1.6.2-2~ -- "$@"
+
 case "$1" in
   install)
     # If we are doing a fresh install, then these files are no longer needed.

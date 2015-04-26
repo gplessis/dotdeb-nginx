@@ -4,5 +4,8 @@ etc/nginx/sites-enabled
 etc/nginx/conf.d
 etc/ufw/applications.d
 usr/share/nginx
+usr/share/vim/addons
+usr/share/vim/registry
 var/log/nginx
 var/lib/nginx
+var/www/html

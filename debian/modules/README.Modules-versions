@@ -7,8 +7,3 @@ README for Modules versions
  nginx-auth-pam
   http://web.iti.upv.es/~sto/nginx/
   Version: 1.2
-
- nginx-syslog
-  Homepage: https://github.com/yaoweibin/nginx_syslog_patch
-  https://raw.github.com/yaoweibin/nginx_syslog_patch/master/syslog_1.3.11.patch
-  Version: e946602a

@@ -10,6 +10,8 @@
 #@MainRule "msg:invalid POST boundary" id:14;
 #@MainRule "msg:invalid JSON" id:15;
 #@MainRule "msg:empty POST" id:16;
+#@MainRule "msg:libinjection_sql" id:17;
+#@MainRule "msg:libinjection_xss" id:18;
 
 ##################################
 ## SQL Injections IDs:1000-1099 ##
@@ -31,6 +33,7 @@ MainRule "str:)" "msg:parenthesis, probable sql/xss" "mz:ARGS|URL|BODY|$HEADERS_
 MainRule "str:'" "msg:simple quote" "mz:ARGS|BODY|URL|$HEADERS_VAR:Cookie" "s:$SQL:4,$XSS:8" id:1013;
 MainRule "str:," "msg:, in stuff" "mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie" "s:$SQL:4" id:1015;
 MainRule "str:#" "msg:mysql comment (#)" "mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie" "s:$SQL:4" id:1016;
+MainRule "str:@@" "msg:double @@" "mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie" "s:$SQL:4" id:1017;
 
 ###############################
 ## OBVIOUS RFI IDs:1100-1199 ##
@@ -72,9 +75,8 @@ MainRule "rx:%[2|3]."  "msg:double encoding !" "mz:ARGS|URL|BODY|$HEADERS_VAR:Co
 ####################################
 MainRule "str:&#" "msg: utf7/8 encoding" "mz:ARGS|BODY|URL|$HEADERS_VAR:Cookie" "s:$EVADE:4" id:1400;
 MainRule "str:%U" "msg: M$ encoding" "mz:ARGS|BODY|URL|$HEADERS_VAR:Cookie" "s:$EVADE:4" id:1401;
-MainRule negative "rx:multipart/form-data|application/x-www-form-urlencoded" "msg:Content is neither mulipart/x-www-form.." "mz:$HEADERS_VAR:Content-type" "s:$EVADE:4" id:1402;
 
 #############################
 ## File uploads: 1500-1600 ##
 #############################
-MainRule "rx:.ph|.asp|.ht" "msg:asp/php file upload!" "mz:FILE_EXT" "s:$UPLOAD:8" id:1500;
+MainRule "rx:\.ph|\.asp|\.ht" "msg:asp/php file upload!" "mz:FILE_EXT" "s:$UPLOAD:8" id:1500;

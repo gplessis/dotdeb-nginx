@@ -1,3 +1,70 @@
+nginx-common (1.6.3-1) unstable; urgency=medium
+
+  Starting with this release, we have enabled PIE build features which allows
+  Address Space Layout Randomization. This is a hardening feature that
+  prevents some potential security issues.
+
+  While this will significantly help increase security, it can potentially cause
+  significant performance issues on i386 systems.
+
+ -- Michael Lustfield <michael@lustfield.net>  Tue, 07 Apr 2015 18:57:45 -0500
+
+nginx-common (1.6.2-5) unstable; urgency=medium
+
+  We have disabled SSLv3 in nginx.conf for security reasons (ref: POODLE),
+  don't forget to re-enable it if your site depends on it.
+
+  In this release we also include a summary of important changes since wheezy
+  at /usr/share/doc/nginx-common/README.Debian.
+
+ -- Christos Trochalakis <yatiohi@ideopolis.gr>  Sun, 02 Nov 2014 09:10:09 +0200
+
+nginx-common (1.6.2-3) unstable; urgency=medium
+
+  Starting with this release, we changed the default document root from
+  /var/www to /var/www/html, so that sensitive files from other virtual hosts
+  wich are typically put into some directory below /var/www are not exposed by
+  the default virtual host.
+
+ -- Christos Trochalakis <yatiohi@ideopolis.gr>  Tue, 30 Sep 2014 17:34:58 +0300
+
+nginx-common (1.6.1-2) unstable; urgency=medium
+
+  As of nginx-1.6.1-2 we have synced all configuration files with upstream and
+  we plan to keep them in sync from now on.
+
+  Unfortunately that might break existing configuration for some users. Please
+  check the matrix below for more information:
+
+  File            Changes
+  -----------------------
+  koi-win         whitespace
+  koi-utf         whitespace
+  mime-types      whitespace, changed js/rss mime type,
+                  minor other changes & additions
+  scgi_params     whitespace, added HTTPS
+  uwsgi_params    whitespace, added HTTPS, removed UWSGI_SCHEME
+  fastcgi_params  whitespace, removed SCRIPT_FILENAME
+  fastcgi.conf    new upstream configuration file
+
+  Fastcgi configuration issues
+  ============================
+
+  nginx shipped a modified `fastcgi_params`, which declared `SCRIPT_FILENAME`
+  fastcgi_param. This line has now been removed. From now on we are also
+  shipping fastcgi.conf from the upstream repository, which includes a sane
+  `SCRIPT_FILENAME` parameter value.
+
+  So, if you are using fastcgi_params, you can try switching to fastcgi.conf
+  or manually set the relevant params.
+
+  You might also want to read the documentation section before proceeding.
+
+  http://nginx.org/en/docs/http/ngx_http_fastcgi_module.html
+  section: $fastcgi_script_name variable.
+
+ -- Christos Trochalakis <yatiohi@ideopolis.gr>  Thu, 28 Aug 2014 14:23:42 +0300
+
 nginx-common (1.4.4-2) unstable; urgency=low
 
   Per CVE-2013-0337 (bug #701112), we are changing /var/log/nginx permissions
@@ -12,6 +79,20 @@ nginx-common (1.4.4-2) unstable; urgency=low
     dpkg-statoverride --add root adm 0755 /var/log/nginx
 
  -- Michael Lustfield <michael@lustfield.net>  Sun, 24 Nov 2013 15:59:52 -0600
+
+nginx (1.4.1-2) unstable; urgency=medium
+
+  Started with nginx 1.4.1-2 upload, nginx-naxsi-ui switched backend from
+  MySQL to SQLite.
+
+  This was mostly caused by the future removal of MySQL support in naxsi-ui.
+  Thus, the nginx maintainers decided to switch from MySQL to SQLite.
+
+  All data contained in the MySQL database is not affected by this switch but
+  you need to start with a clean SQLite database to ensure nginx-naxsi-ui
+  reliability.
+
+ -- Cyril Lavier <cyril.lavier@davromaniak.eu>  Wed,  5 Jun 2013 09:45:03 +0200
 
 nginx (0.8.53-1) unstable; urgency=low
 
