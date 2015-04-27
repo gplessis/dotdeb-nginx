@@ -3,21 +3,21 @@
 # Requirements:
 #   * Docker >= 1.5
 # Usage:
-#   # docker build -t build-wheezy-amd64 -f debian/Dockerfile .
-#   # docker run build-wheezy-amd64
+#   # docker build -t build-jessie-amd64 -f debian/Dockerfile .
+#   # docker run build-jessie-amd64
 #   # ID=$(docker ps -l -q)
 #   # docker cp $ID:/usr/src ~/Downloads/
 #   # docker rm $ID
 
-FROM debian:wheezy
+FROM debian:jessie
 MAINTAINER Guillaume Plessis "gui@dotdeb.org"
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN echo "deb http://http.debian.net/debian/ wheezy main contrib non-free" > /etc/apt/sources.list
-RUN echo "deb http://http.debian.net/debian/ wheezy-updates main contrib non-free" >> /etc/apt/sources.list
-RUN echo "deb http://http.debian.net/debian/ wheezy-backports main contrib non-free" >> /etc/apt/sources.list
-RUN echo "deb http://security.debian.org/ wheezy/updates main contrib non-free" >> /etc/apt/sources.list
+RUN echo "deb http://http.debian.net/debian/ jessie main contrib non-free" > /etc/apt/sources.list
+#RUN echo "deb http://http.debian.net/debian/ jessie-updates main contrib non-free" >> /etc/apt/sources.list
+#RUN echo "deb http://http.debian.net/debian/ jessie-backports main contrib non-free" >> /etc/apt/sources.list
+#RUN echo "deb http://security.debian.org/ jessie/updates main contrib non-free" >> /etc/apt/sources.list
 
 RUN echo "APT::Install-Recommends "false";" > /etc/apt/apt.conf.d/10recommends
 RUN echo "APT::Install-Suggests "false";" >> /etc/apt/apt.conf.d/10recommends

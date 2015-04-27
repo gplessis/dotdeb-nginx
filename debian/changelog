@@ -1,4 +1,4 @@
-nginx (1.8.0-1~dotdeb+7.1) oldstable; urgency=medium
+nginx (1.8.0-1~dotdeb+8.1) oldstable; urgency=medium
 
   * Imported Upstream version 1.8.0
   * syslog support is now upstream
