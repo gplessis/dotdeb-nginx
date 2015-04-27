@@ -1,3 +1,12 @@
+nginx (1.8.0-1~dotdeb+7.1) oldstable; urgency=medium
+
+  * Imported Upstream version 1.8.0
+  * syslog support is now upstream
+  * Thread pool support
+  * Sync with Debian
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Sat, 25 Apr 2015 20:39:38 -0700
+
 nginx (1.6.3-1~dotdeb+wheezy.1) stable; urgency=medium
 
   * Modules update
