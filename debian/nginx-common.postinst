@@ -1,6 +1,12 @@
 #!/bin/sh
 set -e
 
+# Handle naxsi removal
+dpkg-maintscript-helper rm_conffile \
+	          /etc/nginx/naxsi-ui.conf.1.4.1 1.6.2-2~ -- "$@"
+dpkg-maintscript-helper rm_conffile \
+	          /etc/nginx/naxsi-ui.conf       1.6.2-2~ -- "$@"
+
 case "$1" in
   configure)
     logdir="/var/log/nginx"
@@ -21,6 +27,12 @@ case "$1" in
        [ -d /etc/nginx/sites-enabled ] && [ -d /etc/nginx/sites-available ]; then
       ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
     fi
+
+    # Create a default index page when not already present.
+    if [ ! -e /var/www/html/index.nginx-debian.html ]; then
+      cp /usr/share/nginx/html/index.html /var/www/html/index.nginx-debian.html
+    fi
+
     ;;
 
   abort-upgrade|abort-remove|abort-deconfigure)

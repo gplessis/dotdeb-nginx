@@ -6,7 +6,7 @@ debian_ldflags:=$(shell dpkg-buildflags --get LDFLAGS)
 
 # export necessary perl hardenging flags
 # see: src/http/modules/perl/Makefile.PL
-DEBIAN_NGINX_PERL_LDFLAGS:= $(debian_ldflags)
+DEBIAN_NGINX_PERL_LDFLAGS:= $(shell DEB_BUILD_MAINT_OPTIONS=hardening=+all,-pie dpkg-buildflags --get LDFLAGS)
 export DEBIAN_NGINX_PERL_LDFLAGS
 
 FLAVOURS := full light extras naxsi
@@ -31,11 +31,7 @@ endif
 
 ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
 	NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
-	ifeq (${NUMJOBS}, 0)
-		NUMJOBS = 1
-	endif
-else
-	NUMJOBS = 1
+	MAKEFLAGS += -j$(NUMJOBS)
 endif
 
 # configure flags
@@ -60,10 +56,155 @@ common_configure_flags := \
 			--with-http_stub_status_module \
 			--with-http_realip_module \
 			--with-http_auth_request_module \
+			--with-http_gunzip_module \
 			--with-file-aio \
-			--with-threads \
+			--with-threads
 
-config.env.%:
+light_configure_flags := \
+			$(common_configure_flags) \
+			--with-http_gzip_static_module \
+			--without-http_browser_module \
+			--without-http_geo_module \
+			--without-http_limit_req_module \
+			--without-http_limit_conn_module \
+			--without-http_memcached_module \
+			--without-http_referer_module \
+			--without-http_scgi_module \
+			--without-http_split_clients_module \
+			--without-http_ssi_module \
+			--without-http_userid_module \
+			--without-http_uwsgi_module \
+			--add-module=$(MODULESDIR)/nginx-echo \
+			--add-module=$(MODULESDIR)/nginx-x-rid-header \
+				--with-ld-opt=-lossp-uuid
+
+full_configure_flags := \
+			$(common_configure_flags) \
+			--with-http_addition_module \
+			--with-http_dav_module \
+			--with-http_geoip_module \
+			--with-http_gzip_static_module \
+			--with-http_image_filter_module \
+			--with-http_secure_link_module \
+			--with-http_sub_module \
+			--with-http_xslt_module \
+			--with-mail \
+			--with-mail_ssl_module \
+			--add-module=$(MODULESDIR)/nginx-auth-pam \
+			--add-module=$(MODULESDIR)/nginx-dav-ext-module \
+			--add-module=$(MODULESDIR)/nginx-echo \
+			--add-module=$(MODULESDIR)/nginx-upstream-fair \
+			--add-module=$(MODULESDIR)/ngx_http_substitutions_filter_module \
+			--add-module=$(MODULESDIR)/nginx-cache-purge \
+			--add-module=$(MODULESDIR)/ngx_http_pinba_module \
+			--add-module=$(MODULESDIR)/nginx-x-rid-header \
+				--with-ld-opt=-lossp-uuid
+
+extras_configure_flags := \
+			$(common_configure_flags) \
+			--with-http_addition_module \
+			--with-http_dav_module \
+			--with-http_flv_module \
+			--with-http_geoip_module \
+			--with-http_gunzip_module \
+			--with-http_gzip_static_module \
+			--with-http_image_filter_module \
+			--with-http_mp4_module \
+			--with-http_perl_module \
+			--with-http_random_index_module \
+			--with-http_secure_link_module \
+			--with-http_sub_module \
+			--with-http_xslt_module \
+			--with-mail \
+			--with-mail_ssl_module \
+			--add-module=$(MODULESDIR)/headers-more-nginx-module \
+			--add-module=$(MODULESDIR)/nginx-auth-pam \
+			--add-module=$(MODULESDIR)/nginx-cache-purge \
+			--add-module=$(MODULESDIR)/nginx-dav-ext-module \
+			--add-module=$(MODULESDIR)/nginx-development-kit \
+			--add-module=$(MODULESDIR)/nginx-echo \
+			--add-module=$(MODULESDIR)/ngx-fancyindex \
+			--add-module=$(MODULESDIR)/nginx-push-stream-module \
+			--add-module=$(MODULESDIR)/nginx-lua \
+			--add-module=$(MODULESDIR)/nginx-upload-progress \
+			--add-module=$(MODULESDIR)/nginx-upstream-fair \
+			--add-module=$(MODULESDIR)/ngx_http_substitutions_filter_module \
+			--add-module=$(MODULESDIR)/naxsi/naxsi_src \
+			--add-module=$(MODULESDIR)/nginx-auth-ldap \
+			--add-module=$(MODULESDIR)/ngx_http_pinba_module \
+			--add-module=$(MODULESDIR)/ngx_pagespeed \
+			--add-module=$(MODULESDIR)/nginx-x-rid-header \
+			--add-module=$(MODULESDIR)/nginx-rtmp-module \
+				--with-ld-opt=-lossp-uuid
+
+naxsi_configure_flags := \
+			$(common_configure_flags) \
+			--with-http_geoip_module \
+			--with-http_gzip_static_module \
+			--without-mail_pop3_module \
+			--without-mail_smtp_module \
+			--without-mail_imap_module \
+			--without-http_uwsgi_module \
+			--without-http_scgi_module \
+			--add-module=$(MODULESDIR)/naxsi/naxsi_src \
+			--add-module=$(MODULESDIR)/nginx-cache-purge \
+			--add-module=$(MODULESDIR)/nginx-upstream-fair \
+			--add-module=$(MODULESDIR)/nginx-echo \
+			--add-module=$(MODULESDIR)/nginx-x-rid-header \
+				--with-ld-opt=-lossp-uuid \
+
+passenger_configure_flags := \
+			$(common_configure_flags) \
+			--with-http_addition_module \
+			--with-http_dav_module \
+			--with-http_geoip_module \
+			--with-http_gzip_static_module \
+			--with-http_image_filter_module \
+			--with-http_secure_link_module \
+			--with-http_sub_module \
+			--with-http_xslt_module \
+			--with-mail \
+			--with-mail_ssl_module \
+			--add-module=$(MODULESDIR)/nginx-auth-pam \
+			--add-module=$(MODULESDIR)/headers-more-nginx-module \
+			--add-module=$(MODULESDIR)/nginx-echo \
+			--add-module=$(MODULESDIR)/nginx-upstream-fair \
+			--add-module=$(MODULESDIR)/nginx-syslog \
+			--add-module=$(MODULESDIR)/nginx-cache-purge \
+			--add-module=$(MODULESDIR)/ruby-passenger/ext/nginx \
+			--add-module=$(MODULESDIR)/ngx_http_pinba_module \
+			--add-module=$(MODULESDIR)/ngx_http_substitutions_filter_module \
+			--add-module=$(MODULESDIR)/nginx-x-rid-header \
+				--with-ld-opt=-lossp-uuid \
+
+%:
+	dh $@
+
+override_dh_auto_configure:	$(foreach flavour,$(FLAVOURS),config.arch.$(flavour))
+override_dh_auto_build:     $(foreach flavour,$(FLAVOURS),build.arch.$(flavour))
+override_dh_strip:          $(foreach flavour,$(FLAVOURS),strip.arch.$(flavour))
+override_dh_clean:          $(foreach flavour,$(FLAVOURS),clean.$(flavour))
+	dh_clean
+
+override_dh_installinit:
+	dh_installinit --no-restart-on-upgrade --no-start --name=nginx
+
+override_dh_installlogrotate:
+	dh_installlogrotate --package nginx-common --name=nginx
+
+build.arch.%:
+	$(MAKE) -C $(BUILDDIR_$*) build
+
+strip.arch.%:
+	dh_strip --package=nginx-$(*) --dbg-package=nginx-$(*)-dbg
+
+config.arch.%:
+	if [ $* = extras ]; then \
+		cd $(MODULESDIR)/ngx_pagespeed && \
+		curl https://dl.google.com/dl/page-speed/psol/1.9.32.3.tar.gz | tar xz && \
+		perl -pi -e 'print "#ifdef LOG_INFO\n#undef LOG_INFO\n#endif\n\n#ifdef LOG_WARNING\n#undef LOG_WARNING\n#endif\n\n" if $$. == 1' \
+		psol/include/third_party/chromium/src/base/logging.h; \
+	fi
 	dh_testdir
 	mkdir -p $(BUILDDIR_$*)
 	cp -Pa $(CURDIR)/auto $(BUILDDIR_$*)/
@@ -72,220 +213,7 @@ config.env.%:
 	cp -Pa $(CURDIR)/contrib $(BUILDDIR_$*)/
 	cp -Pa $(CURDIR)/src $(BUILDDIR_$*)/
 	cp -Pa $(CURDIR)/man $(BUILDDIR_$*)/
+	cd $(BUILDDIR_$*) && ./configure $($*_configure_flags)
 
-config.status.full: config.env.full
-	cd $(BUILDDIR_full) && ./configure  \
-	    $(common_configure_flags) \
-	    --with-http_addition_module \
-	    --with-http_dav_module \
-	    --with-http_geoip_module \
-	    --with-http_gzip_static_module \
-	    --with-http_image_filter_module \
-	    --with-http_secure_link_module \
-	    --with-http_sub_module \
-	    --with-http_xslt_module \
-	    --with-mail \
-	    --with-mail_ssl_module \
-	    --add-module=$(MODULESDIR)/nginx-auth-pam \
-	    --add-module=$(MODULESDIR)/nginx-dav-ext-module \
-	    --add-module=$(MODULESDIR)/nginx-echo \
-	    --add-module=$(MODULESDIR)/nginx-upstream-fair \
-	    --add-module=$(MODULESDIR)/nginx-syslog \
-	    --add-module=$(MODULESDIR)/nginx-cache-purge \
-	    --add-module=$(MODULESDIR)/ngx_http_pinba_module \
-	    --add-module=$(MODULESDIR)/ngx_http_substitutions_filter_module \
-	    --add-module=$(MODULESDIR)/nginx-x-rid-header \
-				--with-ld-opt=-lossp-uuid \
-            >$@
-	touch $@
-
-config.status.light: config.env.light
-	cd $(BUILDDIR_light) && ./configure  \
-	    $(common_configure_flags) \
-	    --with-http_gzip_static_module \
-	    --without-http_browser_module \
-	    --without-http_geo_module \
-	    --without-http_limit_req_module \
-	    --without-http_limit_zone_module \
-	    --without-http_memcached_module \
-	    --without-http_referer_module \
-	    --without-http_scgi_module \
-	    --without-http_split_clients_module \
-	    --without-http_ssi_module \
-	    --without-http_userid_module \
-	    --without-http_uwsgi_module \
-	    --add-module=$(MODULESDIR)/nginx-echo \
-	    --add-module=$(MODULESDIR)/nginx-x-rid-header \
-				--with-ld-opt=-lossp-uuid \
-            >$@
-	touch $@
-
-config.status.extras: config.env.extras
-	cd $(MODULESDIR)/ngx_pagespeed && \
-	    curl https://dl.google.com/dl/page-speed/psol/1.9.32.3.tar.gz | tar xz && \
-	    perl -pi -e 'print "#ifdef LOG_INFO\n#undef LOG_INFO\n#endif\n\n#ifdef LOG_WARNING\n#undef LOG_WARNING\n#endif\n\n" if $$. == 1' \
-	    psol/include/third_party/chromium/src/base/logging.h
-	cd $(BUILDDIR_extras) && ./configure  \
-	    $(common_configure_flags) \
-	    --with-http_addition_module \
-	    --with-http_dav_module \
-	    --with-http_flv_module \
-	    --with-http_geoip_module \
-	    --with-http_gzip_static_module \
-	    --with-http_gunzip_module \
-	    --with-http_image_filter_module \
-	    --with-http_mp4_module \
-	    --with-http_perl_module \
-	    --with-http_random_index_module \
-	    --with-http_secure_link_module \
-	    --with-http_sub_module \
-	    --with-http_xslt_module \
-	    --with-mail \
-	    --with-mail_ssl_module \
-	    --add-module=$(MODULESDIR)/headers-more-nginx-module \
-	    --add-module=$(MODULESDIR)/naxsi/naxsi_src \
-	    --add-module=$(MODULESDIR)/nginx-auth-ldap \
-	    --add-module=$(MODULESDIR)/nginx-auth-pam \
-	    --add-module=$(MODULESDIR)/nginx-cache-purge \
-	    --add-module=$(MODULESDIR)/nginx-dav-ext-module \
-	    --add-module=$(MODULESDIR)/nginx-development-kit \
-	    --add-module=$(MODULESDIR)/nginx-echo \
-	    --add-module=$(MODULESDIR)/ngx-fancyindex \
-	    --add-module=$(MODULESDIR)/nginx-push-stream-module \
-	    --add-module=$(MODULESDIR)/nginx-lua \
-	    --add-module=$(MODULESDIR)/nginx-upload-progress \
-	    --add-module=$(MODULESDIR)/nginx-upstream-fair \
-	    --add-module=$(MODULESDIR)/nginx-syslog \
-	    --add-module=$(MODULESDIR)/ngx_http_pinba_module \
-	    --add-module=$(MODULESDIR)/ngx_http_substitutions_filter_module \
-	    --add-module=$(MODULESDIR)/ngx_pagespeed \
-	    --add-module=$(MODULESDIR)/nginx-x-rid-header \
-	    --add-module=$(MODULESDIR)/nginx-rtmp-module \
-				--with-ld-opt=-lossp-uuid \
-            >$@
-	touch $@
-
-config.status.naxsi: config.env.naxsi
-	cd $(BUILDDIR_naxsi) && ./configure  \
-	    $(common_configure_flags) \
-	    --with-http_geoip_module \
-	    --with-http_gzip_static_module \
-	    --without-mail_pop3_module \
-	    --without-mail_smtp_module \
-	    --without-mail_imap_module \
-	    --without-http_uwsgi_module \
-	    --without-http_scgi_module \
-	    --add-module=$(MODULESDIR)/naxsi/naxsi_src \
-	    --add-module=$(MODULESDIR)/nginx-cache-purge \
-	    --add-module=$(MODULESDIR)/nginx-upstream-fair \
-	    --add-module=$(MODULESDIR)/nginx-echo \
-	    --add-module=$(MODULESDIR)/nginx-syslog \
-	    --add-module=$(MODULESDIR)/nginx-x-rid-header \
-				--with-ld-opt=-lossp-uuid \
-	    >$@
-	touch $@
-
-config.status.passenger: config.env.passenger
-	cd $(BUILDDIR_passenger) && ./configure  \
-	    $(common_configure_flags) \
-	    --with-http_addition_module \
-	    --with-http_dav_module \
-	    --with-http_geoip_module \
-	    --with-http_gzip_static_module \
-	    --with-http_image_filter_module \
-	    --with-http_secure_link_module \
-	    --with-http_sub_module \
-	    --with-http_xslt_module \
-	    --with-mail \
-	    --with-mail_ssl_module \
-	    --add-module=$(MODULESDIR)/nginx-auth-pam \
-	    --add-module=$(MODULESDIR)/headers-more-nginx-module \
-	    --add-module=$(MODULESDIR)/nginx-echo \
-	    --add-module=$(MODULESDIR)/nginx-upstream-fair \
-	    --add-module=$(MODULESDIR)/nginx-syslog \
-	    --add-module=$(MODULESDIR)/nginx-cache-purge \
-	    --add-module=$(MODULESDIR)/ruby-passenger/ext/nginx \
-	    --add-module=$(MODULESDIR)/ngx_http_pinba_module \
-	    --add-module=$(MODULESDIR)/ngx_http_substitutions_filter_module \
-	    --add-module=$(MODULESDIR)/nginx-x-rid-header \
-				--with-ld-opt=-lossp-uuid \
-	    >$@
-	touch $@
-
-config.status.%:
-	echo "configuration for flavour $* not yet defined."
-
-build-arch.%: config.status.%
-	dh_testdir
-	dh_prep
-	$(MAKE) -j$(NUMJOBS) -C $(BUILDDIR_$*) build
-
-build-arch: $(foreach flavour,$(FLAVOURS),build-arch.$(flavour))
-	dh_testdir
-	touch $@
-
-build-dbg.%: install
-	dh_testdir
-	dh_strip --package=nginx-$(*) --dbg-package=nginx-$(*)-dbg
-
-build-dbg: $(foreach flavour,$(FLAVOURS),build-dbg.$(flavour))
-	dh_testdir
-	touch $@
-
-build-indep:
-
-build: build-indep build-arch
-	dh_testdir
-	touch $@
-
-clean:
-	dh_testdir
-	dh_testroot
-	dh_clean
-	rm -rf $(CURDIR)/debian/build-*
-	rm -rf $(MODULESDIR)/ngx_pagespeed/psol
-
-install:
-	dh_testdir
-	dh_testroot
-	dh_prep
-	dh_installdirs
-	dh_install
-
-binary-indep: build install
-	dh_testdir
-	dh_testroot
-	dh_installman -i
-	dh_installchangelogs -i -k CHANGES
-	dh_installdocs -i
-	dh_installdebconf
-	dh_installexamples -i
-	dh_installinit -i --no-restart-on-upgrade --no-start --name=nginx
-	dh_installlogrotate -i -pnginx-common --name=nginx
-	dh_link -i
-	dh_compress -i
-	dh_fixperms -i
-	dh_installdeb -i
-	dh_gencontrol -i
-	dh_md5sums -i
-	dh_builddeb -i
-
-binary-arch: install build-dbg
-	dh_testdir
-	dh_testroot
-	dh_installchangelogs -a -k CHANGES
-	dh_installdocs -a
-	dh_lintian -a
-	dh_link -aA
-	dh_compress -a
-	dh_perl -a
-	dh_fixperms -a
-	dh_installdeb -a
-	dh_shlibdeps -a
-	dh_gencontrol -a
-	dh_md5sums -a
-	dh_builddeb -a
-
-binary: binary-indep binary-arch
-
-.PHONY: build clean binary-indep binary-arch binary install
+clean.%:
+	rm -rf $(BUILDDIR_$*)

@@ -26,10 +26,11 @@ Build-Depends: autotools-dev,
                ruby1.8-dev | ruby1.9.1-dev,
                rubygems,
                zlib1g-dev
-Standards-Version: 3.9.5
+Standards-Version: 3.9.6.0
 Homepage: http://nginx.net
 Vcs-Git: git://anonscm.debian.org/collab-maint/nginx.git
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=collab-maint/nginx.git;a=summary
+XS-Testsuite: autopkgtest
 
 Package: nginx
 Architecture: all
@@ -65,7 +66,7 @@ Description: small, powerful, scalable web/proxy server - documentation
 
 Package: nginx-common
 Architecture: all
-Depends: lsb-base (>= 3.2-14), ${misc:Depends}
+Depends: lsb-base (>= 3.2-14), ${misc:Depends}, python
 Replaces: nginx (<< 0.8.54-4),
           nginx-extras (<< 0.8.54-4),
           nginx-full (<< 0.8.54-4),
@@ -74,7 +75,7 @@ Breaks: nginx (<< 0.8.54-4),
         nginx-extras (<< 0.8.54-4),
         nginx-full (<< 0.8.54-4),
         nginx-light (<< 0.8.54-4)
-Suggests: fcgiwrap, nginx-doc
+Suggests: fcgiwrap, nginx-doc, ssl-cert
 Description: small, powerful, scalable web/proxy server - common files
  Nginx ("engine X") is a high-performance web and reverse proxy server
  created by Igor Sysoev. It can be used both as a standalone web server
@@ -99,21 +100,17 @@ Description: nginx web/proxy server (standard version)
  standard modules included (but omitting some of those included in
  nginx-extras).
  .
- STANDARD HTTP MODULES: Core, Access, Auth Basic, Auto Index, Browser,
- Charset, Empty GIF, FastCGI, Geo, Gzip, Headers, Index, Limit Requests,
- Limit Zone, Log, Map, Memcached, Proxy, Referer, Rewrite, SCGI,
- Split Clients, SSI, Upstream, User ID, UWSGI.
+ STANDARD HTTP MODULES: Core, Access, Auth Basic, Auto Index, Browser, Empty
+ GIF, FastCGI, Geo, Limit Connections, Limit Requests, Map, Memcached, Proxy,
+ Referer, Rewrite, SCGI, Split Clients, UWSGI.
  .
- OPTIONAL HTTP MODULES: Addition, Auth Request, Debug, GeoIP, Gzip
- Precompression, HTTP Sub, Image Filter, IPv6, Real IP, SSL, Stub Status,
- Substitution, WebDAV, XSLT.
+ OPTIONAL HTTP MODULES: Addition, Auth Request, Charset, WebDAV, GeoIP, Gunzip,
+ Gzip, Gzip Precompression, Headers, Image Filter, Index, Log, Real IP,
+ SSI, SSL, Stub Status, Substitution, Upstream, User ID, XSLT.
  .
- MAIL MODULES: Mail Core, IMAP, POP3, SMTP, SSL.
+ MAIL MODULES: Mail Core, Auth HTTP, Proxy, SSL, IMAP, POP3, SMTP.
  .
- THIRD PARTY MODULES: Auth PAM, DAV Ext, Echo, HTTP Substitution Filter,
- Upstream Fair Queue.
- .
- MODULES ADDED BY DOTDEB : Thread pool, File AIO, Secure link, Syslog, Cache purge, Pinba,
+ MODULES ADDED BY DOTDEB : Gunzip, File AIO, Thread pool, Secure link, Cache purge, Pinba,
  X-rid header
 
 Package: nginx-full-dbg
@@ -146,15 +143,15 @@ Description: nginx web/proxy server (basic version)
  This package provides a very light version of nginx with only the
  minimal set of features and modules.
  .
- STANDARD HTTP MODULES: Core, Access, Auth Basic, Auto Index, Charset,
- Empty GIF, FastCGI, Gzip, Headers, Index, Log, Map, Proxy, Rewrite, Upstream.
+ STANDARD HTTP MODULES: Core, Access, Auth Basic, Auto Index, Empty GIF,
+ FastCGI, Map, Proxy, Rewrite.
  .
- OPTIONAL HTTP MODULES: Auth Request, Debug, Gzip Precompression, IPv6, Real
- Ip, SSL, Stub Status.
+ OPTIONAL HTTP MODULES: Auth Request, Charset, Gzip, Gzip Precompression,
+ Headers, Index, Log, Real IP, SSL, Stub Status, Upstream.
  .
  THIRD PARTY MODULES: Echo.
  .
- MODULES ADDED BY DOTDEB : Thread pool, File AIO, X-rid header
+ MODULES ADDED BY DOTDEB : Gunzip, File AIO, Thread pool, X-rid header
 
 Package: nginx-light-dbg
 Architecture: any
@@ -191,23 +188,19 @@ Description: nginx web/proxy server (extended version)
  extra features and modules such as the Perl module, which allows the
  addition of Perl in configuration files.
  .
- STANDARD HTTP MODULES: Core, Access, Auth Basic, Auto Index, Browser,
- Charset, Empty GIF, FastCGI, Geo, Gzip, Headers, Index, Limit Requests,
- Limit Zone, Log, Map, Memcached, Proxy, Referer, Rewrite, SCGI,
- Split Clients, SSI, Upstream, User ID, UWSGI.
+ STANDARD HTTP MODULES: Core, Access, Auth Basic, Auto Index, Browser, Empty
+ GIF, FastCGI, Geo, Limit Connections, Limit Requests, Map, Memcached, Proxy,
+ Referer, Rewrite, SCGI, Split Clients, UWSGI.
  .
- OPTIONAL HTTP MODULES: Addition, Auth Request, Debug, Embedded Perl, FLV,
- GeoIP, Gzip Precompression, Image Filter, IPv6, MP4, Random Index, Real IP,
- Secure Link, SSL, Stub Status, Substitution, WebDAV, XSLT.
+ OPTIONAL HTTP MODULES: Addition, Auth Request, Charset, WebDAV, FLV, GeoIP,
+ Gunzip, Gzip, Gzip Precompression, Headers, Image Filter, Index, Log, MP4,
+ Embedded Perl, Random Index, Real IP, Secure Link, SSI, SSL, Stub
+ Status, Substitution, Upstream, User ID, XSLT.
  .
- MAIL MODULES: Mail Core, IMAP, POP3, SMTP, SSL.
+ MAIL MODULES: Mail Core, Auth HTTP, Proxy, SSL, IMAP, POP3, SMTP.
  .
- THIRD PARTY MODULES: Auth PAM, DAV Ext, Echo, Embedded Lua,
- Fancy Index, HttpHeadersMore, HTTP Substitution Filter,
- Nginx Development Kit, Upload Progress, Upstream Fair Queue.
- .
- MODULES ADDED BY DOTDEB : Auth LDAP, Cache purge, Thread pool, File AIO, Syslog, Naxsi, Pinba,
- HTTP Gunzip, HTTP push stream, PageSpeed, RTMP, X-rid header
+ MODULES ADDED BY DOTDEB : Gunzip, File AIO, Thread pool, X-rid header, Push stream,
+ Naxsi, Auth LDAP, Pinba, PageSpeed, X-rid header, RTMP
 
 Package: nginx-extras-dbg
 Architecture: any
@@ -249,7 +242,7 @@ Description: nginx web/proxy server (version with naxsi)
  .
  THIRD PARTY MODULES: Naxsi, Cache Purge, Upstream Fair.
  .
- MODULES ADDED BY DOTDEB : Thread pool, File AIO, Geoip, Gzip static, Echo, Syslog, X-rid header
+ MODULES ADDED BY DOTDEB : Gunzip, File AIO, Thread pool, X-rid header, Naxsi
 
 Package: nginx-naxsi-dbg
 Architecture: any

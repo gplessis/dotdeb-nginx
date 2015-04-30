@@ -1,0 +1,135 @@
+.\"     Title: ngx-conf
+.\"    Author: Michael Lustfield <michael@lustfield.net>
+.\"      Date: 01/14/2015
+.\"    Manual: User Commands
+.\"
+.TH "NGX-CONF" "1" "01/14/2015" "ngx-conf" "User Commands"
+.\" disable hyphenation
+.NH
+.\" disable justification (adjust text to left margin only)
+.AD l
+.SH "NAME"
+ngx - a tool to help manage nginx confuration files
+.SH "SYNOPSIS"
+.B ngx-conf
+[-h] (-e | -d | -x | -l) [-f] [-r] [-v] FILE [FILES]
+.br
+.SH "DESCRIPTION"
+.PP
+Ngx-conf is a relatively simple tool to help manage Nginx configuration files.
+It can be used to enable, disable, remove, and list configuration files. In the
+case of configuration files in conf.d/*.conf, it will handle renaming files to
+an enabled/disabled state. In sites-{enabled,available}/*, it will handle the
+creation and removal of symbolic links.
+.SH "OPTIONS"
+.PP
+This program follows the usual command line syntax, with long options starting
+with two dashes (`\-'). A summary of options is included below.
+.TP
+.B \-h, \-\-help
+show a help message and exit
+.TP
+.B \-e, \-\-enable
+enable a configuration files
+.TP
+.B \-d, \-\-disable
+disable a configuration files
+.TP
+.B \-x, \-\-remove
+remove a configuration files; will prompt without -f
+.TP
+.B \-l, \-\-list
+list configuration files
+.TP
+.B \-f, \-\-force
+force change, even if doing so will destroy data
+.TP
+.B \-r, \-\-reload
+reload configuration after change
+.TP
+.B \-v, \-\-verbose
+show verbose output; default is quiet unless errors
+.B FILES
+a list of configuration files to update
+.PP
+Using --force:
+.IP
+In --remove will not prompt you to delete the file(s).
+.br
+In --enable will ignore conflicts.
+.br
+In --disable will ignore conflicts.
+.br
+In --disable will also delete files from sites-enabled.
+.PP
+Only one action (enable|disable|remove|list) can be performed at one time.
+.SH "EXAMPLES"
+.PP
+ngx-conf -e site1 site2 site3
+    enable "site{1,2,3}" configurations
+.br
+ngx-conf -r -d site
+    disable "site" configuration and reload nginx
+.br
+ngx-conf -f -r -x site1 site2
+    remove "site{1,2}" configurations without prompting and reload nginx
+.SH "CONFIGURATION FILES"
+.PP
+Three configuration files, if present, will be read. They will be read in the
+following order; the next read file will always override the previous.
+.IP
+1. /etc/nginx/ngx.cfg
+.br
+2. /etc/ngx.cfg
+.br
+3. ngx.cfg
+.PP
+A sample configuration file with all options set to default:
+.IP
+[DEFAULT]
+.br
+base_dir = /etc/nginx/
+.br
+conf_dir = conf.d/
+.br
+sites_en = sites-enabled/
+.br
+sites_dis = sites-available/
+.br
+conf_ext = .conf
+.br
+verbose = no
+.br
+reload = no
+.br
+force = no
+.PP
+Make sure that base_dir always has a trailing slash.
+.br
+Any arguments given to the command will override configuration options.
+.SH "ALIASES"
+.PP
+If you're interested in any sort of a2{dis,en}{conf,mod,site}, you can create
+some nice aliases. Examples:
+.TP
+.B a2ensite
+alias ngxensite='ngx-conf -e'
+.br
+.TP
+.B a2enconf
+alias ngxenconf='ngx-conf -e'
+.br
+.TP
+.B a2dissite
+alias ngxdissite='ngx-conf -d'
+.br
+.TP
+.B a2disconf
+alias ngxdisconf='ngx-conf -d'
+.SH "BUGS"
+.PP
+If you experience bugs, the best way to report them is to the upstream bug
+tracker. This can be found at https://github.com/ngx/ngx-conf.
+.SH "AUTHORS"
+.PP
+The ngx-conf tool and manual page were written by Michael Lustfield <michael@lustfield.net>.

@@ -20,12 +20,15 @@ if [ -r /etc/default/nginx ]; then
 	. /etc/default/nginx
 fi
 
+STOP_SCHEDULE="${STOP_SCHEDULE:-QUIT/5/TERM/5/KILL/5}"
+
 test -x $DAEMON || exit 0
 
 . /lib/init/vars.sh
 . /lib/lsb/init-functions
 
-PID=$(awk -F'[ \t;]' '$1 !~ /^#/ && /pid/ {print $2}' /etc/nginx/nginx.conf)
+# Try to extract nginx pidfile
+PID=$(cat /etc/nginx/nginx.conf | grep -Ev '^\s*#' | awk 'BEGIN { RS="[;{}]" } { if ($1 == "pid") print $2 }' | head -n1)
 if [ -z "$PID" ]
 then
 	PID=/var/run/nginx.pid
@@ -67,7 +70,7 @@ do_stop()
 	#   1 if daemon was already stopped
 	#   2 if daemon could not be stopped
 	#   other if a failure occurred
-	start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PID --name $NAME
+	start-stop-daemon --stop --quiet --retry=$STOP_SCHEDULE --pidfile $PID --name $NAME
 	RETVAL="$?"
 
 	sleep 1

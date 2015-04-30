@@ -1,0 +1,12 @@
+Test-Command: curl --silent --fail -o /dev/null -w "response_code: %{http_code}\n" http://127.0.0.1/
+Restrictions: allow-stderr isolation-container
+Depends: nginx-light, curl
+
+Test-Command: curl --silent --fail -o /dev/null -w "response_code: %{http_code}\n" http://127.0.0.1/
+Restrictions: allow-stderr isolation-container
+Depends: nginx-full, curl
+
+Test-Command: curl --silent --fail -o /dev/null -w "response_code: %{http_code}\n" http://127.0.0.1/
+Restrictions: allow-stderr isolation-container
+Depends: nginx-extras, curl
+
