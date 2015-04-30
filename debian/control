@@ -113,7 +113,7 @@ Description: nginx web/proxy server (standard version)
  THIRD PARTY MODULES: Auth PAM, DAV Ext, Echo, HTTP Substitution Filter,
  Upstream Fair Queue.
  .
- MODULES ADDED BY DOTDEB : File AIO, Secure link, Syslog, Cache purge, Pinba,
+ MODULES ADDED BY DOTDEB : Thread pool, File AIO, Secure link, Syslog, Cache purge, Pinba,
  X-rid header
 
 Package: nginx-full-dbg
@@ -154,7 +154,7 @@ Description: nginx web/proxy server (basic version)
  .
  THIRD PARTY MODULES: Echo.
  .
- MODULES ADDED BY DOTDEB : File AIO, X-rid header
+ MODULES ADDED BY DOTDEB : Thread pool, File AIO, X-rid header
 
 Package: nginx-light-dbg
 Architecture: any
@@ -206,7 +206,7 @@ Description: nginx web/proxy server (extended version)
  Fancy Index, HttpHeadersMore, HTTP Substitution Filter,
  Nginx Development Kit, Upload Progress, Upstream Fair Queue.
  .
- MODULES ADDED BY DOTDEB : Auth LDAP, Cache purge, File AIO, Syslog, Naxsi, Pinba,
+ MODULES ADDED BY DOTDEB : Auth LDAP, Cache purge, Thread pool, File AIO, Syslog, Naxsi, Pinba,
  HTTP Gunzip, HTTP push stream, PageSpeed, RTMP, X-rid header
 
 Package: nginx-extras-dbg
@@ -249,7 +249,7 @@ Description: nginx web/proxy server (version with naxsi)
  .
  THIRD PARTY MODULES: Naxsi, Cache Purge, Upstream Fair.
  .
- MODULES ADDED BY DOTDEB : File AIO, Geoip, Gzip static, Echo, Syslog, X-rid header
+ MODULES ADDED BY DOTDEB : Thread pool, File AIO, Geoip, Gzip static, Echo, Syslog, X-rid header
 
 Package: nginx-naxsi-dbg
 Architecture: any
@@ -295,7 +295,7 @@ Description: nginx web/proxy server (Passenger version)
  .
  THIRD PARTY MODULES: Echo, Upstream Fair Queue, Passenger.
  .
- MODULES ADDED BY DOTDEB : File AIO, Secure link, Auth PAM, Headers more,
+ MODULES ADDED BY DOTDEB : Thread pool, File AIO, Secure link, Auth PAM, Headers more,
  Syslog, Cache purge, Pinba, HTTP substitution filter, X-rid header
 
 Package: nginx-passenger-dbg
