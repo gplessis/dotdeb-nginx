@@ -15,15 +15,6 @@ MODULESDIR = $(CURDIR)/debian/modules
 BASEDIR = $(CURDIR)
 $(foreach flavour,$(FLAVOURS),$(eval BUILDDIR_$(flavour) = $(CURDIR)/debian/build-$(flavour)))
 
-# export to avoid building embedded libev for
-# passenger flavour
-export USE_VENDORED_LIBEV = false
-
-ifneq ($(DEB_BUILD_ARCH_OS),hurd)
-  FLAVOURS+=passenger
-  BUILDDIR_passenger = $(CURDIR)/debian/build-passenger
-endif
-
 DEB_BUILD_ARCH ?=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 ifeq ($(DEB_BUILD_ARCH),sparc)
 	debian_cflags += -m32 -mcpu=ultrasparc
@@ -150,30 +141,6 @@ naxsi_configure_flags := \
 			--add-module=$(MODULESDIR)/nginx-cache-purge \
 			--add-module=$(MODULESDIR)/nginx-upstream-fair \
 			--add-module=$(MODULESDIR)/nginx-echo \
-			--add-module=$(MODULESDIR)/nginx-x-rid-header \
-				--with-ld-opt=-lossp-uuid \
-
-passenger_configure_flags := \
-			$(common_configure_flags) \
-			--with-http_addition_module \
-			--with-http_dav_module \
-			--with-http_geoip_module \
-			--with-http_gzip_static_module \
-			--with-http_image_filter_module \
-			--with-http_secure_link_module \
-			--with-http_sub_module \
-			--with-http_xslt_module \
-			--with-mail \
-			--with-mail_ssl_module \
-			--add-module=$(MODULESDIR)/nginx-auth-pam \
-			--add-module=$(MODULESDIR)/headers-more-nginx-module \
-			--add-module=$(MODULESDIR)/nginx-echo \
-			--add-module=$(MODULESDIR)/nginx-upstream-fair \
-			--add-module=$(MODULESDIR)/nginx-syslog \
-			--add-module=$(MODULESDIR)/nginx-cache-purge \
-			--add-module=$(MODULESDIR)/ruby-passenger/ext/nginx \
-			--add-module=$(MODULESDIR)/ngx_http_pinba_module \
-			--add-module=$(MODULESDIR)/ngx_http_substitutions_filter_module \
 			--add-module=$(MODULESDIR)/nginx-x-rid-header \
 				--with-ld-opt=-lossp-uuid \
 

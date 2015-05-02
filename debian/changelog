@@ -1,6 +1,7 @@
 nginx (1.8.0-1~dotdeb+6.1) oldoldstable; urgency=medium
 
   * Imported Upstream version 1.8.0
+  * Passenger 3 has been removed, it's not compatible with Nginx 1.8
   * syslog support is now upstream
   * Thread pool support
   * Sync with Debian
