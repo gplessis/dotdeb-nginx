@@ -18,6 +18,7 @@ RUN echo "deb http://http.debian.net/debian/ squeeze main contrib non-free" > /e
 RUN echo "deb http://http.debian.net/debian/ squeeze-updates main contrib non-free" >> /etc/apt/sources.list
 RUN echo "deb http://http.debian.net/debian/ squeeze-lts main contrib non-free" >> /etc/apt/sources.list
 RUN echo "deb http://security.debian.org/ squeeze/updates main contrib non-free" >> /etc/apt/sources.list
+RUN echo "deb http://backports.debian.org/debian-backports squeeze-backports main contrib non-free" >> /etc/apt/sources.list
 
 RUN echo "APT::Install-Recommends "false";" > /etc/apt/apt.conf.d/10recommends
 RUN echo "APT::Install-Suggests "false";" >> /etc/apt/apt.conf.d/10recommends
@@ -26,6 +27,7 @@ RUN apt-get update
 RUN apt-get dist-upgrade -y
 
 RUN apt-get install -y build-essential devscripts equivs libwww-perl
+RUN apt-get install -y -t squeeze-backports debhelper
 
 ADD debian/control /root/
 RUN mk-build-deps --install --tool 'apt-get -y' --remove /root/control && rm -f /root/control
