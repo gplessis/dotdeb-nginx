@@ -1,3 +1,10 @@
+nginx (1.9.0~dotdeb+8.1) stable; urgency=medium
+
+  * Imported Upstream version 1.9.0
+  * updated nginx-echo to latest release
+
+ -- Tim Noise <tim@drkns.net>  Mon, 11 May 2015 02:42:00 +1000
+
 nginx (1.8.0-1~dotdeb+8.1) oldstable; urgency=medium
 
   * Imported Upstream version 1.8.0

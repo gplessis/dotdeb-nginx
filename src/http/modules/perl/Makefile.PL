@@ -3,6 +3,7 @@
 # Copyright (C) Nginx, Inc.
 
 use 5.006001;
+use Config;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
@@ -14,6 +15,9 @@ WriteMakefile(
     AUTHOR            => 'Igor Sysoev',
 
     CCFLAGS           => "$ENV{NGX_PM_CFLAGS}",
+    # Pass link hardening flags
+    # $Config{lddlflags} is the default
+    LDDLFLAGS         => "$Config{lddlflags} $ENV{DEBIAN_NGINX_PERL_LDFLAGS}",
     OPTIMIZE          => '-O',
 
     INC               => join(" ", map {
