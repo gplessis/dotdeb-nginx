@@ -3,4 +3,4 @@ debian/ufw/nginx etc/ufw/applications.d
 debian/index.html usr/share/nginx/html/
 debian/vim/nginx.yaml usr/share/vim/registry
 contrib/vim/* usr/share/vim/addons
-debian/ngx-conf/ngx-conf usr/sbin/ngx-conf
+debian/ngx-conf/ngx-conf usr/sbin
