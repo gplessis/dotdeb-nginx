@@ -1,3 +1,11 @@
+nginx (1.8.0-1~dotdeb+8.2) stable; urgency=medium
+
+  * nginx-push-stream 0.5.1. Close #62
+  * ngx-conf in /usr/sbin. Close #66
+  * ngx_pagespeed 1.9.32.4. Fixes #68
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Wed, 17 Jun 2015 14:50:19 -0700
+
 nginx (1.8.0-1~dotdeb+8.1) oldstable; urgency=medium
 
   * Imported Upstream version 1.8.0
