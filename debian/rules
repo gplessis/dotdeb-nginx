@@ -4,6 +4,11 @@ export DH_VERBOSE=1
 debian_cflags:=$(shell dpkg-buildflags --get CFLAGS) $(shell dpkg-buildflags --get CPPFLAGS)
 debian_ldflags:=$(shell dpkg-buildflags --get LDFLAGS)
 
+DEB_BUILD_MAINT_OPTIONS=hardening=+pie,+relro,+bindnow
+export DEB_BUILD_MAINT_OPTIONS
+hardened_debian_cflags:=$(shell dpkg-buildflags --get CFLAGS) $(shell dpkg-buildflags --get CPPFLAGS)
+hardened_debian_ldflags:=$(shell dpkg-buildflags --get LDFLAGS)
+
 # export necessary perl hardenging flags
 # see: src/http/modules/perl/Makefile.PL
 DEBIAN_NGINX_PERL_LDFLAGS:= $(shell DEB_BUILD_MAINT_OPTIONS=hardening=+all,-pie dpkg-buildflags --get LDFLAGS)
@@ -26,9 +31,18 @@ ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
 endif
 
 # configure flags
-common_configure_flags := \
+
+
+common_ccld_configure_flags := \
 			--with-cc-opt="$(debian_cflags)" \
 			--with-ld-opt="$(debian_ldflags)" \
+
+hardened_ccld_configure_flags := \
+			--with-cc-opt="$(hardened_debian_cflags)" \
+			--with-ld-opt="$(hardened_debian_ldflags)" \
+
+
+common_configure_flags := \
 			--prefix=/usr/share/nginx \
 			--conf-path=/etc/nginx/nginx.conf \
 			--http-log-path=/var/log/nginx/access.log \
@@ -54,6 +68,7 @@ common_configure_flags := \
 
 light_configure_flags := \
 			$(common_configure_flags) \
+			$(common_ccld_configure_flags) \
 			--with-http_gzip_static_module \
 			--without-http_browser_module \
 			--without-http_geo_module \
@@ -72,6 +87,7 @@ light_configure_flags := \
 
 full_configure_flags := \
 			$(common_configure_flags) \
+			$(common_ccld_configure_flags) \
 			--with-http_addition_module \
 			--with-http_dav_module \
 			--with-http_geoip_module \
@@ -94,6 +110,7 @@ full_configure_flags := \
 
 extras_configure_flags := \
 			$(common_configure_flags) \
+			$(common_ccld_configure_flags) \
 			--with-http_addition_module \
 			--with-http_dav_module \
 			--with-http_flv_module \
@@ -131,6 +148,7 @@ extras_configure_flags := \
 
 naxsi_configure_flags := \
 			$(common_configure_flags) \
+			$(hardened_ccld_configure_flags) \
 			--with-http_geoip_module \
 			--with-http_gzip_static_module \
 			--without-mail_pop3_module \
