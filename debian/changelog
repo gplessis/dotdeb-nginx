@@ -1,7 +1,7 @@
 nginx (1.8.1-1~dotdeb+6.2) oldoldstable; urgency=medium
 
   * Imported Upstream version 1.8.1
-  * ngx_pagespeed 1.10.33.2
+  * ngx_pagespeed 1.9.32.11
 
  -- Guillaume Plessis <gui@dotdeb.org>  Tue, 26 Jan 2016 13:09:30 -0800
 
