@@ -148,7 +148,7 @@ case "$1" in
 		# Check configuration before stopping nginx
 		if ! test_nginx_config; then
 			log_end_msg 1 # Configuration error
-			exit 0
+			exit 1
 		fi
 
 		do_stop
@@ -178,7 +178,7 @@ case "$1" in
 		# to the administrator.
 		if ! test_nginx_config; then
 			log_end_msg 1 # Configuration error
-			exit 0
+			exit 1
 		fi
 
 		do_reload
@@ -188,6 +188,7 @@ case "$1" in
 		log_daemon_msg "Testing $DESC configuration"
 		test_nginx_config
 		log_end_msg $?
+		exit $?
 		;;
 	status)
 		status_of_proc -p $PID "$DAEMON" "$NAME" && exit 0 || exit $?
