@@ -58,6 +58,7 @@ do_start()
 
 test_nginx_config() {
 	$DAEMON -t $DAEMON_OPTS >/dev/null 2>&1
+       return $?
 }
 
 #
@@ -148,7 +149,7 @@ case "$1" in
 		# Check configuration before stopping nginx
 		if ! test_nginx_config; then
 			log_end_msg 1 # Configuration error
-			exit 0
+			exit 1
 		fi
 
 		do_stop
@@ -178,7 +179,7 @@ case "$1" in
 		# to the administrator.
 		if ! test_nginx_config; then
 			log_end_msg 1 # Configuration error
-			exit 0
+			exit 1
 		fi
 
 		do_reload
