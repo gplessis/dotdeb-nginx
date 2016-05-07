@@ -7,13 +7,12 @@
 
 #include <ngx_config.h>
 #include <ngx_core.h>
-#include <ngx_http.h>
 
 
 static ngx_uint_t  mday[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
 time_t
-ngx_http_parse_time(u_char *value, size_t len)
+ngx_parse_http_time(u_char *value, size_t len)
 {
     u_char      *p, *end;
     ngx_int_t    month;
@@ -221,7 +220,7 @@ ngx_http_parse_time(u_char *value, size_t len)
     }
 
     if (hour > 23 || min > 59 || sec > 59) {
-         return NGX_ERROR;
+        return NGX_ERROR;
     }
 
     if (day == 29 && month == 1) {
