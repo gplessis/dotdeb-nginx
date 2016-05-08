@@ -1,4 +1,18 @@
-nginx-common (1.6.3-1) unstable; urgency=medium
+nginx-common (1.9.9-1) unstable; urgency=medium
+
+  Starting with this release we are changing the default logrotate rule to keep
+  daily logs for 14 days, this aligns our policy with apache2 (Bug #805322).
+
+ -- Christos Trochalakis <yatiohi@ideopolis.gr>  Thu, 14 Jan 2016 10:17:33 +0200
+
+nginx-common (1.9.6-1) unstable; urgency=medium
+
+  As of nginx 1.9.5 spdy has been replaced by the http2 module. Make sure to
+  replace "spdy" with "http2" in your config files.
+
+ -- Christos Trochalakis <yatiohi@ideopolis.gr>  Fri, 25 Sep 2015 14:06:28 +0300
+
+nginx-common (1.9.1-1) unstable; urgency=medium
 
   Starting with this release, we have enabled PIE build features which allows
   Address Space Layout Randomization. This is a hardening feature that

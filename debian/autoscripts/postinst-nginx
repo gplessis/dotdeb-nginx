@@ -1,0 +1,14 @@
+for confpair in #NAMES# ; do
+	from=$(echo $confpair | cut -d: -f1)
+	to=$(echo $confpair | cut -d: -f2)
+
+	# Symlink on fresh installations
+	if [ -z "$2" ]; then
+		ln -sf /usr/share/nginx/modules-available/$from \
+			/etc/nginx/modules-enabled/$to
+	fi
+done
+
+if [ -s /run/nginx.pid ]; then
+	nginx -s reload
+fi

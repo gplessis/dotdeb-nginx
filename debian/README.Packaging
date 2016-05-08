@@ -9,6 +9,22 @@ Workflow for Unstable
 
 We use the standard git-buildpackage workflow.
 
+Dynamic Modules
+===============
+
+Since v1.9.11 Nginx added dynamic module support. This will sanitize the
+nginx packaging flow in the long term, but there is a lot work to be done
+in order to get there. We will gradually convert all modules to dynamic
+as they add support for it.
+
+Currently nginx modules need to be build together with nginx, but this
+will be fixed upstream [0]. Since we already ship 3rd party modules under
+debian/modules/ we will start shipping module packages (libnginx-mod) from
+the same source. Once upstream implements separated building we will
+split each module to a separate source.
+
+[0] https://www.nginx.com/blog/dynamic-modules-nginx-1-9-11/
+
 Workflow for Experimental (not-active)
 ======================================
 

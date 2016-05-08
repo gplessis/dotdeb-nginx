@@ -1,0 +1,30 @@
+From: Christos Trochalakis <yatiohi@ideopolis.gr>
+Date: Wed, 30 Mar 2016 09:47:11 +0300
+Subject: Make sure signature stays the same in all nginx builds
+
+NGX_HTTP_HEADERS is part of nginx signature. When a dyn
+modules is loaded the signature of the module is compared
+to the one of the nginx binary.
+
+dyn modules are build from nginx-full, so in order to make
+them loadable in other flavors we need to make sure all the
+binaries share the same signature.
+---
+ configure | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+Index: dotdeb-nginx/configure
+===================================================================
+--- dotdeb-nginx.orig/configure
++++ dotdeb-nginx/configure
+@@ -58,6 +58,10 @@ if [ "$NGX_PLATFORM" != win32 ]; then
+     . auto/unix
+ fi
+ 
++# Debian
++# Make sure signature stays the same on all nginx flavors
++have=NGX_HTTP_HEADERS . auto/have
++
+ . auto/threads
+ . auto/modules
+ . auto/lib/conf

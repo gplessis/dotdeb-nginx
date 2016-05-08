@@ -1,0 +1,3 @@
+#!/bin/bash
+
+curl --silent --fail -o /dev/null -w "response_code: %{http_code}\n" http://127.0.0.1/

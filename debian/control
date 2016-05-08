@@ -8,7 +8,7 @@ Build-Depends: autotools-dev,
                dpkg-dev (>= 1.15.5),
                libcurl4-openssl-dev,
                libexpat-dev,
-               libgd2-dev | libgd2-noxpm-dev,
+               libgd-dev,
                libgeoip-dev,
                libldap2-dev,
                liblua5.1-dev,
@@ -21,22 +21,19 @@ Build-Depends: autotools-dev,
                libxslt1-dev,
                po-debconf,
                zlib1g-dev
-Standards-Version: 3.9.6.0
+Standards-Version: 3.9.8.0
 Homepage: http://nginx.net
-Vcs-Git: git://anonscm.debian.org/collab-maint/nginx.git
-Vcs-Browser: http://anonscm.debian.org/gitweb/?p=collab-maint/nginx.git;a=summary
-XS-Testsuite: autopkgtest
+Vcs-Git: https://anonscm.debian.org/cgit/collab-maint/nginx.git
+Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/nginx.git
 
 Package: nginx
 Architecture: all
 Depends: nginx-full   (>= ${source:Version}) |
          nginx-light  (>= ${source:Version}) |
-         nginx-extras (>= ${source:Version}) |
-         nginx-naxsi  (>= ${source:Version}) ,
+         nginx-extras (>= ${source:Version}) ,
          nginx-full   (<< ${source:Version}.1~) |
          nginx-light  (<< ${source:Version}.1~) |
-         nginx-extras (<< ${source:Version}.1~) |
-         nginx-naxsi  (<< ${source:Version}.1~) ,
+         nginx-extras (<< ${source:Version}.1~) ,
          ${misc:Depends}
 Description: small, powerful, scalable web/proxy server
  Nginx ("engine X") is a high-performance web and reverse proxy server
@@ -48,6 +45,7 @@ Description: small, powerful, scalable web/proxy server
 
 Package: nginx-doc
 Architecture: all
+Multi-Arch: foreign
 Section: doc
 Depends: lsb-base (>= 3.2-14), ${misc:Depends}
 Description: small, powerful, scalable web/proxy server - documentation
@@ -59,7 +57,8 @@ Description: small, powerful, scalable web/proxy server - documentation
 
 Package: nginx-common
 Architecture: all
-Depends: lsb-base (>= 3.2-14), ${misc:Depends}, python
+Multi-Arch: foreign
+Depends: lsb-base (>= 3.2-14), ${misc:Depends}
 Replaces: nginx (<< 0.8.54-4),
           nginx-extras (<< 0.8.54-4),
           nginx-full (<< 0.8.54-4),
@@ -79,7 +78,15 @@ Description: small, powerful, scalable web/proxy server - common files
 
 Package: nginx-full
 Architecture: any
-Depends: nginx-common (= ${source:Version}), ${misc:Depends}, ${shlibs:Depends}
+Depends: nginx-common (= ${source:Version}),
+         libnginx-mod-http-geoip (= ${binary:Version}),
+         libnginx-mod-http-image-filter (= ${binary:Version}),
+         libnginx-mod-http-xslt-filter (= ${binary:Version}),
+         libnginx-mod-mail (= ${binary:Version}),
+         libnginx-mod-stream (= ${binary:Version}),
+         libnginx-mod-http-auth-pam (= ${binary:Version}),
+         ${misc:Depends},
+         ${shlibs:Depends}
 Breaks: nginx (<< 1.4.5-1)
 Provides: httpd, httpd-cgi, nginx
 Conflicts: nginx-extras, nginx-light, nginx-naxsi
@@ -98,13 +105,17 @@ Description: nginx web/proxy server (standard version)
  Referer, Rewrite, SCGI, Split Clients, UWSGI.
  .
  OPTIONAL HTTP MODULES: Addition, Auth Request, Charset, WebDAV, GeoIP, Gunzip,
- Gzip, Gzip Precompression, Headers, Image Filter, Index, Log, Real IP, Spdy,
- SSI, SSL, Stub Status, Substitution, Upstream, User ID, XSLT.
+ Gzip, Gzip Precompression, Headers, HTTP/2, Image Filter, Index, Log, Real IP,
+ SSI, SSL, Stream, Stub Status, Substitution, Thread Pool, Upstream, User ID,
+ XSLT.
  .
  MAIL MODULES: Mail Core, Auth HTTP, Proxy, SSL, IMAP, POP3, SMTP.
  .
- MODULES ADDED BY DOTDEB : Gunzip, File AIO, Thread pool, Secure link, Cache purge, Pinba,
- X-rid header
+ THIRD PARTY MODULES: Auth PAM, DAV Ext, Echo, HTTP Substitutions, Upstream
+ Fair Queue.
+ .
+ ADDED BY DOTDEB: File AIO, Secure link, Substitution filter, Cache purge, Pinba,
+ X-rid-header.
 
 Package: nginx-full-dbg
 Architecture: any
@@ -140,11 +151,12 @@ Description: nginx web/proxy server (basic version)
  FastCGI, Map, Proxy, Rewrite.
  .
  OPTIONAL HTTP MODULES: Auth Request, Charset, Gzip, Gzip Precompression,
- Headers, Index, Log, Real IP, SSL, Stub Status, Upstream.
+ Headers, HTTP/2, Index, Log, Real IP, SSI, SSL, Stub Status, Thread Pool,
+ WebDAV, Upstream.
  .
  THIRD PARTY MODULES: Echo.
  .
- MODULES ADDED BY DOTDEB : Gunzip, File AIO, Thread pool, Spdy, X-rid header
+ ADDED BY DOTDEB: File AIO, X-rid-header.
 
 Package: nginx-light-dbg
 Architecture: any
@@ -165,8 +177,15 @@ Package: nginx-extras
 Architecture: any
 Priority: extra
 Depends: nginx-common (= ${source:Version}),
+         libnginx-mod-http-geoip (= ${binary:Version}),
+         libnginx-mod-http-image-filter (= ${binary:Version}),
+         libnginx-mod-http-xslt-filter (= ${binary:Version}),
+         libnginx-mod-mail (= ${binary:Version}),
+         libnginx-mod-stream (= ${binary:Version}),
+         libnginx-mod-http-auth-pam (= ${binary:Version}),
+         libnginx-mod-http-lua (= ${binary:Version}),
+         libnginx-mod-http-perl (= ${binary:Version}),
          ${misc:Depends},
-         ${perl:Depends},
          ${shlibs:Depends}
 Breaks: nginx (<< 1.4.5-1)
 Provides: httpd, httpd-cgi, nginx
@@ -186,14 +205,18 @@ Description: nginx web/proxy server (extended version)
  Referer, Rewrite, SCGI, Split Clients, UWSGI.
  .
  OPTIONAL HTTP MODULES: Addition, Auth Request, Charset, WebDAV, FLV, GeoIP,
- Gunzip, Gzip, Gzip Precompression, Headers, Image Filter, Index, Log, MP4,
- Embedded Perl, Random Index, Real IP, Secure Link, Spdy, SSI, SSL, Stub
- Status, Substitution, Upstream, User ID, XSLT.
+ Gunzip, Gzip, Gzip Precompression, Headers, HTTP/2, Image Filter, Index, Log,
+ MP4, Embedded Perl, Random Index, Real IP, Secure Link, SSI, SSL, Stream,
+ Stub Status, Substitution, Thread Pool, Upstream, User ID, XSLT.
  .
  MAIL MODULES: Mail Core, Auth HTTP, Proxy, SSL, IMAP, POP3, SMTP.
  .
- MODULES ADDED BY DOTDEB : Gunzip, File AIO, Thread pool, X-rid header, Push stream,
- Naxsi, Auth LDAP, Pinba, PageSpeed, X-rid header, RTMP
+ THIRD PARTY MODULES: Auth PAM, Cache Purge, DAV Ext, Echo, Fancy Index,
+ Headers More, Embedded Lua, HTTP Substitutions, Upload Progress,
+ Upstream Fair Queue.
+ .
+ ADDED BY DOTDEB: File AIO, Push stream, Substitution filter, Naxsi, Auth LDAP,
+ Pinba, PageSpeed, X-rid-header, RTMP.
 
 Package: nginx-extras-dbg
 Architecture: any
@@ -210,44 +233,97 @@ Description: nginx web/proxy server (extended version) - debugging symbols
  debugging issues that you may find. It should not be required for normal
  operation.
 
-Package: nginx-naxsi
+Package: libnginx-mod-http-geoip
 Architecture: any
-Priority: extra
-Depends: nginx-common (= ${source:Version}), ${misc:Depends}, ${shlibs:Depends}
-Breaks: nginx (<< 1.4.5-1),
-        nginx-naxsi-ui (<< 1.4.5-1)
-Provides: httpd, httpd-cgi, nginx
-Conflicts: nginx-extras, nginx-full, nginx-light
-Description: nginx web/proxy server (version with naxsi)
- Nginx ("engine X") is a high-performance web and reverse proxy server
- created by Igor Sysoev. It can be used both as a standalone web server
- and as a proxy to reduce the load on back-end HTTP or mail servers.
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: GeoIP HTTP module for Nginx
+ The ngx_http_geoip module creates variables with values depending on the
+ client IP address, using the precompiled MaxMind databases.
  .
- This package provides a version of nginx with the basic modules, plus
- the naxsi Web Application Firewall module.
- .
- STANDARD HTTP MODULES: Core, Access, Auth Basic, Auto Index, Browser,
- Charset, Core, Empty GIF, FastCGI, Geo, Gzip, Headers, Index,
- Limit Requests, Limit Zone, Log, Map, Memcached, Proxy, Referer,
- Rewrite, Split Clients, SSI, Upstream, User ID.
- .
- OPTIONAL HTTP MODULES: Auth Request, Debug, IPv6, Real IP, SSL, Stub Status.
- .
- THIRD PARTY MODULES: Naxsi, Cache Purge, Upstream Fair.
- .
- MODULES ADDED BY DOTDEB : Gunzip, File AIO, Thread pool, Spdy, X-rid header, Naxsi
+ Those variables include country, region, city, latitude, longitude, postal
+ code, etc.
 
-Package: nginx-naxsi-dbg
+Package: libnginx-mod-http-image-filter
 Architecture: any
-Section: debug
-Priority: extra
-Depends: nginx-naxsi (= ${binary:Version}), ${misc:Depends}
-Conflicts: nginx-extras-dbg, nginx-full-dbg, nginx-light-dbg
-Description: nginx web/proxy server (version with naxsi) - debugging symbols
- Nginx ("engine X") is a high-performance web and reverse proxy server
- created by Igor Sysoev. It can be used both as a standalone web server
- and as a proxy to reduce the load on back-end HTTP or mail servers.
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: HTTP image filter module for Nginx
+ The ngx_http_image_filter module is a filter that transforms images in JPEG,
+ GIF, and PNG formats.
  .
- This package provides debugging symbols for nginx-naxsi, to assist in
- debugging issues that you may find. It should not be required for normal
- operation.
+ The module supports filters such as rotate, resize, crop, quality, sharpening,
+ interlacing and more.
+
+Package: libnginx-mod-http-xslt-filter
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: XSLT Transformation module for Nginx
+ The ngx_http_xslt_filter module is a filter that transforms XML responses
+ using one or more XSLT stylesheets.
+ .
+ The transformation can be adjusted by setting the relevant configuration
+ parameters.
+
+Package: libnginx-mod-mail
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: Mail module for Nginx
+ The nginx_mail module adds mail proxy support to nginx.
+ .
+ The module supports proxying all the standard mail protocols such as IMAP,
+ POP3 & SMTP.
+
+Package: libnginx-mod-stream
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: Stream module for Nginx
+ The nginx_stream module adds stream proxy support to nginx.
+ .
+ Stream module supports loadbalancing & proxying to TCP servers. The module
+ also supports ACLs/connection limiting and configuring multiple operational
+ parameters.
+
+Package: libnginx-mod-http-perl
+Architecture: any
+Depends: ${perl:Depends}, ${misc:Depends}, ${shlibs:Depends}
+Replaces: nginx-extras (<< 1.9.14-1)
+Description: Perl module for Nginx
+ Embed Perl runtime into nginx.
+ .
+ The ngx_http_perl module is used to implement location and variable handlers
+ in Perl and insert Perl calls into SSI.
+ .
+ Note that this module is marked experimental.
+
+Package: libnginx-mod-http-auth-pam
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: PAM authentication module for Nginx
+ The nginx_http_auth_pam module enables authentication using PAM.
+ .
+ The module uses PAM as a backend for simple http authentication. It
+ also allows setting the pam service name to allow more fine grained control.
+
+Package: libnginx-mod-http-lua
+Architecture: any
+Depends: libnginx-mod-http-ndk (= ${binary:Version}), ${misc:Depends}, ${shlibs:Depends}
+Description: LUA module for Nginx
+ Embed LUA runtime into nginx.
+ .
+ This module embeds Lua, via the standard Lua 5.1 interpreter or LuaJIT
+ 2.0/2.1, into Nginx and by leveraging Nginx's subrequests, allows the
+ integration of the powerful Lua threads (Lua coroutines) into the Nginx event
+ model.
+
+Package: libnginx-mod-http-ndk
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: Nginx Development Kit module
+ The NDK is an Nginx module that is designed to extend the core functionality of
+ the excellent Nginx webserver in a way that can be used as a basis of other
+ Nginx modules.
+ .
+ It has functions and macros to deal with generic tasks that don't currently
+ have generic code as part of the core distribution. The NDK itself adds few
+ features that are seen from a user's point of view - it's just designed to help
+ reduce the code that Nginx module developers need to write.  Embed LUA runtime
+ into nginx.

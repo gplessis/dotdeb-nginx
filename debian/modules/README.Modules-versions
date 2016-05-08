@@ -5,5 +5,5 @@ README for Modules versions
  version and that are not git submodules.
 
  nginx-auth-pam
-  http://web.iti.upv.es/~sto/nginx/
-  Version: 1.2
+  Homepage: https://github.com/stogh/ngx_http_auth_pam_module
+  Version: 1.5.1

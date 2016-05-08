@@ -1,12 +1,23 @@
-Test-Command: curl --silent --fail -o /dev/null -w "response_code: %{http_code}\n" http://127.0.0.1/
+Tests: light-simple
 Restrictions: allow-stderr isolation-container
 Depends: nginx-light, curl
 
-Test-Command: curl --silent --fail -o /dev/null -w "response_code: %{http_code}\n" http://127.0.0.1/
+Tests: full-simple
 Restrictions: allow-stderr isolation-container
 Depends: nginx-full, curl
 
-Test-Command: curl --silent --fail -o /dev/null -w "response_code: %{http_code}\n" http://127.0.0.1/
+Tests: extras-simple
 Restrictions: allow-stderr isolation-container
 Depends: nginx-extras, curl
 
+Tests: full-module-deps
+Restrictions: allow-stderr isolation-container
+Depends: nginx-full, curl, libnginx-mod-http-auth-pam, libnginx-mod-http-geoip, libnginx-mod-http-image-filter, libnginx-mod-http-lua, libnginx-mod-http-perl, libnginx-mod-http-xslt-filter, libnginx-mod-mail, libnginx-mod-stream
+
+Tests: light-module-deps
+Restrictions: allow-stderr isolation-container
+Depends: nginx-light, curl, libnginx-mod-http-auth-pam, libnginx-mod-http-geoip, libnginx-mod-http-image-filter, libnginx-mod-http-lua, libnginx-mod-http-perl, libnginx-mod-http-xslt-filter, libnginx-mod-mail, libnginx-mod-stream
+
+Tests: extras-module-deps
+Restrictions: allow-stderr isolation-container
+Depends: nginx-extras, curl, libnginx-mod-http-auth-pam, libnginx-mod-http-geoip, libnginx-mod-http-image-filter, libnginx-mod-http-lua, libnginx-mod-http-perl, libnginx-mod-http-xslt-filter, libnginx-mod-mail, libnginx-mod-stream

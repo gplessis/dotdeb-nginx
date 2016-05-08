@@ -35,7 +35,7 @@ server {
 	#listen [::]:80 default ipv6only=on; ## listen for ipv6
 
 	# root specifies the document root for the requests
-	root /usr/share/nginx/html;
+	root /usr/share/nginx/www;
 
 	# index specifies the list of files (in order) to be tried in the event
 	# no file is requested in the URI.
@@ -89,7 +89,7 @@ server {
 	# server block is the same directory. However, this could be used to
 	# have a central directory for all error html files.
 	location = /50x.html {
-		root /usr/share/nginx/html;
+		root /usr/share/nginx/www;
 	}
 
 	# proxy the PHP scripts to Apache listening on 127.0.0.1:80

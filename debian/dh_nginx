@@ -1,0 +1,280 @@
+#! /usr/bin/perl
+
+# dh_nginx - Nginx configuration helper
+# Copyright (C) 2016 Christos Trochalakis <yatiohi@ideopolis.gr>
+#
+# This program is licensed under the terms of the GNU General
+# Public License veserion 2+
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+use strict;
+use File::Find;
+use Debian::Debhelper::Dh_Lib;
+
+
+=head1 NAME
+
+dh_nginx - register configuration snippets to the nginx web server
+
+=cut
+
+sub nginx_depends
+{
+	return 'nginx-common (= ${source:Version})'
+}
+
+sub nginx_api_installdir
+{
+	return "/usr/lib/nginx/modules/";
+}
+
+sub nginx_modules_conf_installdir
+{
+	return "usr/share/nginx/modules-available/"
+}
+
+=head1 SYNOPSIS
+
+B<dh_nginx> [S<I<debhelper options>>] [B<-n>|B<--noscripts>]
+
+=head1 DESCRIPTION
+
+B<dh_nginx> is a debhelper program that is responsible for correctly installing
+Nginx configuration snippets and setting postinst, prerm and dependencies in
+Nginx web server modules and web applications.
+
+It supports the following configuration types
+
+=over 4
+
+=item *
+Nginx modules
+
+=head1 INVOCATION
+
+  %:
+     dh $@ --with nginx
+
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.nginx
+
+=item debian/nginx
+
+=back
+
+Lists files to be registered with the Nginx HTTP server. The file is
+interpreted as line separated list of installation stanzas, where each entry
+consists of whitespace separated values conforming to the file semantics below.
+
+=head2 FILE SEMANTICS
+
+Each line consists of a triple
+
+I<type> I<file> [I<arguments>]
+
+where the values are interpreted as follows:
+
+
+=head3 I<type>
+
+Denotes the type of file to be installed. Recognized values are B<mod> for
+Nginx modules.
+
+=head3 I<file>
+
+Is interpreted as existing file name within the source package. No path
+expansion is effectuated. Just like L<dh_install(1)>, B<dh_nginx> can not
+rename files.
+
+=head3 I<arguments>
+
+Is inrerpreted as optional arguments if any, currently not used.
+
+=head2 MODULES
+
+Modules are handled specially and are determined by the B<mod> type. Modules must
+have a I<.conf> suffix. In that case the file is interpreted as module load
+file and is installed to I</etc/nginx/modules-available>. If the file is ending
+with a I<.so> suffix it is interpreted as actual module shared object and is
+installed to the Nginx module directory, an optional numeric priority can be
+set as the last argument to handle module dependencies.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-e>, B<--noenable>
+
+Install maintainer scripts accordingly, but do not enable the scripts or
+configuration by default.
+
+=item B<-n>, B<--noscripts>
+
+Do not modify F<postinst>/F<postrm>/F<prerm> maintainer scripts.
+
+
+=back
+
+=head1 NOTES
+
+Note that this command is not idempotent. L<dh_prep(1)> should be called
+between invocations of this command. Otherwise, it may cause multiple
+instances of the same text to be added to maintainer scripts.
+
+=head1 AUTHOR
+
+This manual and L<dh_nginx> was written by Christos Trochalakis.
+dh_nginx is heavily influnced by dh_apache2 written by Arno Toell
+<debian@toell.net>.
+
+=cut
+
+
+##
+## main code starts here
+##
+
+init(options => {
+	"e|noenable" => \$dh{NOENABLE},
+});
+
+foreach my $package ((@{$dh{DOPACKAGES}}))
+{
+	my %PACKAGE_TYPE = (
+		has_a_module => [],
+	);
+
+	my $file = pkgfile($package, "nginx");
+	my $tmp  = tmpdir($package);
+
+	my @files_to_register = filedoublearray($file, ".") if $file;
+	foreach my $line (@files_to_register)
+	{
+		my $type = lc(shift @{$line}) if $line->[0];
+		my $source = shift @{$line} if $line->[0];
+		my @arguments = @{$line};
+		my $destination;
+
+		$type = "modules" if $type eq "mod";
+		my $installdir = $tmp . "/" . nginx_modules_conf_installdir();
+
+		verbose_print("$type -- $source -- @arguments\n\n");
+
+		if ($type eq "modules")
+		{
+			my $basesource = basename($source);
+
+			if ($type eq "modules")
+			{
+				if ($basesource =~ m/\.conf$/)
+				{
+					my $enablename = $basesource;
+					my $prio = $#arguments >= 0 ? $arguments[0] : 50;
+					$destination = "$prio-$basesource";
+					push @{$PACKAGE_TYPE{'has_a_module'}}, "$enablename:$destination";
+					verbose_print("Installing module configuration $enablename into $installdir prio:$prio\n");
+				}
+				elsif ($basesource =~ m/\.so$/)
+			{
+					my $modinstalldir = $tmp . "/" . nginx_api_installdir();
+					verbose_print("Installing module binary $source into $modinstalldir\n");
+					if (! -d $modinstalldir)
+					{
+						complex_doit("mkdir","-p", $modinstalldir);
+						complex_doit("chmod","755","$modinstalldir");
+					}
+					complex_doit("cp", $source, $modinstalldir);
+					next;
+				}
+
+				# TODO
+				error("module: \"$basesource\" needs .conf, .so or suffix") if $basesource !~ m/\.(conf|so)/;
+			}
+
+			if (! -d $installdir)
+			{
+				complex_doit("mkdir","-p",$installdir);
+				complex_doit("chmod","755","$installdir");
+			}
+			complex_doit("cp",$source,$installdir);
+			complex_doit("chmod","644","$installdir/$basesource");
+
+		}
+		else
+		{
+			error("Unknown parameter: $type\n");
+		}
+
+	}
+
+        my @postinst_autoscripts;
+
+        if ($#{$PACKAGE_TYPE{'has_a_module'}} >= 0)
+        {
+                if ($package !~ m/libnginx-mod-\w+?/)
+                {
+                        warning("Package $package appears to be an Nginx module. It should comply to the package naming scheme libnginx-mod-<modulename>\n");
+                }
+                addsubstvar($package, "misc:Depends", nginx_depends());
+
+                my $modules = "";
+                foreach my $module (@{$PACKAGE_TYPE{'has_a_module'}})
+                {
+                        $modules .= "$module ";
+                }
+
+                push @postinst_autoscripts, ["module", $modules];
+        }
+
+	if (! $dh{NOSCRIPTS})
+	{
+		foreach my $ref (@postinst_autoscripts)
+		{
+			for my $script_type (qw/postinst prerm postrm/)
+			{
+				if ($script_type eq "postinst" &&  $dh{NOENABLE})
+				{
+					next
+				}
+
+				my %replacements = (
+					NAMES  => $ref->[1],
+				);
+
+				my $sed_command = "";
+				foreach my $key (sort keys %replacements)
+				{
+					my $val = $replacements{$key};
+					# Use a control char as separator for sed, to
+					# reduce escaping issues. Everything else is
+					# passed verbatim, i.e. it must not contain any
+					# shell or sed special characters.
+					my $sep = "\x17";
+					$sed_command .= "s" . $sep . "#$key#" .
+							      $sep . $val .
+							      $sep . "g; ";
+				}
+
+				autoscript($package, "$script_type", "$script_type-nginx", $sed_command);
+			}
+		}
+	}
+}
+
+# vim: syntax=perl sw=8 sts=8 sr noet
