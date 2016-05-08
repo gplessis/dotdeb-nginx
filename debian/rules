@@ -164,7 +164,7 @@ strip.mods.%:
 config.arch.%:
 	if [ $* = extras ]; then \
 		cd $(MODULESDIR)/ngx_pagespeed && \
-		curl https://dl.google.com/dl/page-speed/psol/1.11.33.1.tar.gz | tar xz && \
+		curl https://dl.google.com/dl/page-speed/psol/1.9.32.14.tar.gz | tar xz && \
 		perl -pi -e 'print "#ifdef LOG_INFO\n#undef LOG_INFO\n#endif\n\n#ifdef LOG_WARNING\n#undef LOG_WARNING\n#endif\n\n" if $$. == 1' \
 		psol/include/third_party/chromium/src/base/logging.h; \
 	fi
