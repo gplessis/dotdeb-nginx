@@ -1,3 +1,10 @@
+nginx (1.10.0-1~dotdeb+8.1) stable; urgency=medium
+
+  * Imported Upstream version 1.10.0
+  * ngx_pagespeed 1.11.33.1
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Sat, 07 May 2016 17:28:42 -0800
+
 nginx (1.8.1-1~dotdeb+8.1) stable; urgency=medium
 
   * Imported Upstream version 1.8.1

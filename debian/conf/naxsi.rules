@@ -2,8 +2,7 @@
 
 LearningMode;
 SecRulesEnabled;
-#SecRulesDisabled;
-DeniedUrl "/RequestDenied";
+DeniedUrl "/50x.html";
 
 ## check rules
 CheckRule "$SQL >= 8" BLOCK;

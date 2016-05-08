@@ -1,0 +1,13 @@
+#!/usr/bin/perl -w
+
+use File::Basename;
+
+# Guess module name
+$module = basename($0, '.nginx');
+$module =~ s/^libnginx-mod-//;
+
+$modulepath = $module;
+$modulepath =~ s/-/_/g;
+
+print "mod debian/build-extras/objs/ngx_${modulepath}_module.so\n";
+print "mod debian/libnginx-mod.conf/mod-${module}.conf\n";

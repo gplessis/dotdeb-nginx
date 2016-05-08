@@ -1,0 +1,7 @@
+#!/usr/bin/perl -w
+
+use Config;
+
+my $vendorarch = substr($Config{vendorarch}, 1);
+print "debian/build-extras/objs/src/http/modules/perl/blib/arch/auto/nginx/* $vendorarch/auto/nginx\n";
+print "debian/build-extras/objs/src/http/modules/perl/blib/lib/nginx.pm $vendorarch\n";

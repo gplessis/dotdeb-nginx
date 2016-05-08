@@ -1,6 +1,8 @@
 etc/nginx
 etc/nginx/sites-available
 etc/nginx/sites-enabled
+etc/nginx/modules-available
+etc/nginx/modules-enabled
 etc/nginx/conf.d
 etc/ufw/applications.d
 usr/share/nginx

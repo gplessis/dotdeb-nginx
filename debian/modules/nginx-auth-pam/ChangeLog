@@ -1,3 +1,23 @@
+2016-04-06  sto@iti.es
+
+    * Version 1.5.1.
+	* Fix building alongside other modules in nginx 1.9.11+ (patch provided by
+	  Graham Edgecombe <grahamedgecombe@gmail.com>)
+
+2016-03-23  sto@iti.es
+
+	* Version 1.5.
+	* Added support to build module dynamically (patch provided by Sjir
+	  Bagmeijer <sbagmeijer@ulyaoth.co.kr>).
+	* Log PAM error and info messages to nginx log files (patch provided by
+	  André Caron <andre.l.caron@gmail.com>).
+
+2015-02-04  sto@iti.es
+
+	* Version 1.4.
+	* Cleanup PAM responses on error, the module was not doing it, causing
+	  memory leaks (thanks to Michael Koziarski for the report).
+
 2013-09-17  sto@iti.es
 
 	* Version 1.3.
