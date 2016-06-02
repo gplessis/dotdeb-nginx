@@ -1,0 +1,17 @@
+Index: dotdeb-nginx/debian/modules/ngx_pagespeed/config
+===================================================================
+--- dotdeb-nginx.orig/debian/modules/ngx_pagespeed/config
++++ dotdeb-nginx/debian/modules/ngx_pagespeed/config
+@@ -195,10 +195,10 @@ if [ $ngx_found = yes ]; then
+ 
+   # Make pagespeed run immediately before gzip.
+   HTTP_FILTER_MODULES=$(echo $HTTP_FILTER_MODULES |\
+-    sed "s/$HTTP_GZIP_FILTER_MODULE/$HTTP_GZIP_FILTER_MODULE $ngx_addon_name/")
++    sed "s/ngx_http_gzip_filter_module/ngx_http_gzip_filter_module $ngx_addon_name/")
+   # Make the etag header filter run immediately after gzip.
+   HTTP_FILTER_MODULES=$(echo $HTTP_FILTER_MODULES |\
+-    sed "s/$HTTP_GZIP_FILTER_MODULE/ngx_pagespeed_etag_filter $HTTP_GZIP_FILTER_MODULE/")
++    sed "s/ngx_http_gzip_filter_module/ngx_pagespeed_etag_filter ngx_http_gzip_filter_module/")
+   CORE_LIBS="$CORE_LIBS $pagespeed_libs"
+   CORE_INCS="$CORE_INCS $pagespeed_include"
+   echo "List of modules (in reverse order of applicability): "$HTTP_FILTER_MODULES

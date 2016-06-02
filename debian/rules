@@ -163,6 +163,7 @@ strip.mods.%:
 
 config.arch.%:
 	if [ $* = extras ]; then \
+		cat debian/patches/ngx-pagespeed-1.9.patch | patch -p1 && \
 		cd $(MODULESDIR)/ngx_pagespeed && \
 		curl https://dl.google.com/dl/page-speed/psol/1.9.32.14.tar.gz | tar xz && \
 		perl -pi -e 'print "#ifdef LOG_INFO\n#undef LOG_INFO\n#endif\n\n#ifdef LOG_WARNING\n#undef LOG_WARNING\n#endif\n\n" if $$. == 1' \
