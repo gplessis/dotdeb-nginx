@@ -1,3 +1,9 @@
+nginx (1.10.1-1~dotdeb+7.2) oldstable; urgency=medium
+
+  * Quick and dirty fix for ngx_pagespeed + Nginx 1.9.11+
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Thu, 02 Jun 2016 21:12:30 +0000
+
 nginx (1.10.1-1~dotdeb+7.1) oldstable; urgency=medium
 
   * Imported Upstream version 1.10.1
