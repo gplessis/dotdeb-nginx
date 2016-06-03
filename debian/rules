@@ -97,6 +97,7 @@ full_configure_flags := \
 				--with-ld-opt=-lossp-uuid
 
 extras_configure_flags := \
+			--add-module=$(MODULESDIR)/naxsi/naxsi_src \
 			$(common_configure_flags) \
 			--with-http_addition_module \
 			--with-http_flv_module \
