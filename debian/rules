@@ -159,7 +159,7 @@ strip.arch.%:
 	dh_strip --package=nginx-$(*) --dbg-package=nginx-$(*)-dbg
 
 strip.mods.%:
-	dh_strip --package=libnginx-mod-$(*) #--automatic-dbgsym
+	dh_strip --package=libnginx-mod-$(*) -O--automatic-dbgsym
 
 config.arch.%:
 	if [ $* = extras ]; then \
