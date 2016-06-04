@@ -1,3 +1,11 @@
+nginx (1.10.1-1~dotdeb+8.2) stable; urgency=medium
+
+  * Generate dbgsym packages only if dh_strip supports it
+  * naxsi is back!
+  * nginx-upload-progress now loads perfectly
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Fri, 03 Jun 2016 23:58:31 +0000
+
 nginx (1.10.1-1~dotdeb+8.1) stable; urgency=medium
 
   * Imported Upstream version 1.10.1
