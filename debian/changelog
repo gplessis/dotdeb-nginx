@@ -1,3 +1,11 @@
+nginx (1.10.1-1~dotdeb+7.3) oldstable; urgency=medium
+
+  * Generate dbgsym packages only if dh_strip supports it
+  * naxsi is back!
+  * nginx-upload-progress now loads perfectly
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Sat, 04 Jun 2016 00:08:49 +0000
+
 nginx (1.10.1-1~dotdeb+7.2) oldstable; urgency=medium
 
   * Quick and dirty fix for ngx_pagespeed + Nginx 1.9.11+
