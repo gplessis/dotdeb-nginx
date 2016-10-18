@@ -1,3 +1,9 @@
+nginx (1.10.2-1~dotdeb+7.1) oldstable; urgency=medium
+
+  * Imported Upstream version 1.10.2
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Tue, 18 Oct 2016 23:37:18 +0000
+
 nginx (1.10.1-1~dotdeb+7.3) oldstable; urgency=medium
 
   * Generate dbgsym packages only if dh_strip supports it
