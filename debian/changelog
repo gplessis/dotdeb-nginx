@@ -1,3 +1,9 @@
+nginx (1.10.2-1~dotdeb+http2+8.1) stable; urgency=medium
+
+  * Full HTTP2 support thanks to jessie-backports
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Mon, 24 Oct 2016 19:13:42 +0000
+
 nginx (1.10.2-1~dotdeb+8.1) stable; urgency=medium
 
   * Imported Upstream version 1.10.2
