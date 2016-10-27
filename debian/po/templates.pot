@@ -1,0 +1,49 @@
+# Nginx debconf translations
+# Copyright (C) 2016 Christos Trochalakis
+# This file is distributed under the same license as the nginx package.
+# Chrirtos Trochalakis <yatiohi@ideopolis.gr>, 2016.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: nginx\n"
+"Report-Msgid-Bugs-To: nginx@packages.debian.org\n"
+"POT-Creation-Date: 2016-10-04 20:03+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: note
+#. Description
+#: ../nginx-common.templates:1001
+msgid "Possible insecure nginx log files"
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../nginx-common.templates:1001
+msgid ""
+"The following log files under /var/log/nginx directory are symlinks owned by "
+"www-data:"
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../nginx-common.templates:1001
+msgid "${logfiles}"
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../nginx-common.templates:1001
+msgid ""
+"Since nginx 1.4.4-4 /var/log/nginx was owned by www-data. As a result www-"
+"data could symlink log files to sensitive locations, which in turn could "
+"lead to privilege escalation attacks. Although /var/log/nginx permissions "
+"are now fixed it is possible that such insecure links already exist. So, "
+"please make sure to check the above locations."
+msgstr ""
