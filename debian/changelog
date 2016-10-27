@@ -1,3 +1,16 @@
+nginx (1.10.2-2~dotdeb+7.1) oldstable; urgency=medium
+
+  [ Christos Trochalakis ]
+  * debian/nginx-common.postinst:
+    + Secure log file handling (owner & permissions) against privilege
+      escalation attacks. /var/log/nginx is now owned by root:adm.
+      Thanks Dawid Golunski (http://legalhackers.com) for the report.
+      Changing /var/log/nginx permissions effectively reopens #701112,
+      since log files can be world-readable. This is a trade-off until
+      a better log opening solution is implemented upstream (trac:376).
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Thu, 27 Oct 2016 18:17:42 +0000
+
 nginx (1.10.2-1~dotdeb+7.1) oldstable; urgency=medium
 
   * Imported Upstream version 1.10.2
