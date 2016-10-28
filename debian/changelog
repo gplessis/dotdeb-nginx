@@ -1,3 +1,9 @@
+nginx (1.10.2-2~dotdeb+8.2) stable; urgency=medium
+
+  * Fix a Security Regression
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Fri, 28 Oct 2016 05:39:42 +0000
+
 nginx (1.10.2-2~dotdeb+8.1) stable; urgency=medium
 
   [ Christos Trochalakis ]
