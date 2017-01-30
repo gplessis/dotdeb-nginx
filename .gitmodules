@@ -25,9 +25,6 @@
 [submodule "debian/modules/nginx-dav-ext-module"]
 	path = debian/modules/nginx-dav-ext-module
 	url = git://github.com/arut/nginx-dav-ext-module.git
-[submodule "debian/modules/ngx_http_pinba_module"]
-	path = debian/modules/ngx_http_pinba_module
-	url = git://github.com/tony2001/ngx_http_pinba_module.git
 [submodule "debian/modules/ngx_http_substitutions_filter_module"]
 	path = debian/modules/ngx_http_substitutions_filter_module
 	url = git://github.com/yaoweibin/ngx_http_substitutions_filter_module.git
