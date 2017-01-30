@@ -116,7 +116,7 @@ Description: nginx web/proxy server (standard version)
  THIRD PARTY MODULES: Auth PAM, DAV Ext, Echo, HTTP Substitutions, Upstream
  Fair Queue.
  .
- ADDED BY DOTDEB: File AIO, Secure link, Substitution filter, Cache purge, Pinba,
+ ADDED BY DOTDEB: File AIO, Secure link, Substitution filter, Cache purge,
  X-rid-header.
 
 Package: nginx-full-dbg
