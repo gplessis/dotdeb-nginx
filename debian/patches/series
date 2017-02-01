@@ -1,2 +1,3 @@
 perl-use-dpkg-buildflags.patch
 0002-Make-sure-signature-stays-the-same-in-all-nginx-buil.patch
+nginx_1_9_15_http2_spdy.patch
