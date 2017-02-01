@@ -1,3 +1,11 @@
+nginx (1.10.3-1~dotdeb+7.1) oldstable; urgency=medium
+
+  [ Guillaume Plessis ]
+  * Imported Upstream version 1.10.3
+  * Remove Pinba from nginx-full and nginx-extras
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Wed, 01 Feb 2017 16:01:14 +0000
+
 nginx (1.10.2-2~dotdeb+7.2) oldstable; urgency=medium
 
   * Fix a Security Regression
