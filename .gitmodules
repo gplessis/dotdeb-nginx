@@ -13,9 +13,6 @@
 [submodule "debian/modules/nginx-lua"]
 	path = debian/modules/nginx-lua
 	url = git://github.com/chaoslawful/lua-nginx-module.git
-[submodule "debian/modules/nginx-upstream-fair"]
-	path = debian/modules/nginx-upstream-fair
-	url = git://github.com/gnosek/nginx-upstream-fair.git
 [submodule "debian/modules/nginx-upload-progress"]
 	path = debian/modules/nginx-upload-progress
 	url = git://github.com/masterzen/nginx-upload-progress-module.git
@@ -46,3 +43,6 @@
 [submodule "debian/modules/nginx-rtmp-module"]
 	path = debian/modules/nginx-rtmp-module
 	url = git://github.com/arut/nginx-rtmp-module.git
+[submodule "debian/modules/nginx-upstream-fair"]
+	path = debian/modules/nginx-upstream-fair
+	url = git@github.com:itoffshore/nginx-upstream-fair.git
