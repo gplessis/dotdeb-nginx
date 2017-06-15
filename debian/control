@@ -15,7 +15,6 @@ Build-Depends: autotools-dev,
                libluajit-5.1-dev [i386 amd64 kfreebsd-i386 armel armhf powerpc powerpcspe mips mipsel],
                liblua5.1-0-dev [!i386 !amd64 !kfreebsd-i386 !armel !armhf !powerpc !powerpcspe !mips !mipsel],
                libmhash-dev,
-               libossp-uuid-dev,
                libpam0g-dev,
                libpcre3-dev,
                libperl-dev,
@@ -116,8 +115,7 @@ Description: nginx web/proxy server (standard version)
  THIRD PARTY MODULES: Auth PAM, DAV Ext, Echo, HTTP Substitutions, Upstream
  Fair Queue.
  .
- ADDED BY DOTDEB: File AIO, Secure link, Substitution filter, Cache purge,
- X-rid-header.
+ ADDED BY DOTDEB: File AIO, Secure link, Substitution filter, Cache purge.
 
 Package: nginx-full-dbg
 Architecture: any
@@ -158,7 +156,7 @@ Description: nginx web/proxy server (basic version)
  .
  THIRD PARTY MODULES: Echo.
  .
- ADDED BY DOTDEB: File AIO, X-rid-header.
+ ADDED BY DOTDEB: File AIO.
 
 Package: nginx-light-dbg
 Architecture: any
@@ -218,7 +216,7 @@ Description: nginx web/proxy server (extended version)
  Upstream Fair Queue.
  .
  ADDED BY DOTDEB: File AIO, Push stream, Substitution filter, Naxsi, Auth LDAP,
- Pinba, PageSpeed, X-rid-header, RTMP.
+ Pinba, PageSpeed, RTMP.
 
 Package: nginx-extras-dbg
 Architecture: any
