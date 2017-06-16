@@ -1,3 +1,14 @@
+nginx (1.12.0-1~dotdeb+http2+8.1) stable; urgency=medium
+
+  [ Guillaume Plessis ]
+  * Imported Upstream version 1.12.0
+  * Update submodules
+  * Patches refresh for 1.12.0
+  * nginx-x-rid-header is obsolete
+  * updates configure options
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Mon, 12 Jun 2017 21:30:15 +0000
+
 nginx (1.10.3-1~dotdeb+http2+8.1) stable; urgency=medium
 
   [ Guillaume Plessis ]
