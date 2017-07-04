@@ -1,9 +1,11 @@
-nginx (1.12.0-1) UNRELEASED; urgency=medium
+nginx (1.12.0-1~dotdeb+8.1) oldstable; urgency=medium
 
   [ Guillaume Plessis ]
   * Imported Upstream version 1.12.0
-
-  [ root ]
+  * Update submodules
+  * Patches refresh for 1.12.0
+  * nginx-x-rid-header is obsolete
+  * updates configure options
 
  -- Guillaume Plessis <gui@dotdeb.org>  Mon, 12 Jun 2017 21:30:15 +0000
 
