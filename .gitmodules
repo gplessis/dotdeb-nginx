@@ -42,4 +42,4 @@
 	url = git://github.com/arut/nginx-rtmp-module.git
 [submodule "debian/modules/nginx-upstream-fair"]
 	path = debian/modules/nginx-upstream-fair
-	url = git@github.com:itoffshore/nginx-upstream-fair.git
+	url = git://github.com/itoffshore/nginx-upstream-fair.git
