@@ -1,3 +1,10 @@
+nginx (1.12.2-1~dotdeb+8.1) oldstable; urgency=medium
+
+  [ Guillaume Plessis ]
+  * New upstream version 1.12.2
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Thu, 19 Oct 2017 23:11:03 +0000
+
 nginx (1.12.1-1~dotdeb+8.1) oldstable; urgency=high
 
   [ Guillaume Plessis ]
