@@ -54,8 +54,6 @@ common_configure_flags := \
 			--with-http_auth_request_module \
 			--with-http_v2_module \
 			--with-http_dav_module \
-			--with-http_grpc_module \
-			--with-http_mirror_module \
 			--with-file-aio \
 			--with-threads
 
