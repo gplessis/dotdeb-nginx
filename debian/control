@@ -21,6 +21,7 @@ Build-Depends: autotools-dev,
                libssl-dev,
                libxslt1-dev,
                po-debconf,
+               uuid-dev,
                zlib1g-dev
 Standards-Version: 3.9.8.0
 Homepage: http://nginx.net
@@ -106,9 +107,9 @@ Description: nginx web/proxy server (standard version)
  Referer, Rewrite, SCGI, Split Clients, UWSGI.
  .
  OPTIONAL HTTP MODULES: Addition, Auth Request, Charset, WebDAV, GeoIP, Gunzip,
- Gzip, Gzip Precompression, Headers, HTTP/2, Image Filter, Index, Log, Real IP, SPDY,
- SSI, SSL, Stream, Stub Status, Substitution, Thread Pool, Upstream, User ID,
- XSLT.
+ Gzip, Gzip Precompression, Headers, HTTP/2, HTTP Mirror, HTTP gRPC, Image Filter,
+ Index, Log, Real IP, SPDY, SSI, SSL, Stream, Stub Status, Substitution, Thread Pool,
+ Upstream, User ID, XSLT.
  .
  MAIL MODULES: Mail Core, Auth HTTP, Proxy, SSL, IMAP, POP3, SMTP.
  .
@@ -151,8 +152,8 @@ Description: nginx web/proxy server (basic version)
  FastCGI, Map, Proxy, Rewrite.
  .
  OPTIONAL HTTP MODULES: Auth Request, Charset, Gzip, Gzip Precompression,
- Headers, HTTP/2, Index, Log, Real IP, SPDY, SSI, SSL, Stub Status, Thread Pool,
- WebDAV, Upstream.
+ Headers, HTTP/2, HTTP Mirror, HTTP gRPC, Index, Log, Real IP, SPDY, SSI, SSL,
+ Stub Status, Thread Pool, WebDAV, Upstream.
  .
  THIRD PARTY MODULES: Echo.
  .
@@ -205,9 +206,10 @@ Description: nginx web/proxy server (extended version)
  Referer, Rewrite, SCGI, Split Clients, UWSGI.
  .
  OPTIONAL HTTP MODULES: Addition, Auth Request, Charset, WebDAV, FLV, GeoIP,
- Gunzip, Gzip, Gzip Precompression, Headers, HTTP/2, Image Filter, Index, Log,
- MP4, Embedded Perl, Random Index, Real IP, Secure Link, SPDY, SSI, SSL, Stream,
- Stub Status, Substitution, Thread Pool, Upstream, User ID, XSLT.
+ Gunzip, Gzip, Gzip Precompression, Headers, HTTP/2, HTTP Mirror, HTTP gRPC,
+ Image Filter, Index, Log, MP4, Embedded Perl, Random Index, Real IP, Secure Link,
+ SPDY, SSI, SSL, Stream, Stub Status, Substitution, Thread Pool, Upstream, User ID,
+ XSLT.
  .
  MAIL MODULES: Mail Core, Auth HTTP, Proxy, SSL, IMAP, POP3, SMTP.
  .
@@ -216,7 +218,7 @@ Description: nginx web/proxy server (extended version)
  Upstream Fair Queue.
  .
  ADDED BY DOTDEB: File AIO, Push stream, Substitution filter, Naxsi, Auth LDAP,
- Pinba, PageSpeed, RTMP.
+ Pinba, PageSpeed (amd64 only), RTMP.
 
 Package: nginx-extras-dbg
 Architecture: any

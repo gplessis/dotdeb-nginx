@@ -21,6 +21,9 @@ DEB_BUILD_ARCH ?=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 ifeq ($(DEB_BUILD_ARCH),sparc)
 	debian_cflags += -m32 -mcpu=ultrasparc
 endif
+ifeq ($(DEB_BUILD_ARCH),amd64)
+	pagespeed_configure_opts = --add-module=$(MODULESDIR)/ngx_pagespeed
+endif
 
 ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
 	NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
@@ -52,6 +55,8 @@ common_configure_flags := \
 			--with-http_v2_module \
 			--with-http_spdy_module \
 			--with-http_dav_module \
+			--with-http_grpc_module \
+			--with-http_mirror_module \
 			--with-file-aio \
 			--with-threads
 
@@ -129,8 +134,8 @@ extras_configure_flags := \
 			--add-module=$(MODULESDIR)/nginx-upstream-fair \
 			--add-module=$(MODULESDIR)/ngx_http_substitutions_filter_module \
 			--add-module=$(MODULESDIR)/nginx-auth-ldap \
-			--add-module=$(MODULESDIR)/ngx_pagespeed \
-			--add-module=$(MODULESDIR)/nginx-rtmp-module
+			--add-module=$(MODULESDIR)/nginx-rtmp-module \
+			$(pagespeed_configure_opts)
 
 %:
 	dh $@ --with systemd
@@ -164,9 +169,10 @@ strip.mods.%:
 	dh_strip --package=libnginx-mod-$(*) -O--automatic-dbgsym
 
 config.arch.%:
-	if [ $* = extras ]; then \
+	if [ $* = extras ] && [ $(DEB_BUILD_ARCH) = amd64 ]; then \
 		cd $(MODULESDIR)/ngx_pagespeed && \
-		curl https://dl.google.com/dl/page-speed/psol/1.11.33.4.tar.gz | tar xz && \
+		export PSOL_BUILDTYPE=Release && \
+		curl https://dl.google.com/dl/page-speed/psol/1.13.35.2-x64.tar.gz | tar xz && \
 		perl -pi -e 'print "#ifdef LOG_INFO\n#undef LOG_INFO\n#endif\n\n#ifdef LOG_WARNING\n#undef LOG_WARNING\n#endif\n\n" if $$. == 1' \
 		psol/include/third_party/chromium/src/base/logging.h; \
 	fi
