@@ -13,10 +13,10 @@ binaries share the same signature.
  configure | 4 ++++
  1 file changed, 4 insertions(+)
 
-Index: dotdeb-nginx/configure
+Index: Local/configure
 ===================================================================
---- dotdeb-nginx.orig/configure
-+++ dotdeb-nginx/configure
+--- Local.orig/configure
++++ Local/configure
 @@ -58,6 +58,10 @@ if [ "$NGX_PLATFORM" != win32 ]; then
      . auto/unix
  fi

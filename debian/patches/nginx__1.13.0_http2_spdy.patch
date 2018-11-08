@@ -1,7 +1,7 @@
-Index: dotdeb-nginx/auto/modules
+Index: Local/auto/modules
 ===================================================================
---- dotdeb-nginx.orig/auto/modules
-+++ dotdeb-nginx/auto/modules
+--- Local.orig/auto/modules
++++ Local/auto/modules
 @@ -134,6 +134,7 @@ if [ $HTTP = YES ]; then
      #     ngx_http_header_filter
      #     ngx_http_chunked_filter
@@ -38,7 +38,7 @@ Index: dotdeb-nginx/auto/modules
      if :; then
          ngx_module_name=ngx_http_range_header_filter_module
          ngx_module_incs=
-@@ -436,6 +451,19 @@ if [ $HTTP = YES ]; then
+@@ -438,6 +453,19 @@ if [ $HTTP = YES ]; then
          . auto/module
      fi
  
@@ -58,10 +58,10 @@ Index: dotdeb-nginx/auto/modules
      if :; then
          ngx_module_name=ngx_http_static_module
          ngx_module_incs=
-Index: dotdeb-nginx/auto/options
+Index: Local/auto/options
 ===================================================================
---- dotdeb-nginx.orig/auto/options
-+++ dotdeb-nginx/auto/options
+--- Local.orig/auto/options
++++ Local/auto/options
 @@ -59,6 +59,7 @@ HTTP_CHARSET=YES
  HTTP_GZIP=YES
  HTTP_SSL=NO
@@ -70,7 +70,7 @@ Index: dotdeb-nginx/auto/options
  HTTP_SSI=YES
  HTTP_POSTPONE=NO
  HTTP_REALIP=NO
-@@ -221,6 +222,7 @@ $0: warning: the \"--with-ipv6\" option 
+@@ -223,6 +224,7 @@ $0: warning: the \"--with-ipv6\" option 
  
          --with-http_ssl_module)          HTTP_SSL=YES               ;;
          --with-http_v2_module)           HTTP_V2=YES                ;;
@@ -78,7 +78,7 @@ Index: dotdeb-nginx/auto/options
          --with-http_realip_module)       HTTP_REALIP=YES            ;;
          --with-http_addition_module)     HTTP_ADDITION=YES          ;;
          --with-http_xslt_module)         HTTP_XSLT=YES              ;;
-@@ -430,6 +432,7 @@ cat << END
+@@ -434,6 +436,7 @@ cat << END
  
    --with-http_ssl_module             enable ngx_http_ssl_module
    --with-http_v2_module              enable ngx_http_v2_module
@@ -86,10 +86,10 @@ Index: dotdeb-nginx/auto/options
    --with-http_realip_module          enable ngx_http_realip_module
    --with-http_addition_module        enable ngx_http_addition_module
    --with-http_xslt_module            enable ngx_http_xslt_module
-Index: dotdeb-nginx/src/core/ngx_connection.h
+Index: Local/src/core/ngx_connection.h
 ===================================================================
---- dotdeb-nginx.orig/src/core/ngx_connection.h
-+++ dotdeb-nginx/src/core/ngx_connection.h
+--- Local.orig/src/core/ngx_connection.h
++++ Local/src/core/ngx_connection.h
 @@ -116,6 +116,7 @@ typedef enum {
  #define NGX_LOWLEVEL_BUFFERED  0x0f
  #define NGX_SSL_BUFFERED       0x01
@@ -98,11 +98,11 @@ Index: dotdeb-nginx/src/core/ngx_connection.h
  
  
  struct ngx_connection_s {
-Index: dotdeb-nginx/src/http/modules/ngx_http_ssl_module.c
+Index: Local/src/http/modules/ngx_http_ssl_module.c
 ===================================================================
---- dotdeb-nginx.orig/src/http/modules/ngx_http_ssl_module.c
-+++ dotdeb-nginx/src/http/modules/ngx_http_ssl_module.c
-@@ -347,10 +347,10 @@ ngx_http_ssl_alpn_select(ngx_ssl_conn_t 
+--- Local.orig/src/http/modules/ngx_http_ssl_module.c
++++ Local/src/http/modules/ngx_http_ssl_module.c
+@@ -352,10 +352,10 @@ ngx_http_ssl_alpn_select(ngx_ssl_conn_t 
  #if (NGX_DEBUG)
      unsigned int            i;
  #endif
@@ -115,7 +115,7 @@ Index: dotdeb-nginx/src/http/modules/ngx_http_ssl_module.c
      ngx_connection_t       *c;
  
      c = ngx_ssl_get_connection(ssl_conn);
-@@ -364,9 +364,20 @@ ngx_http_ssl_alpn_select(ngx_ssl_conn_t 
+@@ -369,9 +369,20 @@ ngx_http_ssl_alpn_select(ngx_ssl_conn_t 
      }
  #endif
  
@@ -137,7 +137,7 @@ Index: dotdeb-nginx/src/http/modules/ngx_http_ssl_module.c
      if (hc->addr_conf->http2) {
          srv =
             (unsigned char *) NGX_HTTP_V2_ALPN_ADVERTISE NGX_HTTP_NPN_ADVERTISE;
-@@ -374,6 +385,13 @@ ngx_http_ssl_alpn_select(ngx_ssl_conn_t 
+@@ -379,6 +390,13 @@ ngx_http_ssl_alpn_select(ngx_ssl_conn_t 
  
      } else
  #endif
@@ -151,7 +151,7 @@ Index: dotdeb-nginx/src/http/modules/ngx_http_ssl_module.c
      {
          srv = (unsigned char *) NGX_HTTP_NPN_ADVERTISE;
          srvlen = sizeof(NGX_HTTP_NPN_ADVERTISE) - 1;
-@@ -401,19 +419,32 @@ static int
+@@ -406,19 +424,32 @@ static int
  ngx_http_ssl_npn_advertised(ngx_ssl_conn_t *ssl_conn,
      const unsigned char **out, unsigned int *outlen, void *arg)
  {
@@ -186,7 +186,7 @@ Index: dotdeb-nginx/src/http/modules/ngx_http_ssl_module.c
      if (hc->addr_conf->http2) {
          *out =
              (unsigned char *) NGX_HTTP_V2_NPN_ADVERTISE NGX_HTTP_NPN_ADVERTISE;
-@@ -421,6 +452,20 @@ ngx_http_ssl_npn_advertised(ngx_ssl_conn
+@@ -426,6 +457,20 @@ ngx_http_ssl_npn_advertised(ngx_ssl_conn
  
          return SSL_TLSEXT_ERR_OK;
      }
@@ -207,11 +207,11 @@ Index: dotdeb-nginx/src/http/modules/ngx_http_ssl_module.c
      }
  #endif
  
-Index: dotdeb-nginx/src/http/ngx_http.c
+Index: Local/src/http/ngx_http.c
 ===================================================================
---- dotdeb-nginx.orig/src/http/ngx_http.c
-+++ dotdeb-nginx/src/http/ngx_http.c
-@@ -1202,6 +1202,9 @@ ngx_http_add_addresses(ngx_conf_t *cf, n
+--- Local.orig/src/http/ngx_http.c
++++ Local/src/http/ngx_http.c
+@@ -1199,6 +1199,9 @@ ngx_http_add_addresses(ngx_conf_t *cf, n
  #if (NGX_HTTP_V2)
      ngx_uint_t             http2;
  #endif
@@ -221,7 +221,7 @@ Index: dotdeb-nginx/src/http/ngx_http.c
  
      /*
       * we cannot compare whole sockaddr struct's as kernel
-@@ -1237,6 +1240,9 @@ ngx_http_add_addresses(ngx_conf_t *cf, n
+@@ -1234,6 +1237,9 @@ ngx_http_add_addresses(ngx_conf_t *cf, n
  #if (NGX_HTTP_V2)
          http2 = lsopt->http2 || addr[i].opt.http2;
  #endif
@@ -231,7 +231,7 @@ Index: dotdeb-nginx/src/http/ngx_http.c
  
          if (lsopt->set) {
  
-@@ -1271,6 +1277,9 @@ ngx_http_add_addresses(ngx_conf_t *cf, n
+@@ -1268,6 +1274,9 @@ ngx_http_add_addresses(ngx_conf_t *cf, n
  #if (NGX_HTTP_V2)
          addr[i].opt.http2 = http2;
  #endif
@@ -241,7 +241,7 @@ Index: dotdeb-nginx/src/http/ngx_http.c
  
          return NGX_OK;
      }
-@@ -1314,6 +1323,18 @@ ngx_http_add_address(ngx_conf_t *cf, ngx
+@@ -1311,6 +1320,18 @@ ngx_http_add_address(ngx_conf_t *cf, ngx
  
  #endif
  
@@ -260,7 +260,7 @@ Index: dotdeb-nginx/src/http/ngx_http.c
      addr = ngx_array_push(&port->addrs);
      if (addr == NULL) {
          return NGX_ERROR;
-@@ -1807,6 +1828,9 @@ ngx_http_add_addrs(ngx_conf_t *cf, ngx_h
+@@ -1804,6 +1825,9 @@ ngx_http_add_addrs(ngx_conf_t *cf, ngx_h
  #if (NGX_HTTP_V2)
          addrs[i].conf.http2 = addr[i].opt.http2;
  #endif
@@ -270,7 +270,7 @@ Index: dotdeb-nginx/src/http/ngx_http.c
          addrs[i].conf.proxy_protocol = addr[i].opt.proxy_protocol;
  
          if (addr[i].hash.buckets == NULL
-@@ -1872,6 +1896,9 @@ ngx_http_add_addrs6(ngx_conf_t *cf, ngx_
+@@ -1869,6 +1893,9 @@ ngx_http_add_addrs6(ngx_conf_t *cf, ngx_
  #if (NGX_HTTP_V2)
          addrs6[i].conf.http2 = addr[i].opt.http2;
  #endif
@@ -280,10 +280,10 @@ Index: dotdeb-nginx/src/http/ngx_http.c
          addrs6[i].conf.proxy_protocol = addr[i].opt.proxy_protocol;
  
          if (addr[i].hash.buckets == NULL
-Index: dotdeb-nginx/src/http/ngx_http.h
+Index: Local/src/http/ngx_http.h
 ===================================================================
---- dotdeb-nginx.orig/src/http/ngx_http.h
-+++ dotdeb-nginx/src/http/ngx_http.h
+--- Local.orig/src/http/ngx_http.h
++++ Local/src/http/ngx_http.h
 @@ -19,6 +19,9 @@ typedef struct ngx_http_cache_s       ng
  typedef struct ngx_http_file_cache_s  ngx_http_file_cache_t;
  typedef struct ngx_http_log_ctx_s     ngx_http_log_ctx_t;
@@ -308,11 +308,11 @@ Index: dotdeb-nginx/src/http/ngx_http.h
  #if (NGX_HTTP_CACHE)
  #include <ngx_http_cache.h>
  #endif
-Index: dotdeb-nginx/src/http/ngx_http_core_module.c
+Index: Local/src/http/ngx_http_core_module.c
 ===================================================================
---- dotdeb-nginx.orig/src/http/ngx_http_core_module.c
-+++ dotdeb-nginx/src/http/ngx_http_core_module.c
-@@ -2156,6 +2156,13 @@ ngx_http_gzip_ok(ngx_http_request_t *r)
+--- Local.orig/src/http/ngx_http_core_module.c
++++ Local/src/http/ngx_http_core_module.c
+@@ -1940,6 +1940,13 @@ ngx_http_gzip_ok(ngx_http_request_t *r)
          return NGX_DECLINED;
      }
  
@@ -326,7 +326,7 @@ Index: dotdeb-nginx/src/http/ngx_http_core_module.c
      ae = r->headers_in.accept_encoding;
      if (ae == NULL) {
          return NGX_DECLINED;
-@@ -2500,6 +2507,9 @@ ngx_http_subrequest(ngx_http_request_t *
+@@ -2297,6 +2304,9 @@ ngx_http_subrequest(ngx_http_request_t *
  #if (NGX_HTTP_V2)
      sr->stream = r->stream;
  #endif
@@ -336,7 +336,7 @@ Index: dotdeb-nginx/src/http/ngx_http_core_module.c
  
      sr->method = NGX_HTTP_GET;
      sr->http_version = r->http_version;
-@@ -4178,11 +4188,15 @@ ngx_http_core_listen(ngx_conf_t *cf, ngx
+@@ -3986,11 +3996,15 @@ ngx_http_core_listen(ngx_conf_t *cf, ngx
          }
  
          if (ngx_strcmp(value[n].data, "spdy") == 0) {
@@ -356,10 +356,10 @@ Index: dotdeb-nginx/src/http/ngx_http_core_module.c
          }
  
          if (ngx_strncmp(value[n].data, "so_keepalive=", 13) == 0) {
-Index: dotdeb-nginx/src/http/ngx_http_core_module.h
+Index: Local/src/http/ngx_http_core_module.h
 ===================================================================
---- dotdeb-nginx.orig/src/http/ngx_http_core_module.h
-+++ dotdeb-nginx/src/http/ngx_http_core_module.h
+--- Local.orig/src/http/ngx_http_core_module.h
++++ Local/src/http/ngx_http_core_module.h
 @@ -74,6 +74,9 @@ typedef struct {
      unsigned                   wildcard:1;
      unsigned                   ssl:1;
@@ -370,7 +370,7 @@ Index: dotdeb-nginx/src/http/ngx_http_core_module.h
  #if (NGX_HAVE_INET6)
      unsigned                   ipv6only:1;
  #endif
-@@ -236,6 +239,9 @@ struct ngx_http_addr_conf_s {
+@@ -235,6 +238,9 @@ struct ngx_http_addr_conf_s {
  
      unsigned                   ssl:1;
      unsigned                   http2:1;
@@ -380,11 +380,11 @@ Index: dotdeb-nginx/src/http/ngx_http_core_module.h
      unsigned                   proxy_protocol:1;
  };
  
-Index: dotdeb-nginx/src/http/ngx_http_request.c
+Index: Local/src/http/ngx_http_request.c
 ===================================================================
---- dotdeb-nginx.orig/src/http/ngx_http_request.c
-+++ dotdeb-nginx/src/http/ngx_http_request.c
-@@ -316,6 +316,11 @@ ngx_http_init_connection(ngx_connection_
+--- Local.orig/src/http/ngx_http_request.c
++++ Local/src/http/ngx_http_request.c
+@@ -323,6 +323,11 @@ ngx_http_init_connection(ngx_connection_
      rev->handler = ngx_http_wait_request_handler;
      c->write->handler = ngx_http_empty_handler;
  
@@ -396,7 +396,7 @@ Index: dotdeb-nginx/src/http/ngx_http_request.c
  #if (NGX_HTTP_V2)
      if (hc->addr_conf->http2) {
          rev->handler = ngx_http_v2_init;
-@@ -801,6 +806,34 @@ ngx_http_ssl_handshake_handler(ngx_conne
+@@ -825,6 +830,34 @@ ngx_http_ssl_handshake_handler(ngx_conne
          }
  #endif
  
@@ -431,7 +431,7 @@ Index: dotdeb-nginx/src/http/ngx_http_request.c
          c->log->action = "waiting for request";
  
          c->read->handler = ngx_http_wait_request_handler;
-@@ -2529,6 +2562,12 @@ ngx_http_finalize_connection(ngx_http_re
+@@ -2584,6 +2617,12 @@ ngx_http_finalize_connection(ngx_http_re
          return;
      }
  #endif
@@ -444,7 +444,7 @@ Index: dotdeb-nginx/src/http/ngx_http_request.c
  
      clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);
  
-@@ -2736,6 +2775,18 @@ ngx_http_test_reading(ngx_http_request_t
+@@ -2793,6 +2832,18 @@ ngx_http_test_reading(ngx_http_request_t
      }
  
  #endif
@@ -463,7 +463,7 @@ Index: dotdeb-nginx/src/http/ngx_http_request.c
  
  #if (NGX_HAVE_KQUEUE)
  
-@@ -3420,6 +3471,12 @@ ngx_http_close_request(ngx_http_request_
+@@ -3456,6 +3507,12 @@ ngx_http_close_request(ngx_http_request_
          return;
      }
  #endif
@@ -476,11 +476,11 @@ Index: dotdeb-nginx/src/http/ngx_http_request.c
  
      ngx_http_free_request(r, rc);
      ngx_http_close_connection(c);
-Index: dotdeb-nginx/src/http/ngx_http_request.h
+Index: Local/src/http/ngx_http_request.h
 ===================================================================
---- dotdeb-nginx.orig/src/http/ngx_http_request.h
-+++ dotdeb-nginx/src/http/ngx_http_request.h
-@@ -424,6 +424,9 @@ struct ngx_http_request_s {
+--- Local.orig/src/http/ngx_http_request.h
++++ Local/src/http/ngx_http_request.h
+@@ -431,6 +431,9 @@ struct ngx_http_request_s {
      int                              *captures;
      u_char                           *captures_data;
  #endif
@@ -490,12 +490,12 @@ Index: dotdeb-nginx/src/http/ngx_http_request.h
  
      size_t                            limit_rate;
      size_t                            limit_rate_after;
-Index: dotdeb-nginx/src/http/ngx_http_request_body.c
+Index: Local/src/http/ngx_http_request_body.c
 ===================================================================
---- dotdeb-nginx.orig/src/http/ngx_http_request_body.c
-+++ dotdeb-nginx/src/http/ngx_http_request_body.c
-@@ -52,6 +52,12 @@ ngx_http_read_client_request_body(ngx_ht
-         goto done;
+--- Local.orig/src/http/ngx_http_request_body.c
++++ Local/src/http/ngx_http_request_body.c
+@@ -524,6 +524,12 @@ ngx_http_discard_request_body(ngx_http_r
+         return NGX_OK;
      }
  #endif
 +#if (NGX_HTTP_SPDY)
@@ -506,9 +506,9 @@ Index: dotdeb-nginx/src/http/ngx_http_request_body.c
 +#endif
  
      if (ngx_http_test_expect(r) != NGX_OK) {
-         rc = NGX_HTTP_INTERNAL_SERVER_ERROR;
-@@ -524,6 +530,12 @@ ngx_http_discard_request_body(ngx_http_r
-         return NGX_OK;
+         return NGX_HTTP_INTERNAL_SERVER_ERROR;
+@@ -1103,6 +1109,12 @@ ngx_http_request_body_save_filter(ngx_ht
+                        cl->buf->file_last - cl->buf->file_pos);
      }
  #endif
 +#if (NGX_HTTP_SPDY)
@@ -518,12 +518,12 @@ Index: dotdeb-nginx/src/http/ngx_http_request_body.c
 +    }
 +#endif
  
-     if (ngx_http_test_expect(r) != NGX_OK) {
-         return NGX_HTTP_INTERNAL_SERVER_ERROR;
-Index: dotdeb-nginx/src/http/ngx_http_spdy.c
+     for (cl = in; cl; cl = cl->next) {
+         ngx_log_debug7(NGX_LOG_DEBUG_EVENT, r->connection->log, 0,
+Index: Local/src/http/ngx_http_spdy.c
 ===================================================================
 --- /dev/null
-+++ dotdeb-nginx/src/http/ngx_http_spdy.c
++++ Local/src/http/ngx_http_spdy.c
 @@ -0,0 +1,3701 @@
 +
 +/*
@@ -4226,10 +4226,10 @@ Index: dotdeb-nginx/src/http/ngx_http_spdy.c
 +                   "spdy zfree: %p", address);
 +#endif
 +}
-Index: dotdeb-nginx/src/http/ngx_http_spdy.h
+Index: Local/src/http/ngx_http_spdy.h
 ===================================================================
 --- /dev/null
-+++ dotdeb-nginx/src/http/ngx_http_spdy.h
++++ Local/src/http/ngx_http_spdy.h
 @@ -0,0 +1,261 @@
 +/*
 + * Copyright (C) Nginx, Inc.
@@ -4492,10 +4492,10 @@ Index: dotdeb-nginx/src/http/ngx_http_spdy.h
 +#define ngx_spdy_frame_write_window  ngx_spdy_frame_aligned_write_uint32
 +
 +#endif /* _NGX_HTTP_SPDY_H_INCLUDED_ */
-Index: dotdeb-nginx/src/http/ngx_http_spdy_filter_module.c
+Index: Local/src/http/ngx_http_spdy_filter_module.c
 ===================================================================
 --- /dev/null
-+++ dotdeb-nginx/src/http/ngx_http_spdy_filter_module.c
++++ Local/src/http/ngx_http_spdy_filter_module.c
 @@ -0,0 +1,1222 @@
 +
 +/*
@@ -5719,10 +5719,10 @@ Index: dotdeb-nginx/src/http/ngx_http_spdy_filter_module.c
 +
 +    return NGX_OK;
 +}
-Index: dotdeb-nginx/src/http/ngx_http_spdy_module.c
+Index: Local/src/http/ngx_http_spdy_module.c
 ===================================================================
 --- /dev/null
-+++ dotdeb-nginx/src/http/ngx_http_spdy_module.c
++++ Local/src/http/ngx_http_spdy_module.c
 @@ -0,0 +1,408 @@
 +
 +/*
@@ -6132,10 +6132,10 @@ Index: dotdeb-nginx/src/http/ngx_http_spdy_module.c
 +
 +    return NGX_CONF_OK;
 +}
-Index: dotdeb-nginx/src/http/ngx_http_spdy_module.h
+Index: Local/src/http/ngx_http_spdy_module.h
 ===================================================================
 --- /dev/null
-+++ dotdeb-nginx/src/http/ngx_http_spdy_module.h
++++ Local/src/http/ngx_http_spdy_module.h
 @@ -0,0 +1,41 @@
 +
 +/*
@@ -6178,11 +6178,11 @@ Index: dotdeb-nginx/src/http/ngx_http_spdy_module.h
 +
 +
 +#endif /* _NGX_HTTP_SPDY_MODULE_H_INCLUDED_ */
-Index: dotdeb-nginx/src/http/ngx_http_upstream.c
+Index: Local/src/http/ngx_http_upstream.c
 ===================================================================
---- dotdeb-nginx.orig/src/http/ngx_http_upstream.c
-+++ dotdeb-nginx/src/http/ngx_http_upstream.c
-@@ -512,6 +512,12 @@ ngx_http_upstream_init(ngx_http_request_
+--- Local.orig/src/http/ngx_http_upstream.c
++++ Local/src/http/ngx_http_upstream.c
+@@ -520,6 +520,12 @@ ngx_http_upstream_init(ngx_http_request_
          return;
      }
  #endif
@@ -6195,7 +6195,7 @@ Index: dotdeb-nginx/src/http/ngx_http_upstream.c
  
      if (c->read->timer_set) {
          ngx_del_timer(c->read);
-@@ -1306,6 +1312,11 @@ ngx_http_upstream_check_broken_connectio
+@@ -1341,6 +1347,11 @@ ngx_http_upstream_check_broken_connectio
          return;
      }
  #endif
@@ -6207,11 +6207,11 @@ Index: dotdeb-nginx/src/http/ngx_http_upstream.c
  
  #if (NGX_HAVE_KQUEUE)
  
-Index: dotdeb-nginx/src/http/v2/ngx_http_v2_module.c
+Index: Local/src/http/v2/ngx_http_v2_module.c
 ===================================================================
---- dotdeb-nginx.orig/src/http/v2/ngx_http_v2_module.c
-+++ dotdeb-nginx/src/http/v2/ngx_http_v2_module.c
-@@ -34,8 +34,6 @@ static char *ngx_http_v2_preread_size(ng
+--- Local.orig/src/http/v2/ngx_http_v2_module.c
++++ Local/src/http/v2/ngx_http_v2_module.c
+@@ -36,8 +36,6 @@ static char *ngx_http_v2_preread_size(ng
  static char *ngx_http_v2_streams_index_mask(ngx_conf_t *cf, void *post,
      void *data);
  static char *ngx_http_v2_chunk_size(ngx_conf_t *cf, void *post, void *data);
@@ -6220,9 +6220,9 @@ Index: dotdeb-nginx/src/http/v2/ngx_http_v2_module.c
  
  
  static ngx_conf_post_t  ngx_http_v2_recv_buffer_size_post =
-@@ -129,62 +127,6 @@ static ngx_command_t  ngx_http_v2_comman
-       offsetof(ngx_http_v2_loc_conf_t, chunk_size),
-       &ngx_http_v2_chunk_size_post },
+@@ -152,62 +150,6 @@ static ngx_command_t  ngx_http_v2_comman
+       0,
+       NULL },
  
 -    { ngx_string("spdy_recv_buffer_size"),
 -      NGX_HTTP_MAIN_CONF|NGX_CONF_TAKE1,
@@ -6283,7 +6283,7 @@ Index: dotdeb-nginx/src/http/v2/ngx_http_v2_module.c
        ngx_null_command
  };
  
-@@ -496,14 +438,3 @@ ngx_http_v2_chunk_size(ngx_conf_t *cf, v
+@@ -597,14 +539,3 @@ ngx_http_v2_chunk_size(ngx_conf_t *cf, v
  
      return NGX_CONF_OK;
  }
