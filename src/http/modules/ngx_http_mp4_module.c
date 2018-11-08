@@ -636,7 +636,7 @@ ngx_http_mp4_handler(ngx_http_request_t *r)
     }
 
     if (mp4 == NULL) {
-        b = ngx_pcalloc(r->pool, sizeof(ngx_buf_t));
+        b = ngx_calloc_buf(r->pool);
         if (b == NULL) {
             return NGX_HTTP_INTERNAL_SERVER_ERROR;
         }
@@ -941,6 +941,13 @@ ngx_http_mp4_read_atom(ngx_http_mp4_file_t *mp4,
                 atom_header = mp4->buffer_pos;
                 atom_size = ngx_mp4_get_64value(atom_header + 8);
                 atom_header_size = sizeof(ngx_mp4_atom_header64_t);
+
+                if (atom_size < sizeof(ngx_mp4_atom_header64_t)) {
+                    ngx_log_error(NGX_LOG_ERR, mp4->file.log, 0,
+                                  "\"%s\" mp4 atom is too small:%uL",
+                                  mp4->file.name.data, atom_size);
+                    return NGX_ERROR;
+                }
 
             } else {
                 ngx_log_error(NGX_LOG_ERR, mp4->file.log, 0,
