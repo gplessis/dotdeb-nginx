@@ -1,3 +1,10 @@
+nginx (1.14.2-1~dotdeb+http2+8.1) oldoldstable; urgency=medium
+
+  [ Guillaume Plessis ]
+  * New upstream version 1.14.2
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Tue, 04 Dec 2018 20:01:35 +0000
+
 nginx (1.14.1-1~dotdeb+http2+8.1) oldoldstable; urgency=medium
 
   [ Guillaume Plessis ]
